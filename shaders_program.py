@@ -29,19 +29,24 @@ def __create_vertex_shader():
 #version 330
 
 layout (location = 0) in vec3 position;
+layout (location = 1) in vec3 normal;
 
 uniform mat4 projection;
 uniform mat4 view;
 
 out vec4 vertexColor;
+out vec3 vertexNormal;
+out vec3 vertexWorldPosition;
 
 void main() {
     gl_Position = projection * view * vec4(position, 1.0);
-    float color = 155 * (position.y * 5);
+    float color = 155 * (position.y * 50);
     if (color > 155)
         color = 155;
     color = (color + 100) / 255;
     vertexColor = vec4(color, color, color, 1.0);
+    vertexNormal = normal;
+    vertexWorldPosition = position;
 }
 """
     return __create_shader(GL_VERTEX_SHADER, shader_code)
@@ -52,9 +57,18 @@ def __create_fragment_shader():
 #version 330
 
 in vec4 vertexColor;
+in vec3 vertexNormal;
+in vec3 vertexWorldPosition;
 
 void main() {
-    gl_FragColor = vertexColor;
+    vec3 lightPos = vec3(0.0, 0.5, 1.5);
+    vec3 lightColor = vec3(1.0, 0.0, 0.0);
+    vec3 norm = normalize(vertexNormal);
+    vec3 lightDir = normalize(lightPos - vertexWorldPosition);
+    float diff = max(dot(norm, lightDir), 0.0);
+    vec3 diffuse = diff * lightColor;
+    vec3 objColor = diffuse * vertexColor.xyz;
+    gl_FragColor = vec4(objColor, 1.0);
 }
 """
     return __create_shader(GL_FRAGMENT_SHADER, shader_code)

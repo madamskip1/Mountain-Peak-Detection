@@ -4,18 +4,21 @@ from OpenGL.GL import *
 
 class TerrainMap:
     def __init__(self, hgt_file_path, rows, cols, simplify_factor=1):
-        self.vbo = None
+        self.vao = None
+        self.vbo_vertices = None
+        self.vbo_normals = None
         self.ibo = None
         self.simplify_factor = simplify_factor
         self.rows = rows
         self.cols = cols
-        self.data, self.vertices, self.triangles = load_terrain_map(hgt_file_path, rows, cols, simplify_factor)
+        self.data, self.vertices, self.triangles, self.normals = load_terrain_map(hgt_file_path, rows, cols, simplify_factor)
         self.num_triangles = len(self.triangles)
 
     def prepare_buffers(self):
-        self.__gen_vao_buffer()
-        self.__gen_vbo_buffer()
-        self.__gen_ibo_buffer()
+        self.__gen_vao()
+        self.__gen_vbo_vertices()
+        self.__gen_vbo_normals()
+        self.__gen_ibo()
         glBindVertexArray(0)
 
     def draw(self, view, perspective, shader_program):
@@ -39,20 +42,29 @@ class TerrainMap:
     def get_size(self):
         return [self.rows, self.cols]
 
-    def __gen_vbo_buffer(self):
-        self.vbo = glGenBuffers(1)
-        glBindBuffer(GL_ARRAY_BUFFER, self.vbo)
+    def __gen_vbo_vertices(self):
+        self.vbo_vertices = glGenBuffers(1)
+        glBindBuffer(GL_ARRAY_BUFFER, self.vbo_vertices)
         glBufferData(GL_ARRAY_BUFFER, self.vertices.nbytes, self.vertices, GL_STATIC_DRAW)
         stride = 3 * self.vertices.itemsize
         offset = ctypes.c_void_p(0)
         glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, stride, offset)
         glEnableVertexAttribArray(0)
 
-    def __gen_ibo_buffer(self):
+    def __gen_vbo_normals(self):
+        self.vbo_normals = glGenBuffers(1)
+        glBindBuffer(GL_ARRAY_BUFFER, self.vbo_normals)
+        glBufferData(GL_ARRAY_BUFFER, self.normals.nbytes, self.normals, GL_STATIC_DRAW)
+        stride = 3 * self.vertices.itemsize
+        offset = ctypes.c_void_p(0)
+        glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, stride, offset)
+        glEnableVertexAttribArray(1)
+
+    def __gen_ibo(self):
         self.ibo = glGenBuffers(1)
         glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, self.ibo)
         glBufferData(GL_ELEMENT_ARRAY_BUFFER, self.triangles.nbytes, self.triangles, GL_STATIC_DRAW)
 
-    def __gen_vao_buffer(self):
+    def __gen_vao(self):
         self.vao = glGenVertexArrays(1)
         glBindVertexArray(self.vao)

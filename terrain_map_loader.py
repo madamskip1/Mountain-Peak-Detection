@@ -5,10 +5,12 @@ def load_terrain_map(file_path, rows, cols, simplify_factor=1):
     elevation = __load_hgt_file(file_path, rows, cols)
     if simplify_factor > 1:
         elevation, rows, cols = __simplify_elevation(elevation, simplify_factor)
+    print(rows, cols)
     vertices = __generate_vertices(elevation, rows, cols)
     triangles = __generate_triangles(rows, cols)
+    normals = __generate_triangles_normals(triangles, vertices)
 
-    return elevation, vertices, triangles
+    return elevation, vertices, triangles, normals
 
 
 def __load_hgt_file(file_path, rows, cols):
@@ -16,6 +18,7 @@ def __load_hgt_file(file_path, rows, cols):
         elevation = np.fromfile(file, np.dtype('>i2'), rows * cols)
         elevation = elevation.reshape(rows, cols)
         elevation = elevation.T
+        print(np.min(elevation))
 
     return elevation
 
@@ -31,11 +34,12 @@ def __simplify_elevation(elevation, simplify_factor):
 def __generate_vertices(elevation, rows, cols):
     origin = [-1.0, .0, -1.0]
     size = 2
-
+    simplified_by = 3601 / rows
     origin_x, origin_y, origin_z = origin
     x_step = size / (cols - 1)
     y_step = size / (rows - 1)
-    altitude_scale = x_step / 30
+    altitude_scale = x_step / 30 / simplified_by
+
     vertices = np.zeros((rows * cols * 3), dtype=np.float32)
     vertices_index = 0
 
@@ -53,8 +57,10 @@ def __generate_vertices(elevation, rows, cols):
 
 
 def __generate_triangles(rows, cols):
-    triangles_num = ((cols - 1) * (rows - 1) * 2) * 6
-    triangles = np.zeros(triangles_num, dtype=np.uint32)
+    triangles_num = ((cols - 1) * (rows - 1) * 2)
+    triangles_indices_num = triangles_num * 3
+
+    triangles = np.zeros(triangles_indices_num, dtype=np.uint32)
     triangles_index = 0
     index = 0
 
@@ -78,3 +84,25 @@ def __generate_triangles(rows, cols):
         index = index + 1
 
     return triangles
+
+def __generate_triangles_normals(triangles, vertices):
+    vertices_triangles_normals = [[] for i in range(int(len(vertices) / 3))]
+    vertices_np = np.array(vertices).reshape(-1, 3)
+    vertices_normal = np.zeros_like(vertices_np)
+
+    for A, B, C in zip(*[iter(triangles)] * 3):
+        AB = vertices_np[B] - vertices_np[A]
+        AC = vertices_np[C] - vertices_np[A]
+        triangle_normal = np.cross(AB, AC)
+        triangle_normal = triangle_normal / np.linalg.norm(triangle_normal)
+
+        vertices_triangles_normals[A].append(triangle_normal)
+        vertices_triangles_normals[B].append(triangle_normal)
+        vertices_triangles_normals[C].append(triangle_normal)
+
+    print(len(vertices_triangles_normals))
+    for index, vertex_triangles_normals in enumerate(vertices_triangles_normals):
+        vertex_normal = np.add.reduce(vertex_triangles_normals)
+        vertices_normal[index] = vertex_normal
+
+    return vertices_normal.flatten()
