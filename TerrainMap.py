@@ -1,6 +1,7 @@
 from terrain_map_loader import load_terrain_map
 from OpenGL.GL import *
 
+
 class TerrainMap:
     def __init__(self, hgt_file_path, rows, cols, simplify_factor=1):
         self.vbo = None
@@ -16,7 +17,6 @@ class TerrainMap:
         self.__gen_vbo_buffer()
         self.__gen_ibo_buffer()
         glBindVertexArray(0)
-
 
     def draw(self, view, perspective, shader_program):
         glBindVertexArray(self.vao)
@@ -37,7 +37,7 @@ class TerrainMap:
         return self.triangles
 
     def get_size(self):
-        return [self.width, self.height]
+        return [self.rows, self.cols]
 
     def __gen_vbo_buffer(self):
         self.vbo = glGenBuffers(1)
@@ -47,7 +47,6 @@ class TerrainMap:
         offset = ctypes.c_void_p(0)
         glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, stride, offset)
         glEnableVertexAttribArray(0)
-
 
     def __gen_ibo_buffer(self):
         self.ibo = glGenBuffers(1)

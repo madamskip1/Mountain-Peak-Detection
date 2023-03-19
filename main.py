@@ -1,19 +1,16 @@
 import numpy as np
 from OpenGL.GL import *
-from OpenGL.GLU import *
 from OpenGL.GLUT import *
 
-from TerrainMap import TerrainMap
 from Camera import Camera
+from TerrainMap import TerrainMap
 from shaders_program import create_shader_program
 
-
-
 camera = Camera(
-    position=np.array([0.3, 0.5, 1.5]),
+    position=np.array([-1.5, 0.5, 1.5]),
     target=np.array([0.0, 0.0, 0.01]),
     fov_h=45,
-    aspect_ratio=8.0/6.0,
+    aspect_ratio=8.0 / 6.0,
     near=0.1,
     far=100
 )
@@ -21,9 +18,11 @@ camera = Camera(
 terrain_map = TerrainMap("N49E020.hgt", 3601, 3601, 4)
 shader_program = None
 
+
 def init():
     glClearColor(0.0, 0.0, 0.0, 0.0)
     glEnable(GL_DEPTH_TEST)
+
 
 def display():
     global camera, terrain_map, shader_program
@@ -34,10 +33,12 @@ def display():
     terrain_map.draw(view_matrix, perspective_matrix, shader_program)
     glutSwapBuffers()
 
-def keyboard_callback(key, x, y):
+
+def keyboard_callback(key, *_):
     global camera
     camera.keyboard_callback(key)
     glutPostRedisplay()
+
 
 def main():
     global shader_program, terrain_map
@@ -53,6 +54,7 @@ def main():
 
     init()
     glutMainLoop()
+
 
 if __name__ == "__main__":
     main()

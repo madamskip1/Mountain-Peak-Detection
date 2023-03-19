@@ -1,5 +1,6 @@
 from OpenGL.GL import *
 
+
 def create_shader_program():
     vertex_shader = __create_vertex_shader()
     fragment_shader = __create_fragment_shader()
@@ -9,8 +10,8 @@ def create_shader_program():
     glAttachShader(program, fragment_shader)
     glLinkProgram(program)
 
-    #glDeleteShader(vertex_shader)
-    #glDeleteShader(fragment_shader)
+    # glDeleteShader(vertex_shader)
+    # glDeleteShader(fragment_shader)
 
     return program
 

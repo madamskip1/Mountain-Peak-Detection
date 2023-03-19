@@ -12,14 +12,13 @@ def load_terrain_map(file_path, rows, cols, simplify_factor=1):
 
 
 def __load_hgt_file(file_path, rows, cols):
-    elevation = None
     with open(file_path, 'rb') as file:
         elevation = np.fromfile(file, np.dtype('>i2'), rows * cols)
         elevation = elevation.reshape(rows, cols)
+        elevation = elevation.T
 
-        # elevation = np.flipud(elevation)
-        # do we need to flip?
     return elevation
+
 
 def __simplify_elevation(elevation, simplify_factor):
     elevation = elevation[::simplify_factor, ::simplify_factor]
@@ -27,6 +26,7 @@ def __simplify_elevation(elevation, simplify_factor):
     cols = elevation.shape[1]
 
     return elevation, rows, cols
+
 
 def __generate_vertices(elevation, rows, cols):
     origin = [-1.0, .0, -1.0]
@@ -41,7 +41,7 @@ def __generate_vertices(elevation, rows, cols):
 
     for (x, y), z in np.ndenumerate(elevation):
         x_coord = origin_x + x_step * x
-        y_coord = origin_y + altitude_scale * z  # up is Y coorrd in OpenGL
+        y_coord = origin_y + altitude_scale * z  # up is Y coord in OpenGL
         z_coord = origin_z + y_step * y
 
         vertices[vertices_index] = x_coord
@@ -50,6 +50,7 @@ def __generate_vertices(elevation, rows, cols):
         vertices_index = vertices_index + 3
 
     return vertices
+
 
 def __generate_triangles(rows, cols):
     triangles_num = ((cols - 1) * (rows - 1) * 2) * 6
