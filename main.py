@@ -5,6 +5,7 @@ from OpenGL.GLUT import *
 from Camera import Camera
 from TerrainMap import TerrainMap
 from shaders_program import create_shader_program
+from diffuse_lightning import set_diffuse_light
 
 camera = Camera(
     position=np.array([-1.0, 0.1, 1.5]),
@@ -17,6 +18,9 @@ camera = Camera(
 
 terrain_map = TerrainMap("N49E020.hgt", 3601, 3601, 20)
 shader_program = None
+
+light_pos = [0.0, 0.5, 1.5]
+light_color = [1.0, 0.0, 0.0]
 
 
 def init():
@@ -41,7 +45,7 @@ def keyboard_callback(key, *_):
 
 
 def main():
-    global shader_program, terrain_map
+    global shader_program, terrain_map, light_pos, light_color
     glutInit()
     glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGB | GLUT_DEPTH)
     glutInitWindowSize(800, 600)
@@ -51,7 +55,7 @@ def main():
     shader_program = create_shader_program()
     glUseProgram(shader_program)
     terrain_map.prepare_buffers()
-
+    set_diffuse_light(shader_program, light_pos, light_color)
     init()
     glutMainLoop()
 

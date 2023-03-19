@@ -5,7 +5,7 @@ def load_terrain_map(file_path, rows, cols, simplify_factor=1):
     elevation = __load_hgt_file(file_path, rows, cols)
     if simplify_factor > 1:
         elevation, rows, cols = __simplify_elevation(elevation, simplify_factor)
-    print(rows, cols)
+
     vertices = __generate_vertices(elevation, rows, cols)
     triangles = __generate_triangles(rows, cols)
     normals = __generate_triangles_normals(triangles, vertices)
@@ -18,7 +18,6 @@ def __load_hgt_file(file_path, rows, cols):
         elevation = np.fromfile(file, np.dtype('>i2'), rows * cols)
         elevation = elevation.reshape(rows, cols)
         elevation = elevation.T
-        print(np.min(elevation))
 
     return elevation
 
@@ -100,7 +99,6 @@ def __generate_triangles_normals(triangles, vertices):
         vertices_triangles_normals[B].append(triangle_normal)
         vertices_triangles_normals[C].append(triangle_normal)
 
-    print(len(vertices_triangles_normals))
     for index, vertex_triangles_normals in enumerate(vertices_triangles_normals):
         vertex_normal = np.add.reduce(vertex_triangles_normals)
         vertices_normal[index] = vertex_normal

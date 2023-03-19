@@ -60,9 +60,10 @@ in vec4 vertexColor;
 in vec3 vertexNormal;
 in vec3 vertexWorldPosition;
 
+uniform vec3 lightPos;
+uniform vec3 lightColor;
+
 void main() {
-    vec3 lightPos = vec3(0.0, 0.5, 1.5);
-    vec3 lightColor = vec3(1.0, 0.0, 0.0);
     vec3 norm = normalize(vertexNormal);
     vec3 lightDir = normalize(lightPos - vertexWorldPosition);
     float diff = max(dot(norm, lightDir), 0.0);
