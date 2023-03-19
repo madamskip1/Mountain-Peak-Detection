@@ -11,7 +11,9 @@ class TerrainMap:
         self.simplify_factor = simplify_factor
         self.rows = rows
         self.cols = cols
-        self.data, self.vertices, self.triangles, self.normals = load_terrain_map(hgt_file_path, rows, cols, simplify_factor)
+        self.data, self.vertices, self.triangles, self.normals, size, self.steps = load_terrain_map(hgt_file_path, rows, cols,
+                                                                                              simplify_factor)
+        self.rows, self.cols = size
         self.num_triangles = len(self.triangles)
 
     def prepare_buffers(self):
@@ -34,13 +36,18 @@ class TerrainMap:
         glBindVertexArray(0)
 
     def get_vertices(self):
+        print(self.vertices)
         return self.vertices
 
     def get_triangles(self):
         return self.triangles
 
     def get_size(self):
+        print(self.rows, self.cols)
         return [self.rows, self.cols]
+
+    def get_steps(self):
+        return self.steps  # [x_step, y_step, z_step]
 
     def __gen_vbo_vertices(self):
         self.vbo_vertices = glGenBuffers(1)

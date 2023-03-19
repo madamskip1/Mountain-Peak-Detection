@@ -3,14 +3,15 @@ import numpy as np
 
 def load_terrain_map(file_path, rows, cols, simplify_factor=1):
     elevation = __load_hgt_file(file_path, rows, cols)
+
     if simplify_factor > 1:
         elevation, rows, cols = __simplify_elevation(elevation, simplify_factor)
 
-    vertices = __generate_vertices(elevation, rows, cols)
+    vertices, steps = __generate_vertices(elevation, rows, cols)
     triangles = __generate_triangles(rows, cols)
     normals = __generate_triangles_normals(triangles, vertices)
-
-    return elevation, vertices, triangles, normals
+    print("Steps: ", steps)
+    return elevation, vertices, triangles, normals, [rows, cols], steps
 
 
 def __load_hgt_file(file_path, rows, cols):
@@ -32,9 +33,11 @@ def __simplify_elevation(elevation, simplify_factor):
 
 def __generate_vertices(elevation, rows, cols):
     origin = [-1.0, .0, -1.0]
+    direction = [1.0, 1.0, -1.0]
     size = 2
     simplified_by = 3601 / rows
     origin_x, origin_y, origin_z = origin
+    direction_x, direction_y, direction_z = direction
     x_step = size / (cols - 1)
     y_step = size / (rows - 1)
     altitude_scale = x_step / 30 / simplified_by
@@ -42,17 +45,16 @@ def __generate_vertices(elevation, rows, cols):
     vertices = np.zeros((rows * cols * 3), dtype=np.float32)
     vertices_index = 0
 
-    for (x, y), z in np.ndenumerate(elevation):
+    for (x, y), altitude in np.ndenumerate(elevation):
         x_coord = origin_x + x_step * x
-        y_coord = origin_y + altitude_scale * z  # up is Y coord in OpenGL
+        y_coord = origin_y + altitude_scale * altitude   # up is Y coord in OpenGL
         z_coord = origin_z + y_step * y
-
         vertices[vertices_index] = x_coord
         vertices[vertices_index + 1] = y_coord
         vertices[vertices_index + 2] = z_coord
         vertices_index = vertices_index + 3
 
-    return vertices
+    return vertices, [x_step, altitude_scale, y_step]
 
 
 def __generate_triangles(rows, cols):

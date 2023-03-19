@@ -4,11 +4,13 @@ from OpenGL.GLUT import *
 
 from Camera import Camera
 from TerrainMap import TerrainMap
+from World import World
+from Peaks import Peaks
 from shaders_program import create_shader_program
 from diffuse_lightning import set_diffuse_light
 
 camera = Camera(
-    position=np.array([-1.0, 0.1, 1.5]),
+    position=np.array([0.0, 1.1, 3.5]),
     target=np.array([0.0, 0.0, 0.01]),
     fov_h=45,
     aspect_ratio=8.0 / 6.0,
@@ -17,6 +19,8 @@ camera = Camera(
 )
 
 terrain_map = TerrainMap("N49E020.hgt", 3601, 3601, 20)
+world = World(terrain_map)
+peaks = Peaks(world)
 shader_program = None
 
 light_pos = [0.0, 0.5, 1.5]
