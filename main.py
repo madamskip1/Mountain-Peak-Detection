@@ -3,28 +3,46 @@ from OpenGL.GL import *
 from OpenGL.GLUT import *
 
 from Camera import Camera
-from TerrainMap import TerrainMap
+from TerrainModel import TerrainModel
 from World import World
 from Peaks import Peaks
 from shaders_program import create_shader_program
 from diffuse_lightning import set_diffuse_light
 
-camera = Camera(
-    position=np.array([0.0, 1.1, 3.5]),
-    target=np.array([0.0, 0.0, 0.01]),
-    fov_h=45,
-    aspect_ratio=8.0 / 6.0,
-    near=0.1,
-    far=100
-)
+####################
 
-terrain_map = TerrainMap("N49E020.hgt", 3601, 3601, 20)
+obs_location = [49.3390454, 20.081936, 1000.0]
+obs_angles = [144.31152, 2.5936904]
+
+####################
+
+
+
+terrain_map = TerrainModel(
+    hgt_file_path="N49E020.hgt",
+    hgt_size=3601,
+    world_size=100,
+    simplify_factor=10)
+
 world = World(terrain_map)
 peaks = Peaks(world)
 shader_program = None
 
-light_pos = [0.0, 0.5, 1.5]
-light_color = [1.0, 0.0, 0.0]
+cam_pos_xyz = world.get_coord_from_geo(*obs_location)
+cam_position = np.array([cam_pos_xyz[0], cam_pos_xyz[1], cam_pos_xyz[2]])
+
+light_pos = np.array([cam_pos_xyz[0], cam_pos_xyz[1] + 1.0, cam_pos_xyz[2]])
+light_color = [0.99, 0.99, 0.99]
+
+camera = Camera(
+    position=cam_position,
+    fov_h=65,
+    aspect_ratio=8.0 / 6.0,
+    near=0.01,
+    far=100
+)
+
+camera.set_angles(*obs_angles)
 
 
 def init():
@@ -33,12 +51,15 @@ def init():
 
 
 def display():
-    global camera, terrain_map, shader_program
+    global camera, terrain_map, shader_program, world, peaks
     glClearColor(0.0, 0.0, 0.0, 1.0)
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
     view_matrix = camera.calc_view_matrix()
     perspective_matrix = camera.calc_perspective_matrix()
+    world.set_mvp_matrices(view_matrix, perspective_matrix)
+
     terrain_map.draw(view_matrix, perspective_matrix, shader_program)
+    peaks.get_peaks_in_frutsum()
     glutSwapBuffers()
 
 

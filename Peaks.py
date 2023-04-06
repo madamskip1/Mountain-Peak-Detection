@@ -1,6 +1,8 @@
 import pandas as pd
 import numpy as np
 
+from OpenGL.GL import *
+from OpenGL.GLUT import *
 
 class Peaks:
     def __init__(self, world):
@@ -10,17 +12,52 @@ class Peaks:
         self.__prepare_dataframe()
         self.__prepare_model_coords()
 
+    def get_peaks_in_frutsum(self):
+        in_frutsum = self.dataframe[self.dataframe['vertex_num'].apply(lambda x:
+                                                              self.world.check_vertex_frutsum_vertex_num(x))]
+        #print(in_frutsum[['name', 'latitude', 'longitude']])
+        in_frutsum_num = len(in_frutsum.index)
+        print(in_frutsum_num)
+        print(len(in_frutsum['vertex_num'].unique()))
+
+        visible_peaks = []
+        occlusion_passed = 0
+        query_ids = glGenQueries(in_frutsum_num)
+        print("Query len: ", in_frutsum_num)
+        query_index = 0
+        for index, row in in_frutsum.iterrows():
+            glBeginQuery(GL_SAMPLES_PASSED, query_ids[query_index])
+            glBegin(GL_POINTS)
+            vertex = np.array([row['vertex_x'], row['vertex_y'], row['vertex_z']])
+            glVertex3fv(vertex)
+            glEnd()
+            glEndQuery(GL_SAMPLES_PASSED)
+            query_result = glGetQueryObjectiv(query_ids[query_index], GL_QUERY_RESULT)
+            #print("__________")
+            #print(row[['latitude', 'longitude', 'vertex_x', 'vertex_y', 'vertex_z']])
+            if query_result == 0:
+                occlusion_passed = occlusion_passed + 1
+            #else:
+            #    print("NOT_PASSED")
+            query_index = query_index + 1
+
+        print("in frutsum: ", in_frutsum_num, " | occlusion passed: ", occlusion_passed)
+
+
+
     def __prepare_model_coords(self):
         self.dataframe['vertex_num'] = np.NaN
         self.dataframe['vertex_num'] = self.dataframe[['latitude', 'longitude']].apply(lambda x:
-                                                            self.world.get_vertex_num(x['latitude'], x['longitude']), axis=1)
-        print(self.dataframe[self.dataframe['name'] == 'Lomnický štít'])
+                                                                                       self.world.get_vertex_num(
+                                                                                           x['latitude'],
+                                                                                           x['longitude']), axis=1)
 
         self.dataframe['vertex_x'] = np.NaN
         self.dataframe['vertex_y'] = np.NaN
         self.dataframe['vertex_z'] = np.NaN
         self.dataframe[['vertex_x', 'vertex_y', 'vertex_z']] = self.dataframe['vertex_num'].apply(
             lambda x: pd.Series(self.world.get_vertex_coords(x)))
+        self.dataframe['vertex_y'] = self.dataframe['vertex_y'].apply(lambda x: x + 0.000001)
 
     def __prepare_dataframe(self):
         files_names = self.__prepare_list_of_data_files_names()

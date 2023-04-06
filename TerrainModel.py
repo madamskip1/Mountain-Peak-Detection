@@ -2,18 +2,18 @@ from terrain_map_loader import load_terrain_map
 from OpenGL.GL import *
 
 
-class TerrainMap:
-    def __init__(self, hgt_file_path, rows, cols, simplify_factor=1):
+class TerrainModel:
+    def __init__(self, hgt_file_path, hgt_size, world_size, simplify_factor=1):
         self.vao = None
         self.vbo_vertices = None
         self.vbo_normals = None
         self.ibo = None
+        self.world_size = world_size
         self.simplify_factor = simplify_factor
-        self.rows = rows
-        self.cols = cols
-        self.data, self.vertices, self.triangles, self.normals, size, self.steps = load_terrain_map(hgt_file_path, rows, cols,
-                                                                                              simplify_factor)
-        self.rows, self.cols = size
+        self.data, self.vertices, self.triangles, self.normals, self.hgt_size, self.steps = load_terrain_map(
+            hgt_file_path,
+            hgt_size,
+            simplify_factor)
         self.num_triangles = len(self.triangles)
 
     def prepare_buffers(self):
@@ -42,9 +42,11 @@ class TerrainMap:
     def get_triangles(self):
         return self.triangles
 
-    def get_size(self):
-        print(self.rows, self.cols)
-        return [self.rows, self.cols]
+    def get_hgt_size(self):
+        return self.hgt_size
+
+    def get_world_size(self):
+        return self.world_size
 
     def get_steps(self):
         return self.steps  # [x_step, y_step, z_step]

@@ -2,8 +2,23 @@ import numpy as np
 from OpenGL.GLUT import *
 
 
+def fix_angles(yaw_degree, pitch_degree):
+    if 0.0 <= yaw_degree <= 180.0:
+        yaw_degree = 180.0 - yaw_degree
+    else:
+        yaw_degree = 180.0 + 360.0 - yaw_degree
+
+    if yaw_degree < 0.0:
+        yaw_degree = 360.0 + yaw_degree
+    elif yaw_degree >= 360.0:
+        yaw_degree = yaw_degree - 360.0
+
+    return yaw_degree, pitch_degree
+
+
 class Camera:
-    def __init__(self, position, target, fov_h, aspect_ratio, near, far, up=np.array([0.0, 1.0, 0.0])):
+    def __init__(self, position, fov_h, aspect_ratio, near, far, target=np.array([0, 0, 0]),
+                 up=np.array([0.0, 1.0, 0.0])):
         self.position = position
         self.target = target
         self.up = up
@@ -20,6 +35,7 @@ class Camera:
         self.position = position
 
     def set_angles(self, yaw_degree, pitch_degree):
+        yaw_degree, pitch_degree = fix_angles(yaw_degree, pitch_degree)
         self.yaw_degree = yaw_degree
         self.pitch_degree = pitch_degree
         self.__update_direction()
