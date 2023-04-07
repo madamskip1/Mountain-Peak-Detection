@@ -12,17 +12,24 @@ class Peaks:
         self.__prepare_dataframe()
         self.__prepare_model_coords()
 
-    def get_peaks_in_frutsum(self):
-        before_frutsum_test = len(self.dataframe.index)
-        in_frutsum = self.dataframe[self.dataframe['vertex_num'].apply(lambda x:
-                                                              self.world.check_vertex_frutsum_vertex_num(x))]
-        #print(in_frutsum[['name', 'latitude', 'longitude']])
-        in_frutsum_num = len(in_frutsum.index)
+    def get_visible_peaks(self):
+        in_frutsum = self.__frutsum_test()
+        occlusion_passed = self.__occlusion_test(in_frutsum)
+        occlusion_passed.to_csv('output/visible_peaks.csv', sep=';', header=False, index=False)
 
-        occlusion_peaks_passed = np.full(in_frutsum_num, False, dtype=bool)
-        query_ids = glGenQueries(in_frutsum_num)
+        return occlusion_passed
+
+    def __frutsum_test(self):
+        in_frutsum = self.dataframe[self.dataframe['vertex_num'].apply(lambda x:
+                                                                       self.world.check_vertex_frutsum_vertex_num(x))]
+        return in_frutsum
+
+    def __occlusion_test(self, df):
+        df_len = len(df.index)
+        occlusion_peaks_passed = np.full(df_len, False, dtype=bool)
+        query_ids = glGenQueries(df_len)
         query_index = 0
-        for index, row in in_frutsum.iterrows():
+        for index, row in df.iterrows():
             glBeginQuery(GL_SAMPLES_PASSED, query_ids[query_index])
             glBegin(GL_POINTS)
             vertex = np.array([row['vertex_x'], row['vertex_y'], row['vertex_z']])
@@ -34,16 +41,15 @@ class Peaks:
             if query_result > 0:
                 occlusion_peaks_passed[query_index] = True
             query_index = query_index + 1
-        occlusion_passed = in_frutsum[occlusion_peaks_passed]
-        print("before tests: ", before_frutsum_test, ", in frutsum: ", in_frutsum_num, " | occlusion passed: ", len(occlusion_passed))
+
+        occlusion_passed = df[occlusion_peaks_passed]
         occlusion_passed = occlusion_passed.copy()
-
-        occlusion_passed[['screen_x', 'screen_y', 'screen_z']] = occlusion_passed[['vertex_x', 'vertex_y', 'vertex_z']].apply(
+        occlusion_passed[['screen_x', 'screen_y', 'screen_z']] = occlusion_passed[
+            ['vertex_x', 'vertex_y', 'vertex_z']].apply(
             lambda x:
-            pd.Series(self.world.get_screen_coords(x['vertex_x'], x['vertex_y'], x['vertex_z'])), axis=1)
+            pd.Series(self.world.get_screen_coords(x['vertex_x'], x['vertex_y'], x['vertex_z'])),
+            axis=1)
 
-        occlusion_passed['name'] = occlusion_passed['name'].apply(lambda x: x.encode('utf-8').decode('utf-8'))
-        occlusion_passed.to_csv('output/visible_peaks.csv', sep=';', header=False, index=False)
         return occlusion_passed
 
     def __prepare_model_coords(self):

@@ -23,7 +23,7 @@ terrain_map = TerrainModel(
     hgt_file_path="N49E020.hgt",
     hgt_size=3601,
     world_size=100,
-    simplify_factor=5)
+    simplify_factor=20)
 
 world = World(terrain_map)
 peaks = Peaks(world)
@@ -62,7 +62,7 @@ def display():
     world.set_mvp_matrices(view_matrix, perspective_matrix)
 
     terrain_map.draw(view_matrix, perspective_matrix, shader_program)
-    peaks_visible = peaks.get_peaks_in_frutsum()
+    peaks_visible = peaks.get_visible_peaks()
     save(peaks_visible)
     glutSwapBuffers()
 
