@@ -13,17 +13,14 @@ class Peaks:
         self.__prepare_model_coords()
 
     def get_peaks_in_frutsum(self):
+        before_frutsum_test = len(self.dataframe.index)
         in_frutsum = self.dataframe[self.dataframe['vertex_num'].apply(lambda x:
                                                               self.world.check_vertex_frutsum_vertex_num(x))]
         #print(in_frutsum[['name', 'latitude', 'longitude']])
         in_frutsum_num = len(in_frutsum.index)
-        print(in_frutsum_num)
-        print(len(in_frutsum['vertex_num'].unique()))
 
-        visible_peaks = []
-        occlusion_passed = 0
+        occlusion_peaks_passed = np.full(in_frutsum_num, False, dtype=bool)
         query_ids = glGenQueries(in_frutsum_num)
-        print("Query len: ", in_frutsum_num)
         query_index = 0
         for index, row in in_frutsum.iterrows():
             glBeginQuery(GL_SAMPLES_PASSED, query_ids[query_index])
@@ -33,17 +30,21 @@ class Peaks:
             glEnd()
             glEndQuery(GL_SAMPLES_PASSED)
             query_result = glGetQueryObjectiv(query_ids[query_index], GL_QUERY_RESULT)
-            #print("__________")
-            #print(row[['latitude', 'longitude', 'vertex_x', 'vertex_y', 'vertex_z']])
-            if query_result == 0:
-                occlusion_passed = occlusion_passed + 1
-            #else:
-            #    print("NOT_PASSED")
+
+            if query_result > 0:
+                occlusion_peaks_passed[query_index] = True
             query_index = query_index + 1
+        occlusion_passed = in_frutsum[occlusion_peaks_passed]
+        print("before tests: ", before_frutsum_test, ", in frutsum: ", in_frutsum_num, " | occlusion passed: ", len(occlusion_passed))
+        occlusion_passed = occlusion_passed.copy()
 
-        print("in frutsum: ", in_frutsum_num, " | occlusion passed: ", occlusion_passed)
+        occlusion_passed[['screen_x', 'screen_y', 'screen_z']] = occlusion_passed[['vertex_x', 'vertex_y', 'vertex_z']].apply(
+            lambda x:
+            pd.Series(self.world.get_screen_coords(x['vertex_x'], x['vertex_y'], x['vertex_z'])), axis=1)
 
-
+        occlusion_passed['name'] = occlusion_passed['name'].apply(lambda x: x.encode('utf-8').decode('utf-8'))
+        occlusion_passed.to_csv('output/visible_peaks.csv', sep=';', header=False, index=False)
+        return occlusion_passed
 
     def __prepare_model_coords(self):
         self.dataframe['vertex_num'] = np.NaN
@@ -52,9 +53,6 @@ class Peaks:
                                                                                            x['latitude'],
                                                                                            x['longitude']), axis=1)
 
-        self.dataframe['vertex_x'] = np.NaN
-        self.dataframe['vertex_y'] = np.NaN
-        self.dataframe['vertex_z'] = np.NaN
         self.dataframe[['vertex_x', 'vertex_y', 'vertex_z']] = self.dataframe['vertex_num'].apply(
             lambda x: pd.Series(self.world.get_vertex_coords(x)))
         self.dataframe['vertex_y'] = self.dataframe['vertex_y'].apply(lambda x: x + 0.000001)
@@ -83,6 +81,7 @@ class Peaks:
                 file_name = self.__peaks_data_path + str(latitude) + "_" + str(longitude) + ".csv"
                 files_names.append(file_name)
 
+        files_names = ['peaks_data/49_20_test.csv']
         return files_names
 
     def __read_data(self, file_name):

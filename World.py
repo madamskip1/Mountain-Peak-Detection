@@ -12,6 +12,7 @@ class World:
         self.vertices = terrain_model.get_vertices()
         self.model_x_step, self.model_y_step, self.model_z_step = terrain_model.get_steps()
         self.hgt_size = terrain_model.get_hgt_size()
+        print("HGH size: ", self.hgt_size)
         self.world_size = terrain_model.get_world_size()
         self.geo_x_step = abs(self.longitude_range[1] - self.longitude_range[0]) / self.hgt_size
         self.geo_z_step = abs(self.latitude_range[1] - self.latitude_range[0]) / self.hgt_size
@@ -30,9 +31,12 @@ class World:
         self.perspective_matrix = perspective
 
     def get_vertex_num(self, latitude, longitude):
-        z = int((latitude - self.latitude_range[0]) / self.geo_z_step)
-        x = int((longitude - self.longitude_range[0]) / self.geo_x_step)
-        vertex_num = (x + 1) * self.hgt_size - z - 1
+        x, _, z = self.get_coord_from_geo(latitude, longitude, 0.0)
+        x = x / self.model_x_step
+        z = z / self.model_z_step
+        x = int(x)
+        z = int(z)
+        vertex_num = x * self.hgt_size + z
 
         return vertex_num
 
@@ -47,7 +51,12 @@ class World:
     def check_vertex_frutsum_coords(self, x, y, z):
         screen_position = gluProject(x, y, z, self.view_matrix, self.perspective_matrix, self.viewport)
         return ((0 <= screen_position[0] <= self.viewport[2])
-                and (0 <= screen_position[1] <= self.viewport[3]))
+                and (0 <= screen_position[1] <= self.viewport[3])
+                and (0 <= screen_position[2] <= 1))
+
+    def get_screen_coords(self, vertex_x, vertex_y, vertex_z):
+        screen_position = gluProject(vertex_x, vertex_y, vertex_z, self.view_matrix, self.perspective_matrix, self.viewport)
+        return screen_position
 
     def get_coord_from_geo(self, latitude, longitude, altitude):
         origin_chord = [0.0, 0.0]
@@ -58,5 +67,5 @@ class World:
         simplified_by = 3601 / 361
         altitude_scale = self.model_x_step / 30 / simplified_by
         y = (altitude + 200) * self.model_y_step
-        print(x, y, z)
+
         return x, y, z
