@@ -67,7 +67,7 @@ class Peaks:
         peaks_in_frustum = self.dataframe[self.dataframe[
             ['vertex_x', 'vertex_y', 'vertex_z']
         ].apply(lambda x:
-                self.world.check_vertex_frutsum_coords(
+                self.world.check_vertex_frustum_coords(
                     x['vertex_x'], x['vertex_y'], x['vertex_z']
                 ), axis=1)]
         return peaks_in_frustum
