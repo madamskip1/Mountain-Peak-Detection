@@ -81,12 +81,6 @@ class Peaks:
     def __occlusion_test(self, df):
         occlusion_peaks_passed = self.__occlusion_query(df)
         occlusion_passed = df[occlusion_peaks_passed]
-        occlusion_passed = occlusion_passed.copy()
-        occlusion_passed[['screen_x', 'screen_y', 'screen_z']] = occlusion_passed[
-            ['vertex_x', 'vertex_y', 'vertex_z']].apply(
-            lambda x:
-            pd.Series(self.world.get_screen_coords(x['vertex_x'], x['vertex_y'], x['vertex_z'])),
-            axis=1)
 
         return occlusion_passed
 
