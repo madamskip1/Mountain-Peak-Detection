@@ -64,11 +64,17 @@ class Peaks:
     ##### Visible tests
 
     def __frustum_test(self):
+        self.dataframe[['screen_x', 'screen_y', 'screen_z']] = self.dataframe[
+            ['vertex_x', 'vertex_y', 'vertex_z']].apply(
+            lambda x:
+            pd.Series(self.world.get_screen_coords(x['vertex_x'], x['vertex_y'], x['vertex_z'])),
+            axis=1)
+
         peaks_in_frustum = self.dataframe[self.dataframe[
-            ['vertex_x', 'vertex_y', 'vertex_z']
+            ['screen_x', 'screen_y', 'screen_z']
         ].apply(lambda x:
-                self.world.check_vertex_frustum_coords(
-                    x['vertex_x'], x['vertex_y'], x['vertex_z']
+                self.world.check_if_point_in_viewport(
+                    x['screen_x'], x['screen_y'], x['screen_z']
                 ), axis=1)]
         return peaks_in_frustum
 

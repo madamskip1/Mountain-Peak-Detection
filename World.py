@@ -30,6 +30,7 @@ class World:
         self.world_size = terrain_model.get_world_size()
         self.world_size = [111.2, 71.0]
         self.viewport = np.array([0, 0, 768, 1024])
+
         self.view_matrix = None
         self.perspective_matrix = None
 
@@ -86,11 +87,10 @@ class World:
         vertex_coords_end = vertex_coords_start + 3
         return self.terrain_model.get_vertices(vertex_coords_start, vertex_coords_end)
 
-    def check_vertex_frustum_coords(self, x, y, z):
-        screen_position = gluProject(x, y, z, self.view_matrix, self.perspective_matrix, self.viewport)
-        return ((0 <= screen_position[0] <= self.viewport[2])
-                and (0 <= screen_position[1] <= self.viewport[3])
-                and (0 <= screen_position[2] <= 1))
+    def check_if_point_in_viewport(self, screen_x, screen_y, screen_z):
+        return ((0 <= screen_x <= self.viewport[2])
+                and (0 <= screen_y <= self.viewport[3])
+                and (0 <= screen_z <= 1))
 
     def get_screen_coords(self, vertex_x, vertex_y, vertex_z):
         screen_position = gluProject(vertex_x, vertex_y, vertex_z, self.view_matrix, self.perspective_matrix,
@@ -98,10 +98,8 @@ class World:
         return screen_position
 
     def get_coord_from_geo(self, latitude, longitude, altitude):
-        origin_geo = [49.0, 20.0]
-        # There is something wrong: 20 is longitude, not latitude. Need bugfix
-        z = (longitude - origin_geo[1]) * self.world_size[1]
-        x = (origin_geo[0] + 1.0 - latitude) * self.world_size[0]
+        z = (longitude - self.longitude_range[0]) * self.world_size[1]
+        x = (self.latitude_range[0] + 1.0 - latitude) * self.world_size[0]
         altitude_scale = 1 / 1000
         y = (altitude + 20) * altitude_scale
 
