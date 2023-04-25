@@ -44,6 +44,7 @@ void main() {
     if (color > 155)
         color = 155;
     color = (color + 100) / 255;
+    color = 1.0;
     vertexColor = vec4(color, color, color, 1.0);
     vertexNormal = normal;
     vertexWorldPosition = position;

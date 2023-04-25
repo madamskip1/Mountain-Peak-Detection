@@ -1,30 +1,44 @@
 import numpy as np
 from OpenGL.GLUT import *
 
+def rotate_up_vector(up_vector, angle, front):
+    angle = np.deg2rad(angle)
+    front = front / np.linalg.norm(front)
+    cos_angle = np.cos(angle)
+    sin_angle = np.sin(angle)
+    x, y, z = front
 
-def fix_angles(yaw_degree, pitch_degree):
-    if 0.0 <= yaw_degree <= 180.0:
-        yaw_degree = 180.0 - yaw_degree
-    else:
-        yaw_degree = 180.0 + 360.0 - yaw_degree
+    rotation_matrix = np.array([
+      [ (cos_angle + x*x * (1 - cos_angle)), (x * y * (1 - cos_angle) - z * sin_angle), (x * z * (1 - cos_angle) + y * sin_angle) ],
+      [ (y * x * (1 - cos_angle) + z * sin_angle), (cos_angle + y * y * (1 - cos_angle)), (y * z * (1 - cos_angle) - x * sin_angle) ],
+      [ (z * x * (1 - cos_angle) - y * sin_angle), (z * y * (1 - cos_angle) + x * sin_angle), (cos_angle  + z * z * (1 - cos_angle)) ]
+    ])
+    up_vector = np.dot(rotation_matrix, up_vector)
+    return up_vector
 
+def fix_angles(yaw_degree, pitch_degree, roll_degree):
+    yaw_degree = 180.0 - yaw_degree
     if yaw_degree < 0.0:
         yaw_degree = 360.0 + yaw_degree
     elif yaw_degree >= 360.0:
         yaw_degree = yaw_degree - 360.0
 
-    return yaw_degree, pitch_degree
+    pitch_degree = (-1) * pitch_degree
+    roll_degree = (-1) * roll_degree
+    return yaw_degree, pitch_degree, roll_degree
 
 
 class Camera:
     def __init__(self, position, fov_h, aspect_ratio, near, far, target=np.array([0, 0, 0]),
                  up=np.array([0.0, 1.0, 0.0])):
         self.position = position
+
         self.target = target
         self.up = up
         self.direction = target - position
-        self.yaw_degree = 0
-        self.pitch_degree = 0
+        self.yaw_degree = 0.0
+        self.pitch_degree = 0.0
+        self.roll_degree = 0.0
 
         self.fov_h = fov_h
         self.aspect_ratio = aspect_ratio
@@ -34,12 +48,14 @@ class Camera:
     def set_position(self, position):
         self.position = position
 
-    def set_angles(self, yaw_degree, pitch_degree):
-        yaw_degree, pitch_degree = fix_angles(yaw_degree, pitch_degree)
+    def set_angles(self, yaw_degree, pitch_degree, roll_degree):
+        yaw_degree, pitch_degree, roll_degree = fix_angles(yaw_degree, pitch_degree, roll_degree)
         self.yaw_degree = yaw_degree
         self.pitch_degree = pitch_degree
+        self.roll_degree = roll_degree
         self.__update_direction()
         self.__update_target()
+        self.__update_up()
 
     def calc_view_matrix(self):
         eye = self.position
@@ -98,3 +114,6 @@ class Camera:
 
     def __update_target(self):
         self.target = self.position + self.direction
+
+    def __update_up(self):
+        self.up = rotate_up_vector(self.up, self.roll_degree, self.direction)

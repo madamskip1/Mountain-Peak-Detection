@@ -1,5 +1,7 @@
 import numpy as np
 
+latitude_approximation = 111.2
+longitude_approximation = 71.0
 
 def load_terrain_map(file_path, hgt_size, simplify_factor=1):
     elevation = __load_hgt_file(file_path, hgt_size)
@@ -10,7 +12,7 @@ def load_terrain_map(file_path, hgt_size, simplify_factor=1):
     vertices, steps = __generate_vertices(elevation, hgt_size)
     triangles = __generate_triangles(hgt_size)
     normals = __generate_triangles_normals(triangles, vertices)
-    print("Steps: ", steps)
+
     return elevation, vertices, triangles, normals, hgt_size, steps
 
 
@@ -30,33 +32,37 @@ def __simplify_elevation(elevation, simplify_factor):
 
 
 def __generate_vertices(elevation, hgt_size):
+    global latitude_approximation, longitude_approximation
     size = 100
     origin = [0.0, .0, 0.0]
     direction = [1.0, 1.0, -1.0]
     simplified_by = 3601 / hgt_size
+
     origin_x, origin_y, origin_z = origin
     origin_x = 0  # -size / 2
     origin_z = 0
+
     direction_x, direction_y, direction_z = direction
-    x_step = size / (hgt_size - 1)
-    y_step = x_step
-    altitude_scale = x_step / 30 / simplified_by
+    x_step = latitude_approximation / (hgt_size - 1)
+    z_step = longitude_approximation / (hgt_size - 1)
+    altitude_scale = 1/1000
 
     vertices = np.zeros((hgt_size * hgt_size * 3), dtype=np.float32)
     vertices_index = 0
 
-    for (x, y), altitude in np.ndenumerate(elevation):
+    for (x, z), altitude in np.ndenumerate(elevation):
+        # x - latitude
+        # y - altitude
+        # z - longitude
         x_coord = origin_x + x_step * x
         y_coord = origin_y + altitude_scale * altitude  # up is Y coord in OpenGL
-        z_coord = origin_z + y_step * y
+        z_coord = origin_z + z_step * z
         vertices[vertices_index] = x_coord
         vertices[vertices_index + 1] = y_coord
         vertices[vertices_index + 2] = z_coord
         vertices_index = vertices_index + 3
 
-    print("DU:")
-    print([x_step, altitude_scale, y_step])
-    return vertices, [x_step, altitude_scale, y_step]
+    return vertices, [x_step, altitude_scale, z_step]
 
 
 def __generate_triangles(hgt_size):

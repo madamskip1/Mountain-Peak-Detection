@@ -4,6 +4,7 @@ import numpy as np
 from OpenGL.GL import *
 from OpenGL.GLUT import *
 
+
 class Peaks:
     def __init__(self, world):
         self.world = world
@@ -15,13 +16,19 @@ class Peaks:
     def get_visible_peaks(self):
         in_frutsum = self.__frutsum_test()
         occlusion_passed = self.__occlusion_test(in_frutsum)
+        visible_peaks_with_distance = self.__calc_distance(occlusion_passed)
         occlusion_passed.to_csv('output/visible_peaks.csv', sep=';', header=False, index=False)
 
         return occlusion_passed
 
     def __frutsum_test(self):
-        in_frutsum = self.dataframe[self.dataframe['vertex_num'].apply(lambda x:
-                                                                       self.world.check_vertex_frutsum_vertex_num(x))]
+        in_frutsum = self.dataframe[self.dataframe[['vertex_x', 'vertex_y', 'vertex_z']].apply(lambda x:
+                                                                       self.world.check_vertex_frutsum_coords(
+                                                                           x['vertex_x'],
+                                                                           x['vertex_y'],
+                                                                           x['vertex_z']
+                                                                       ), axis=1)]
+        print("In frutsum: ", len(in_frutsum.index))
         return in_frutsum
 
     def __occlusion_test(self, df):
@@ -53,14 +60,13 @@ class Peaks:
         return occlusion_passed
 
     def __prepare_model_coords(self):
-        self.dataframe['vertex_num'] = np.NaN
-        self.dataframe['vertex_num'] = self.dataframe[['latitude', 'longitude']].apply(lambda x:
-                                                                                       self.world.get_vertex_num(
-                                                                                           x['latitude'],
-                                                                                           x['longitude']), axis=1)
-
-        self.dataframe[['vertex_x', 'vertex_y', 'vertex_z']] = self.dataframe['vertex_num'].apply(
-            lambda x: pd.Series(self.world.get_vertex_coords(x)))
+        self.dataframe[['vertex_x', 'vertex_y', 'vertex_z']] = self.dataframe[['latitude', 'longitude']].apply(
+        lambda x: pd.Series(self.world.get_vertex_coord_peak(
+            x['latitude'],
+            x['longitude']
+        )),
+        axis=1)
+        print(self.dataframe.to_string())
         self.dataframe['vertex_y'] = self.dataframe['vertex_y'].apply(lambda x: x + 0.000001)
 
     def __prepare_dataframe(self):
@@ -87,10 +93,17 @@ class Peaks:
                 file_name = self.__peaks_data_path + str(latitude) + "_" + str(longitude) + ".csv"
                 files_names.append(file_name)
 
-        files_names = ['peaks_data/49_20_test.csv']
         return files_names
 
     def __read_data(self, file_name):
         headers = ['name', 'latitude', 'longitude', 'feature_code', 'elevation', 'dem']
         data = pd.read_csv(file_name, delimiter=';', header=None, names=headers)
         return data
+
+    def __calc_distance(self, df):
+        df['distance'] = df[['latitude', 'longitude']].apply(
+            lambda x: round(self.world.calc_distance_to_point(x['latitude'], x['longitude']), 1), axis=1
+        )
+        print(df)
+        return df
+

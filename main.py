@@ -1,7 +1,9 @@
 import numpy as np
 from OpenGL.GL import *
 from OpenGL.GLUT import *
-from PIL import Image, ImageDraw, ImageFont
+from PIL import Image, ImageDraw, ImageOps
+import cv2 as cv
+from unidecode import unidecode
 
 from Camera import Camera
 from TerrainModel import TerrainModel
@@ -12,8 +14,10 @@ from diffuse_lightning import set_diffuse_light
 
 ####################
 
-obs_location = [49.3390454, 20.081936, 1000.0]
-obs_angles = [144.31152, 2.5936904]
+obs_location = [49.3390454, 20.081936, 991.1]
+obs_angles = [144.31152, 2.5936904, 0.4797333]
+window_size = [3840, 5120]
+window_size = [768, 1024]
 
 ####################
 
@@ -22,27 +26,27 @@ obs_angles = [144.31152, 2.5936904]
 terrain_map = TerrainModel(
     hgt_file_path="N49E020.hgt",
     hgt_size=3601,
-    world_size=100,
-    simplify_factor=20)
+    world_size=[100],
+    simplify_factor=2)
 
-world = World(terrain_map)
+world = World(terrain_map, obs_location)
 peaks = Peaks(world)
 shader_program = None
 
 cam_pos_xyz = world.get_coord_from_geo(*obs_location)
 cam_position = np.array([cam_pos_xyz[0], cam_pos_xyz[1], cam_pos_xyz[2]])
 
-light_pos = np.array([cam_pos_xyz[0], cam_pos_xyz[1] + 1.0, cam_pos_xyz[2]])
+light_pos = np.array([cam_pos_xyz[0], cam_pos_xyz[1]+0.0, cam_pos_xyz[2]])
 light_color = [0.99, 0.99, 0.99]
 
 
 
 camera = Camera(
     position=cam_position,
-    fov_h=65,
-    aspect_ratio=8.0 / 6.0,
+    fov_h=66,
+    aspect_ratio=window_size[0]/window_size[1],
     near=0.01,
-    far=30,
+    far=50,
 )
 
 camera.set_angles(*obs_angles)
@@ -68,28 +72,37 @@ def display():
 
 
 def save(peaks_visible):
-    data =( GLubyte * (3*800*600) )(0)
-    glReadPixels(0, 0, 800, 600, GL_RGB, GL_UNSIGNED_BYTE, data)
-    image = Image.frombytes(mode="RGB", size=(800, 600), data=data)
+    data =( GLubyte * (3 * window_size[0] * window_size[1]) )(0)
+    glReadPixels(0, 0, window_size[0], window_size[1], GL_RGB, GL_UNSIGNED_BYTE, data)
+    image = Image.frombytes(mode="RGB", size=(window_size[0], window_size[1]), data=data)
     image = image.transpose(Image.FLIP_TOP_BOTTOM)
+    image = ImageOps.mirror(image)
 
     image.save("output/rendered_scene.png")
+    save_edges_img(image)
     image = add_peaks_names(image, peaks_visible)
     image.save("output/rendered_scene_annotated.png")
+    save_edges_img(image, "_annotated")
 
 def add_peaks_names(image, peaks_visible):
     image_draw = ImageDraw.Draw(image)
-    peaks_visible[['name', 'screen_x', 'screen_y', 'screen_z']].apply(lambda x:
-                add_text_to_img(image_draw, x['name'], [x['screen_x'], x['screen_y']]), axis=1)
+    peaks_visible[['name', 'screen_x', 'screen_y', 'screen_z', 'distance']].apply(lambda x:
+                add_text_to_img(image_draw, x['name'] + " (" + str(x['distance']) + ")", [x['screen_x'], x['screen_y']]), axis=1)
     return image
+
+def save_edges_img(image, mod=""):
+    opencv_image = cv.cvtColor(np.array(image), cv.COLOR_RGB2BGR)
+    edges_image = cv.Canny(opencv_image, 100, 255)
+    cv.imwrite("output/edges"+mod+".png", edges_image)
 
 def add_text_to_img(image_draw, text, position):
     position[0] = int(position[0])
+    position[0] = window_size[0] - position[0]
     position[1] = int(position[1])
-    position[1] = 600 - position[1]
-    pos_y = np.random.randint(50, 550)
+    position[1] = window_size[1] - position[1]
+    pos_y = np.random.randint(100, window_size[1] - 100)
     image_draw.line((position[0], position[1], position[0], pos_y), fill=(255, 0, 0, 255))
-    text = text.encode('latin-1', errors="ignore")
+    text = unidecode(text)
     image_draw.text((position[0], pos_y), text)
 
 
@@ -104,13 +117,14 @@ def keyboard_callback(key, *_):
 def main():
     global shader_program, terrain_map, light_pos, light_color
     glutInit()
-    glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGB | GLUT_DEPTH)
-    glutInitWindowSize(800, 600)
+    glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGB | GLUT_DEPTH | GLUT_MULTISAMPLE)
+    glutInitWindowSize(window_size[0], window_size[1])
     glutCreateWindow(b"Cube")
     glutDisplayFunc(display)
     glutSpecialFunc(keyboard_callback)
     shader_program = create_shader_program()
     glUseProgram(shader_program)
+    glEnable(GL_MULTISAMPLE)
     terrain_map.prepare_buffers()
     set_diffuse_light(shader_program, light_pos, light_color)
     init()
