@@ -27,7 +27,7 @@ terrain_map = TerrainModel(
     hgt_file_path="N49E020.hgt",
     hgt_size=3601,
     world_size=[100],
-    simplify_factor=2)
+    simplify_factor=10)
 
 world = World(terrain_map, obs_location)
 peaks = Peaks(world)
@@ -42,13 +42,12 @@ light_color = [0.99, 0.99, 0.99]
 
 
 camera = Camera(
-    position=cam_position,
-    fov_h=66,
+    fov_horizontal=66,
     aspect_ratio=window_size[0]/window_size[1],
     near=0.01,
     far=50,
 )
-
+camera.set_position(cam_position)
 camera.set_angles(*obs_angles)
 
 
@@ -61,8 +60,8 @@ def display():
     global camera, terrain_map, shader_program, world, peaks
     glClearColor(0.0, 0.0, 0.0, 1.0)
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
-    view_matrix = camera.calc_view_matrix()
-    perspective_matrix = camera.calc_perspective_matrix()
+    view_matrix = camera.get_view_matrix()
+    perspective_matrix = camera.get_projection_matrix()
     world.set_mvp_matrices(view_matrix, perspective_matrix)
 
     terrain_map.draw(view_matrix, perspective_matrix, shader_program)
@@ -108,12 +107,6 @@ def add_text_to_img(image_draw, text, position):
 
 
 
-def keyboard_callback(key, *_):
-    global camera
-    camera.keyboard_callback(key)
-    glutPostRedisplay()
-
-
 def main():
     global shader_program, terrain_map, light_pos, light_color
     glutInit()
@@ -121,7 +114,6 @@ def main():
     glutInitWindowSize(window_size[0], window_size[1])
     glutCreateWindow(b"Cube")
     glutDisplayFunc(display)
-    glutSpecialFunc(keyboard_callback)
     shader_program = create_shader_program()
     glUseProgram(shader_program)
     glEnable(GL_MULTISAMPLE)
