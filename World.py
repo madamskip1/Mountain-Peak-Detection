@@ -44,48 +44,28 @@ class World:
         self.view_matrix = view
         self.perspective_matrix = perspective
 
-    def get_vertex_num(self, latitude, longitude):
-        x, _, z = self.get_coord_from_geo(latitude, longitude, 0.0)
-        x = x / self.model_x_step
-        z = z / self.model_z_step
-        x = int(x)
-        z = int(z)
-        vertex_num = x * self.hgt_size + z
-
-        return vertex_num
-
     def get_vertex_coord_peak(self, latitude, longitude):
         x, _, z = self.get_coord_from_geo(latitude, longitude, 0.0)
         x = x / self.model_x_step
         z = z / self.model_z_step
-        x = int(x)
-        z = int(z)
+        x = round(x)
+        z = round(z)
         max_x, max_y, max_z = 0, 0, 0
-        start_x = 0 if (x - 1) < 0 else (x - 1)
-        start_z = 0 if (z - 1) < 0 else (z - 1)
-        end_x = self.hgt_size if (x + 1) > self.hgt_size else (x + 1)
-        end_z = self.hgt_size if (z + 1) > self.hgt_size else (z + 1)
+        start_x = max(0, x - 1)
+        start_z = max(0, z - 1)
+        end_x = min(x + 1, self.hgt_size)
+        end_z = min(z + 1, self.hgt_size)
 
         for x_loop in range(start_x, end_x + 1):
             for z_loop in range(start_z, end_z + 1):
                 vertex_num = x * self.hgt_size + z
-                vertex_coord = self.get_vertex_coords(vertex_num)
+                vertex_coord = self.__get_vertex_coords(vertex_num)
                 if vertex_coord[1] > max_y:
                     max_x = vertex_coord[0]
                     max_y = vertex_coord[1]
                     max_z = vertex_coord[2]
 
         return max_x, max_y, max_z
-
-    def __get_vertex_altitude(self, vertex_num):
-        vertex_coords_start = vertex_num * 3
-        vertex_altitude_index = vertex_coords_start + 1
-        return self.terrain_model.get_vertex(vertex_altitude_index)
-
-    def get_vertex_coords(self, vertex_num):
-        vertex_coords_start = vertex_num * 3
-        vertex_coords_end = vertex_coords_start + 3
-        return self.terrain_model.get_vertices(vertex_coords_start, vertex_coords_end)
 
     def check_if_point_in_viewport(self, screen_x, screen_y, screen_z):
         return ((0 <= screen_x <= self.viewport[2])
@@ -107,3 +87,8 @@ class World:
 
     def calc_distance_to_point(self, lat, long):
         return equirectangular_approximation(lat, long, self.world_position[0], self.world_position[1])
+
+    def __get_vertex_coords(self, vertex_num):
+        vertex_coords_start = vertex_num * 3
+        vertex_coords_end = vertex_coords_start + 3
+        return self.terrain_model.get_vertices(vertex_coords_start, vertex_coords_end)

@@ -38,9 +38,6 @@ class TerrainModel:
     def get_vertices(self, start_index, end_index):
         return self.vertices[start_index: end_index]
 
-    def get_vertex(self, index):
-        return self.vertices[index]
-
     def get_triangles(self):
         return self.triangles
 
