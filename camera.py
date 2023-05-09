@@ -47,8 +47,6 @@ class Camera:
         self.pitch_degree = 0.0
         self.roll_degree = 0.0
 
-    ##### SETTERS
-
     def set_position(self, position):
         self.position = position
 
@@ -58,8 +56,6 @@ class Camera:
         self.pitch_degree = pitch
         self.roll_degree = roll
         self.__update_vectors()
-
-    ##### MVP Matrices
 
     def get_view_matrix(self):
         eye = self.position
@@ -94,8 +90,6 @@ class Camera:
         ])
 
         return projection_matrix
-
-    ##### Private
 
     def __update_vectors(self):
         self.__update_direction()
