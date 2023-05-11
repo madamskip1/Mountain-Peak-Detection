@@ -3,44 +3,41 @@ from OpenGL.GL import *
 from OpenGL.GLUT import *
 from PIL import Image, ImageDraw, ImageOps
 import cv2 as cv
-from unidecode import unidecode
 
 from Camera import Camera
 from TerrainData import TerrainData
-from TerrainModel import NewTerrainModel
+from TerrainModel import TerrainModel
 from Peaks import Peaks
 from shaders_program import create_shader_program
 from diffuse_lightning import set_diffuse_light
 from ScreenManager import ScreenManager
 from CoordsManager import CoordsManager
+from elevation_data_loader import load_elevation_data
 
 ####################
-obs_location = [49.3390454, 20.081936, 991.1]
-obs_angles = [144.31152, 2.5936904, 0.4797333]
-window_size = [3840, 5120]
-window_size = [768, 1024]
-
 options = {
-    "window_size": (768, 1024),
+    "window_size": (768, 1024),  # photo size 3840, 5120
     "observer_location": (49.3390454, 20.081936, 991.1),
     "observer_rotation": (144.31152, 2.5936904, 0.4797333),
     "hgt_init_size": 3601,
-    "simplify_factor": 20,
-    "max_distance": 30.0,
+    "simplify_factor": 10,
+    "max_distance": 50.0,
     "min_distance": 0.01,
     "fov_horizontal": 66.0
 }
 ####################
 
-screen_manager = ScreenManager(*options["window_size"])
-coords_manager = CoordsManager(options["observer_location"])
-terrain_data = TerrainData(options["hgt_init_size"], options["simplify_factor"], options['max_distance'],
-                           coords_manager.convert_geo_to_local_coords(*options['observer_location']))
-terrain_map = NewTerrainModel(terrain_data)
+elevation_data, coords_range, world_size, grid_size = load_elevation_data(
+    options["observer_location"][0], options["observer_location"][1],
+    options["max_distance"], options["hgt_init_size"], options["simplify_factor"])
 
+screen_manager = ScreenManager(*options["window_size"])
+coords_manager = CoordsManager(options["observer_location"], coords_range, grid_size)
+terrain_data = TerrainData(elevation_data, world_size, options["max_distance"],
+                           coords_manager.convert_geo_to_local_coords(*options['observer_location']))
+terrain_model = TerrainModel(terrain_data)
 
 peaks = Peaks(terrain_data, screen_manager, coords_manager)
-shader_program = None
 
 camera = Camera(
     fov_horizontal=66,
@@ -50,13 +47,15 @@ camera = Camera(
 )
 
 cam_pos_xyz = coords_manager.convert_geo_to_local_coords(*options["observer_location"])
-
 cam_position = np.array([cam_pos_xyz[0], cam_pos_xyz[1], cam_pos_xyz[2]])
+
 camera.set_position(cam_position)
 camera.set_angles(*options["observer_rotation"])
 
 light_pos = np.array([cam_pos_xyz[0], cam_pos_xyz[1] + 3.0, cam_pos_xyz[2]])
 light_color = [0.99, 0.99, 0.99]
+
+shader_program = None
 
 
 def init():
@@ -65,22 +64,22 @@ def init():
 
 
 def display():
-    global camera, terrain_map, shader_program, peaks
+    global camera, terrain_model, shader_program, peaks
     glClearColor(0.0, 0.0, 0.0, 1.0)
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
     view_matrix = camera.get_view_matrix()
     projection_matrix = camera.get_projection_matrix()
     screen_manager.set_MVP_matrices(view_matrix, projection_matrix)
-    terrain_map.draw(view_matrix, projection_matrix, shader_program)
+    terrain_model.draw(view_matrix, projection_matrix, shader_program)
     peaks_visible = peaks.get_visible_peaks()
     save(peaks_visible)
     glutSwapBuffers()
 
 
 def save(peaks_visible):
-    data = (GLubyte * (3 * window_size[0] * window_size[1]))(0)
-    glReadPixels(0, 0, window_size[0], window_size[1], GL_RGB, GL_UNSIGNED_BYTE, data)
-    image = Image.frombytes(mode="RGB", size=(window_size[0], window_size[1]), data=data)
+    data = (GLubyte * (3 * options["window_size"][0] * options["window_size"][1]))(0)
+    glReadPixels(0, 0, options["window_size"][0], options["window_size"][1], GL_RGB, GL_UNSIGNED_BYTE, data)
+    image = Image.frombytes(mode="RGB", size=(options["window_size"][0], options["window_size"][1]), data=data)
     image = image.transpose(Image.FLIP_TOP_BOTTOM)
     image = ImageOps.mirror(image)
 
@@ -111,26 +110,25 @@ def save_edges_img(image, mod=""):
 
 def add_text_to_img(image_draw, text, position):
     position[0] = int(position[0])
-    position[0] = window_size[0] - position[0]
+    position[0] = options["window_size"][0] - position[0]
     position[1] = int(position[1])
-    position[1] = window_size[1] - position[1]
-    pos_y = np.random.randint(100, window_size[1] - 100)
+    position[1] = options["window_size"][1] - position[1]
+    pos_y = np.random.randint(100, options["window_size"][1] - 100)
     image_draw.line((position[0], position[1], position[0], pos_y), fill=(255, 0, 0, 255))
-    text = unidecode(text)
     image_draw.text((position[0], pos_y), text)
 
 
 def main():
-    global shader_program, terrain_map, light_pos, light_color
+    global shader_program, terrain_model, light_pos, light_color
     glutInit()
     glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGB | GLUT_DEPTH | GLUT_MULTISAMPLE)
-    glutInitWindowSize(window_size[0], window_size[1])
-    glutCreateWindow(b"Cube")
+    glutInitWindowSize(options["window_size"][0], options["window_size"][1])
+    glutCreateWindow(b"TerrainModel")
     glutDisplayFunc(display)
     shader_program = create_shader_program()
     glUseProgram(shader_program)
     glEnable(GL_MULTISAMPLE)
-    terrain_map.prepare_buffers()
+    terrain_model.prepare_buffers()
     set_diffuse_light(shader_program, light_pos, light_color)
     init()
     glutMainLoop()

@@ -2,25 +2,23 @@ import math
 
 import numpy as np
 
-latitude_approximation = 111.2
-longitude_approximation = 71.0
-
 
 class TerrainData:
-    def __init__(self, hgt_init_size, simplify_factor, max_distance, observer_location):
-        self.hgt_size = hgt_init_size
+    def __init__(self, elevation_data, world_size, max_distance, observer_location_local):
         self.max_distance = max_distance
+        self.hgt_size = elevation_data.shape
         self.scale = None
         self.vertices = None
         self.triangles = None
         self.normals = None
-        self.observer_location = observer_location
+        self.observer_location_local = observer_location_local
         self.rows = 0
         self.cols = 0
         self.offset_x = 0
         self.offset_z = 0
         self.terrain_origin = None
-        self.__init_terrain_data(simplify_factor)
+        self.world_size = world_size
+        self.__init_terrain_data(elevation_data)
 
     def get_vertices(self, start_index, end_index):
         return self.vertices[start_index: end_index]
@@ -32,11 +30,9 @@ class TerrainData:
         z = int(z)
         return x, z
 
-    def __init_terrain_data(self, simplify_factor):
-        path = "N49E020.hgt"
-
-        elevation = self.__load_hgt_file(path, simplify_factor)
-        self.__generate_vertices(elevation)
+    def __init_terrain_data(self, elevation_data):
+        self.__calc_terrain_scale()
+        self.__generate_vertices(elevation_data)
         self.__generate_triangles()
         self.__generate_normals()
 
@@ -52,7 +48,6 @@ class TerrainData:
         return elevation
 
     def __generate_vertices(self, elevation):
-        self.__calc_terrain_scale()
         elevation = self.__drop_unused_data(elevation)
 
         vertices = np.zeros((self.rows * self.cols * 3), dtype=np.float32)
@@ -73,26 +68,26 @@ class TerrainData:
         self.vertices = vertices
 
     def __calc_terrain_scale(self):
-        x_scale = latitude_approximation / (self.hgt_size - 1)
+        x_scale = self.world_size[0] / (self.hgt_size[0] - 1)
         y_scale = 1.0 / 1000
-        z_scale = longitude_approximation / (self.hgt_size - 1)
+        z_scale = self.world_size[1] / (self.hgt_size[1] - 1)
         self.scale = (x_scale, y_scale, z_scale)
 
     def __drop_unused_data(self, elevation):
-        observer_vertex_x, observer_vertex_z = self.get_vertex_index(self.observer_location[0],
-                                                                     self.observer_location[2])
+        observer_vertex_x, observer_vertex_z = self.get_vertex_index(self.observer_location_local[0],
+                                                                     self.observer_location_local[2])
         range_x = math.ceil(self.max_distance / self.scale[0])
         range_z = math.ceil(self.max_distance / self.scale[2])
 
         x_start = observer_vertex_x - range_x
         x_end = observer_vertex_x + range_x
         x_start = max(0, x_start)
-        x_end = min(x_end, self.hgt_size)
+        x_end = min(x_end, self.hgt_size[0])
 
         z_start = observer_vertex_z - range_z
         z_end = observer_vertex_z + range_z
         z_start = max(0, z_start)
-        z_end = min(z_end, self.hgt_size)
+        z_end = min(z_end, self.hgt_size[1])
 
         elevation = elevation[x_start:x_end + 1, z_start:z_end + 1]
         init_origin = (0.0, 0.0, 0.0)
@@ -109,6 +104,7 @@ class TerrainData:
     def __generate_triangles(self):
         triangles_num = ((self.rows - 1) * (self.cols - 1) * 2)
         triangles_indices_num = triangles_num * 3
+
         triangles = np.zeros(triangles_indices_num, dtype=np.uint32)
         triangles_index = 0
         index = 0

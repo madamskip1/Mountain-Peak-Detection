@@ -1,6 +1,7 @@
 import numpy as np
 import pandas as pd
 from OpenGL.GL import *
+from unidecode import unidecode
 
 
 class Peaks:
@@ -34,6 +35,8 @@ class Peaks:
             for file_name in files_names:
                 dataframes.append(self.__read_data(file_name))
             self.dataframe = pd.concat(dataframes)
+
+        self.dataframe['name'] = self.dataframe['name'].apply(lambda x: unidecode(x))
 
     def __prepare_list_of_data_files_names(self):
         latitude_start, latitude_end = self.coords_manager.latitude_range
@@ -142,7 +145,7 @@ class Peaks:
                 vertex_coords_start = vertex_num * 3
                 vertex_coords_end = vertex_coords_start + 3
                 vertex_coord = self.terrain_data.get_vertices(vertex_coords_start, vertex_coords_end)
-                
+
                 if vertex_coord[1] > max_y:
                     max_x = vertex_coord[0]
                     max_y = vertex_coord[1]

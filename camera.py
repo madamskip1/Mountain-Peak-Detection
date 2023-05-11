@@ -46,6 +46,7 @@ class Camera:
         self.yaw_degree = 0.0
         self.pitch_degree = 0.0
         self.roll_degree = 0.0
+        self.__update_vectors()
 
     def set_position(self, position):
         self.position = position
