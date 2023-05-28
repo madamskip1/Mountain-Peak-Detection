@@ -50,3 +50,5 @@ local.properties
 
 opencv_sdk
 opencv_sdk/
+
+app/src/main/assets/
