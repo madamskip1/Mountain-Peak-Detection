@@ -4,9 +4,9 @@ import android.util.Log;
 
 public class Camera {
     private final double fovHorizontal;
-    private final double aspectRatio;
-    private final double near;
-    private final double far;
+    private final float aspectRatio;
+    private final float near;
+    private final float far;
 
     private final double[] position;
     private final double[] targetVector;
@@ -14,7 +14,7 @@ public class Camera {
     private final double[] upVector;
     private double[] directionVector;
 
-    Camera(double fovHorizontal, double aspectRatio, double near, double far) {
+    Camera(double fovHorizontal, float aspectRatio, float near, float far) {
         this.fovHorizontal = fovHorizontal;
         this.aspectRatio = aspectRatio;
         this.near = near;
@@ -38,18 +38,18 @@ public class Camera {
         updateVectors();
     }
 
-    public double[] getProjectionMatrix() {
-        double f = 1.0 / Math.tan(Math.toRadians(fovHorizontal / 2.0));
+    public float[] getProjectionMatrix() {
+        float f = 1.0f / (float) Math.tan(Math.toRadians(fovHorizontal / 2.0));
 
-        return new double[]{
-                f / aspectRatio, 0.0, 0.0, 0.0,  // col 1
-                0.0, f, 0.0, 0.0,  // col 2
-                0.0, 0.0, (far + near) / (near - far), -1.0,  // col 3
-                0.0, 0.0, (2.0 * far * near) / (near - far), 0.0  // col 4
+        return new float[]{
+                (f / aspectRatio), 0.0f, 0.0f, 0.0f,  // col 1
+                0.0f, f, 0.0f, 0.0f,  // col 2
+                0.0f, 0.0f, (far + near) / (near - far), -1.0f,  // col 3
+                0.0f, 0.0f, (2.0f * far * near) / (near - far), 0.0f  // col 4
         };
     }
 
-    public double[] getViewMatrix() {
+    public float[] getViewMatrix() {
         double[] eyeTarget = new double[]{
                 position[0] - targetVector[0],
                 position[1] - targetVector[1],
@@ -64,15 +64,15 @@ public class Camera {
         double[] xMatrix = Utility.normalizeVectorDouble(Utility.crossProduct3ElementsVector(upVector, zMatrix), 3);
         double[] yMatrix = Utility.crossProduct3ElementsVector(zMatrix, xMatrix);
 
-        double xTranslation = Utility.dotProduct(xMatrix, 3, negatedEye, 3);
-        double yTranslation = Utility.dotProduct(yMatrix, 3, negatedEye, 3);
-        double zTranslation = Utility.dotProduct(zMatrix, 3, negatedEye, 3);
+        float xTranslation = (float) Utility.dotProduct(xMatrix, 3, negatedEye, 3);
+        float yTranslation = (float) Utility.dotProduct(yMatrix, 3, negatedEye, 3);
+        float zTranslation = (float) Utility.dotProduct(zMatrix, 3, negatedEye, 3);
 
-        return new double[]{
-                xMatrix[0], yMatrix[0], zMatrix[0], 0.0,  // col 1
-                xMatrix[1], yMatrix[1], zMatrix[1], 0.0,  // col 2
-                xMatrix[2], yMatrix[2], zMatrix[2], 0.0,  // col 3
-                xTranslation, yTranslation, zTranslation, 1.0,  // col 1
+        return new float[]{
+                (float) xMatrix[0], (float) yMatrix[0], (float) zMatrix[0], 0.0f,  // col 1
+                (float) xMatrix[1], (float) yMatrix[1], (float) zMatrix[1], 0.0f,  // col 2
+                (float) xMatrix[2], (float) yMatrix[2], (float) zMatrix[2], 0.0f,  // col 3
+                xTranslation, yTranslation, zTranslation, 1.0f,  // col 1
         };
     }
 
