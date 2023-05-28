@@ -11,6 +11,19 @@ import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 
 public class TerrainLoader {
+    private final String[][] filesNamesGrid = new String[][]
+            {
+                    { null, null, null },
+                    { "N49E019.hgt", "N49E020.hgt", null },
+                    { "N48E019.hgt", "N48E020.hgt", null }
+            };
+    private final float[] world_size = new float[] { 222.38985328911747f, 145.87864979682834f };
+    private final float[] grid_size = new float[] { 111.19492664455873f, 72.93932489841417f };
+    private final int[] newHgtSize = new int[] { 2402, 2402 };
+    private final float max_distance = 50.0f;
+    private final int observer_vertex_x = 793;
+    private final int observer_vertex_z = 1298;
+
     private final float LATITUDE_APPROXIMATION = 111.0f;
     private final float LONGITUDE_APPROXIMATION = 73.0f;
 
@@ -21,14 +34,14 @@ public class TerrainLoader {
 
     private float[] vertices;
 
+
+
     public TerrainLoader(Context context) {
         this.context = context;
         worldSize = new float[]{LATITUDE_APPROXIMATION, LONGITUDE_APPROXIMATION};
         calcScale();
-        short[][] heightMap = loadHgtFile("srtm_data/N49E020.hgt");
-        generateVertices(heightMap);
-        heightMap = null;
-        generateTriangles();
+        short[][] heightMap = loadHgtGrid();
+        heightMap = dropUnusedData(heightMap);
     }
 
     private short[][] loadHgtFile(String path) {
@@ -42,6 +55,94 @@ public class TerrainLoader {
         return heightMap;
     }
 
+    private short[][] loadHgtGrid()
+    {
+        int startRow = -1;
+        int startCol = -1;
+        int endRow = -1;
+        int endCol = -1;
+
+        for (int i = 0; i < 3; ++i)
+        {
+            for (int j = 0; j < 3; ++j)
+            {
+                if (filesNamesGrid[i][j] != null)
+                {
+                    if (startRow == -1)
+                    {
+                        startRow = i;
+                    }
+                    if (startCol == -1)
+                    {
+                        startCol = j;
+                    }
+                    if (endRow < i)
+                    {
+                        endRow = i;
+                    }
+                    if (endCol < j)
+                    {
+                        endCol = j;
+                    }
+                }
+            }
+        }
+
+        int rows = endRow - startRow + 1;
+        int cols = endCol - startCol + 1;
+
+        short[][] elevation = new short[rows * 1201][cols * 1201];
+        for (int i = 0; i < rows; ++i)
+        {
+            for (int j = 0; j < cols; ++j)
+            {
+                short[][] fileData = loadHgtFile("srtm_data/" + filesNamesGrid[i + startRow][j + startCol]);
+                int xOffset = i * 1201;
+                int zOffset = j * 1201;
+
+                for (int x = 0; x < 1201; ++x)
+                {
+                    int rowIndex = x + xOffset;
+                    for (int z = 0; z < 1201; ++z)
+                    {
+                        int colIndex = z + zOffset;
+                        short val = fileData[x][z];
+                        elevation[rowIndex][colIndex] = val;
+                    }
+                }
+                fileData = null;
+            }
+        }
+
+        return elevation;
+    }
+
+    private short[][] dropUnusedData(short[][] heightMap)
+    {
+        int range_x = (int) Math.ceil(max_distance / scale[0]);
+        int range_z = (int) Math.ceil(max_distance / scale[2]);
+
+        int x_start = observer_vertex_x - range_x;
+        int x_end = observer_vertex_x + range_x;
+        int z_start = observer_vertex_z - range_z;
+        int z_end = observer_vertex_z + range_z;
+        x_start = Math.max(0, x_start);
+        z_start = Math.max(0, z_start);
+        x_end = Math.min(x_end, newHgtSize[0]);
+        z_end = Math.min(z_end, newHgtSize[1]);
+
+        float origin_x = 0.0f + (float)x_start * scale[0];
+        float origin_z = 0.0f + (float)z_start * scale[2];
+
+        short[][] newHeightMap = new short[x_end - x_start + 1][z_end - z_start + 1];
+        for (int i = x_start; i <= x_end; i++) {
+            for (int j = z_start; j <= z_end; j++) {
+                newHeightMap[i - x_start][j - z_start] = heightMap[i][j];
+            }
+        }
+        heightMap = null;
+        return newHeightMap;
+    }
 
     private byte[] loadHgtByteData(String path) throws IOException {
         AssetManager assetManager = context.getAssets();
@@ -93,7 +194,6 @@ public class TerrainLoader {
 
     private void generateVertices(short[][] heightMap) {
         float[] vertices = new float[1201 * 1201 * 3];
-        Log.d("Moje", "verictes length= " + vertices.length);
         int verticesIndex = 0;
 
         for (int x = 0; x < 1201; ++x) {
@@ -112,18 +212,14 @@ public class TerrainLoader {
     }
 
     private void generateTriangles() {
-        Log.d("Moje", "dUpa");
         int trianglesNum = ((1201 - 1) * (1201 - 1) *2);
-        Log.d("Moje", "dUpa");
         int[] triangles = new int[trianglesNum * 3];
 
-        Log.d("Moje", "dUpa");
-        Log.d("Moje", "dUpatutaj");
         int trianglesIndex = 0;
         int index = 0;
         int xMax = 1201 - 1;
         int zMax = 1201 - 1;
-        Log.d("Moje", "dUpa");
+
         for (int x = 0; x < xMax; ++x) {
             for (int z = 0; z < zMax; ++z) {
                 int a = index;
