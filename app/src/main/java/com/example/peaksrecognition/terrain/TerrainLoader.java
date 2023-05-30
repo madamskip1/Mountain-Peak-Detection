@@ -25,6 +25,13 @@ public class TerrainLoader {
 
     private float[] vertices;
 
+    private int heightMapRows;
+    private int heightMapCols;
+    private int heightMapOffsetX;
+    private int heightMapOffsetZ;
+
+    private double[] terrainOrigin;
+
     public TerrainLoader(Context context) {
         this.context = context;
         double observerLatitude = 49.339045;
@@ -38,7 +45,7 @@ public class TerrainLoader {
         short[][] heightMap = loadHgtGrid(filesNamesGrid);
         heightMap = dropUnusedData(heightMap);
         generateVertices(heightMap);
-        //generateTriangles();
+        generateTriangles();
     }
 
     private short[][] loadHgtFile(String path) {
@@ -114,6 +121,7 @@ public class TerrainLoader {
         x_end = Math.min(x_end, newHgtSize[0]);
         z_end = Math.min(z_end, newHgtSize[1]);
 
+
         double origin_x = 0.0f + x_start * scale[0];
         double origin_z = 0.0f + z_start * scale[2];
 
@@ -123,6 +131,15 @@ public class TerrainLoader {
                 System.arraycopy(heightMap[i], z_start, newHeightMap[i - x_start], 0, z_end + 1 - z_start);
         }
         heightMap = null;
+
+
+        terrainOrigin = new double[] { origin_x, 0.0, origin_z };
+        heightMapRows = x_end - x_start + 1;
+        heightMapCols = z_end - z_start + 1;
+        heightMapOffsetX = x_start;
+        heightMapOffsetZ = z_start;
+
+
         return newHeightMap;
     }
 
@@ -176,15 +193,15 @@ public class TerrainLoader {
 
     private void generateVertices(short[][] heightMap) {
         // TODO: Fix after adding dropUnusedData
-        float[] vertices = new float[1201 * 1201 * 3];
+        float[] vertices = new float[heightMapRows * heightMapCols * 3];
         int verticesIndex = 0;
 
-        for (int x = 0; x < 1201; ++x) {
-            for (int z = 0; z < 1201; ++z) {
+        for (int x = 0; x < heightMapRows; ++x) {
+            for (int z = 0; z < heightMapCols; ++z) {
                 short y = heightMap[x][z];
-                float xCoord = (float) (0.0 + scale[0] * x);
-                float yCoord = (float) (0.0 + scale[1] * y);
-                float zCoord = (float) (0.0 + scale[2] * z);
+                float xCoord = (float) (terrainOrigin[0] + scale[0] * x);
+                float yCoord = (float) (terrainOrigin[1] + scale[1] * y);
+                float zCoord = (float) (terrainOrigin[2] + scale[2] * z);
                 vertices[verticesIndex] = xCoord;
                 vertices[verticesIndex + 1] = yCoord;
                 vertices[verticesIndex + 2] = zCoord;
@@ -195,20 +212,20 @@ public class TerrainLoader {
     }
 
     private void generateTriangles() {
-        int trianglesNum = ((1201 - 1) * (1201 - 1) * 2);
+        int trianglesNum = (heightMapRows - 1) * (heightMapCols - 1) * 2;
         int[] triangles = new int[trianglesNum * 3];
 
         int trianglesIndex = 0;
         int index = 0;
-        int xMax = 1201 - 1;
-        int zMax = 1201 - 1;
+        int xMax = heightMapRows - 1;
+        int zMax = heightMapCols - 1;
 
         for (int x = 0; x < xMax; ++x) {
             for (int z = 0; z < zMax; ++z) {
                 int a = index;
                 int b = index + 1;
-                int c = index + 1201 + 1;
-                int d = index + 1201;
+                int c = index + heightMapCols + 1;
+                int d = index + heightMapCols;
                 ++index;
 
                 triangles[trianglesIndex] = a;
