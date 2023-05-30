@@ -1,13 +1,13 @@
 package com.example.peaksrecognition;
 
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.app.ActivityCompat;
-
 import android.Manifest;
 import android.content.pm.PackageManager;
 import android.opengl.GLSurfaceView;
 import android.os.Bundle;
 import android.widget.ImageView;
+
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
 
 import com.example.peaksrecognition.mainopengl.OffScreenRenderer;
 
@@ -28,6 +28,7 @@ public class MainActivity extends AppCompatActivity {
     private GLSurfaceView glView;
     private OffScreenRenderer renderer2;
     private ImageView imageView;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -55,20 +56,16 @@ public class MainActivity extends AppCompatActivity {
         saveMatToDeviceMemory(image);
     }
 
-    private void checkSaveToDeviceMemoryPermissions()
-    {
+    private void checkSaveToDeviceMemoryPermissions() {
         if (ActivityCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
             if (ActivityCompat.shouldShowRequestPermissionRationale(
                     MainActivity.this,
                     android.Manifest.permission.ACCESS_FINE_LOCATION)
-            )
-            {
+            ) {
                 ActivityCompat.requestPermissions(
                         MainActivity.this,
                         new String[]{android.Manifest.permission.ACCESS_FINE_LOCATION}, 1);
-            }
-            else
-            {
+            } else {
                 ActivityCompat.requestPermissions(
                         MainActivity.this,
                         new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, 1);
@@ -76,15 +73,13 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    private void saveMatToDeviceMemory(Mat imageMat)
-    {
+    private void saveMatToDeviceMemory(Mat imageMat) {
         byte[] imageData;
-        MatOfByte matOfByte =  new MatOfByte();
+        MatOfByte matOfByte = new MatOfByte();
         Imgcodecs.imencode(".jpg", imageMat, matOfByte);
         imageData = matOfByte.toArray();
         File dir = new File(getExternalFilesDir(null), "test");
-        if (!dir.exists())
-        {
+        if (!dir.exists()) {
             dir.mkdir();
         }
         File file = new File(dir, "off_screen_render.jpg");

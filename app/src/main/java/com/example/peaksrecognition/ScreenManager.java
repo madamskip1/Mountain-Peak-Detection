@@ -3,7 +3,7 @@ package com.example.peaksrecognition;
 import android.opengl.GLU;
 
 public class ScreenManager {
-    private int[] viewport;
+    private final int[] viewport;
     private float[] viewMatrix;
     private float[] projectionMatrix;
 
@@ -16,7 +16,7 @@ public class ScreenManager {
     }
 
     public void setViewportDimensions(int screenWidth, int screenHeight) {
-        viewport[2] = screenHeight;
+        viewport[2] = screenWidth;
         viewport[3] = screenHeight;
     }
 

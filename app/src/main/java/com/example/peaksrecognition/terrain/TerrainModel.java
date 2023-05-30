@@ -1,7 +1,6 @@
 package com.example.peaksrecognition.terrain;
 
 import android.opengl.GLES30;
-import android.util.Log;
 
 import com.example.peaksrecognition.mainopengl.ShaderProgram;
 

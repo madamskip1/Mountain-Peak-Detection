@@ -21,9 +21,9 @@ public class TerrainLoader {
 
     private final double[] worldSize;
     private final int[] initHgtSize = new int[]{3601, 3601};
-    private int[] hgtSize;
     private final int simplifyFactor = 3;
     private final Context context;
+    private int[] hgtSize;
     private double[] scale;
 
     private float[] vertices;
@@ -35,8 +35,8 @@ public class TerrainLoader {
 
     private double[] terrainOrigin;
 
-    private int[][] coordsRange;
-    private double[] gridSize;
+    private final int[][] coordsRange;
+    private final double[] gridSize;
 
     public TerrainLoader(Context context, double observerLatitude, double observerLongitude) {
         this.context = context;
@@ -61,18 +61,18 @@ public class TerrainLoader {
         return vertices;
     }
 
-    public int[] getTriangles()
-    {
+    public int[] getTriangles() {
         return triangles;
     }
 
     public int[][] getCoordsRange() {
         return coordsRange;
     }
-    public double[] getGridSize()
-    {
+
+    public double[] getGridSize() {
         return gridSize;
     }
+
     private short[][] loadHgtFile(String path) {
         byte[] data;
         try {
@@ -130,7 +130,7 @@ public class TerrainLoader {
             }
         }
 
-        hgtSize = new int[] { elevation.length, elevation[0].length };
+        hgtSize = new int[]{elevation.length, elevation[0].length};
         return elevation;
     }
 
@@ -157,7 +157,7 @@ public class TerrainLoader {
         }
         heightMap = null;
 
-        terrainOrigin = new double[] { origin_x, 0.0, origin_z };
+        terrainOrigin = new double[]{origin_x, 0.0, origin_z};
         heightMapRows = x_end - x_start + 1;
         heightMapCols = z_end - z_start + 1;
         heightMapOffsetX = x_start;
