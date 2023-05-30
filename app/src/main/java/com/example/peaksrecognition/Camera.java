@@ -72,10 +72,10 @@ public class Camera {
         float zTranslation = (float) Utility.dotProduct(zMatrix, 3, negatedEye, 3);
 
         float[] viewMatrix = new float[]{
-                (float) xMatrix[0], (float) yMatrix[0], (float) zMatrix[0], 0.0f,  // col 1
-                (float) xMatrix[1], (float) yMatrix[1], (float) zMatrix[1], 0.0f,  // col 2
-                (float) xMatrix[2], (float) yMatrix[2], (float) zMatrix[2], 0.0f,  // col 3
-                xTranslation, yTranslation, zTranslation, 1.0f,  // col 1
+                -(float) xMatrix[0], (float) yMatrix[0], (float) zMatrix[0], 0.0f,  // col 1
+                -(float) xMatrix[1], (float) yMatrix[1], (float) zMatrix[1], 0.0f,  // col 2
+                -(float) xMatrix[2], (float) yMatrix[2], (float) zMatrix[2], 0.0f,  // col 3
+                -xTranslation, yTranslation, zTranslation, 1.0f,  // col 1
         };
         return viewMatrix;
     }
