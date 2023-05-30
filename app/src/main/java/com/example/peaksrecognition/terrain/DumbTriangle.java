@@ -8,6 +8,7 @@ import com.example.peaksrecognition.mainopengl.ShaderProgram;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.nio.FloatBuffer;
+import java.nio.IntBuffer;
 import java.nio.ShortBuffer;
 
 public class DumbTriangle {
@@ -17,10 +18,10 @@ public class DumbTriangle {
             -0.5f, -0.311004243f, 0.0f, // bottom left
             0.5f, -0.311004243f, 0.0f  // bottom right
     };
-    static short[] drawOrder = {0, 1, 2};
+    static int[] drawOrder = {0, 1, 2};
 
     private final FloatBuffer vertexBuffer;
-    private final ShortBuffer drawListBuffer;
+    private final IntBuffer drawListBuffer;
 
     private final ShaderProgram shaderClass;
 
@@ -43,9 +44,9 @@ public class DumbTriangle {
         vertexBuffer.put(triangleCoords);
         vertexBuffer.position(0);
 
-        ByteBuffer dlb = ByteBuffer.allocateDirect(drawOrder.length * 2);
+        ByteBuffer dlb = ByteBuffer.allocateDirect(drawOrder.length * 4);
         dlb.order(ByteOrder.nativeOrder());
-        drawListBuffer = dlb.asShortBuffer();
+        drawListBuffer = dlb.asIntBuffer();
         drawListBuffer.put(drawOrder);
         drawListBuffer.position(0);
 
@@ -61,7 +62,7 @@ public class DumbTriangle {
         GLES30.glDrawElements(
                 GLES30.GL_TRIANGLES,
                 drawOrder.length,
-                GLES30.GL_UNSIGNED_SHORT,
+                GLES30.GL_UNSIGNED_INT,
                 0);
         GLES30.glBindVertexArray(0);
     }
@@ -101,7 +102,7 @@ public class DumbTriangle {
         GLES30.glBindBuffer(GLES30.GL_ELEMENT_ARRAY_BUFFER, ibo);
         GLES30.glBufferData(
                 GLES30.GL_ELEMENT_ARRAY_BUFFER,
-                drawListBuffer.capacity() * 2,
+                drawListBuffer.capacity() * 4,
                 drawListBuffer,
                 GLES30.GL_STATIC_DRAW);
         GLES30.glBindBuffer(GLES30.GL_ELEMENT_ARRAY_BUFFER, 0);

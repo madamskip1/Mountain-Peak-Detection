@@ -3,12 +3,21 @@ package com.example.peaksrecognition;
 import android.opengl.GLU;
 
 public class ScreenManager {
-    private final int[] viewport;
+    private int[] viewport;
     private float[] viewMatrix;
     private float[] projectionMatrix;
 
+    public ScreenManager() {
+        viewport = new int[]{0, 0, 0, 0};
+    }
+
     ScreenManager(int screenWidth, int screenHeight) {
         viewport = new int[]{0, 0, screenWidth, screenHeight};
+    }
+
+    public void setViewportDimensions(int screenWidth, int screenHeight) {
+        viewport[2] = screenHeight;
+        viewport[3] = screenHeight;
     }
 
     public void setMVPMatrices(float[] viewMatrix, float[] projectionMatrix) {

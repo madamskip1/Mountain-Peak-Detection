@@ -8,13 +8,13 @@ public class Camera {
     private final float near;
     private final float far;
 
-    private final double[] position;
-    private final double[] targetVector;
+    private double[] position;
+    private double[] targetVector;
     private double[] angles;
     private final double[] upVector;
     private double[] directionVector;
 
-    Camera(double fovHorizontal, float aspectRatio, float near, float far) {
+    public Camera(double fovHorizontal, float aspectRatio, float near, float far) {
         this.fovHorizontal = fovHorizontal;
         this.aspectRatio = aspectRatio;
         this.near = near;
@@ -31,6 +31,7 @@ public class Camera {
         position[0] = x;
         position[1] = y;
         position[2] = z;
+
     }
 
     public void setAngles(double yawDegree, double pitchDegree, double rollDegree) {
@@ -41,12 +42,14 @@ public class Camera {
     public float[] getProjectionMatrix() {
         float f = 1.0f / (float) Math.tan(Math.toRadians(fovHorizontal / 2.0));
 
-        return new float[]{
+        float[] projectionMatrix = new float[]{
                 (f / aspectRatio), 0.0f, 0.0f, 0.0f,  // col 1
                 0.0f, f, 0.0f, 0.0f,  // col 2
                 0.0f, 0.0f, (far + near) / (near - far), -1.0f,  // col 3
                 0.0f, 0.0f, (2.0f * far * near) / (near - far), 0.0f  // col 4
         };
+
+        return projectionMatrix;
     }
 
     public float[] getViewMatrix() {
@@ -68,12 +71,13 @@ public class Camera {
         float yTranslation = (float) Utility.dotProduct(yMatrix, 3, negatedEye, 3);
         float zTranslation = (float) Utility.dotProduct(zMatrix, 3, negatedEye, 3);
 
-        return new float[]{
+        float[] viewMatrix = new float[]{
                 (float) xMatrix[0], (float) yMatrix[0], (float) zMatrix[0], 0.0f,  // col 1
                 (float) xMatrix[1], (float) yMatrix[1], (float) zMatrix[1], 0.0f,  // col 2
                 (float) xMatrix[2], (float) yMatrix[2], (float) zMatrix[2], 0.0f,  // col 3
                 xTranslation, yTranslation, zTranslation, 1.0f,  // col 1
         };
+        return viewMatrix;
     }
 
     private double[] fixAngles(double yawDegree, double pitchDegree, double rollDegree) {
@@ -91,14 +95,10 @@ public class Camera {
     }
 
     private void updateVectors() {
+
         updateDirectionVector();
         updateUpVector();
         updateTargetVector();
-        Log.d("moje", "position: " + position[0] + " " + position[1] + " " + position[2] + " ");
-        Log.d("moje", "angles: " + angles[0] + " " + angles[1] + " " + angles[2] + " ");
-        Log.d("moje", "upVector: " + upVector[0] + " " + upVector[1] + " " + upVector[2] + " ");
-        Log.d("moje", "targetVector: " + targetVector[0] + " " + targetVector[1] + " " + targetVector[2] + " ");
-        Log.d("moje", "directionVector: " + directionVector[0] + " " + directionVector[1] + " " + directionVector[2] + " ");
     }
 
     private void updateDirectionVector() {

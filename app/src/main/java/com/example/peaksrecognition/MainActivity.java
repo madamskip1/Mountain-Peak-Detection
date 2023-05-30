@@ -15,8 +15,6 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        TerrainLoader terrainLoader = new TerrainLoader(this);
-
         glView = new MyGLSurfaceView(this);
         setContentView(glView);
     }

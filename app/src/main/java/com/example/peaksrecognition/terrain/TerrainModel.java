@@ -1,6 +1,7 @@
 package com.example.peaksrecognition.terrain;
 
 import android.opengl.GLES30;
+import android.util.Log;
 
 import com.example.peaksrecognition.mainopengl.ShaderProgram;
 
@@ -21,6 +22,9 @@ public class TerrainModel {
 
     private FloatBuffer vertexBuffer;
     private IntBuffer trianglesBuffer;
+
+    private float[] vertices;
+    private int[] triangles;
 
     private int trianglesLength;
 
@@ -47,6 +51,7 @@ public class TerrainModel {
                 0
         );
         GLES30.glBindVertexArray(0);
+
     }
 
 
@@ -69,7 +74,7 @@ public class TerrainModel {
     }
 
     private void generateVboData() {
-        float[] vertices = terrainLoader.getVertices();
+        vertices = terrainLoader.getVertices();
         ByteBuffer byteBuffer = ByteBuffer.allocateDirect(vertices.length * 4);
         byteBuffer.order(ByteOrder.nativeOrder());
         vertexBuffer = byteBuffer.asFloatBuffer();
@@ -87,7 +92,7 @@ public class TerrainModel {
     }
 
     private void generateIboData() {
-        int[] triangles = terrainLoader.getTriangles();
+        triangles = terrainLoader.getTriangles();
         trianglesLength = triangles.length;
         ByteBuffer byteBuffer = ByteBuffer.allocateDirect(triangles.length * 4);
         byteBuffer.order(ByteOrder.nativeOrder());

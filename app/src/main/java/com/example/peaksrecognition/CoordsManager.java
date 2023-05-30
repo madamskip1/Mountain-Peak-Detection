@@ -1,14 +1,16 @@
 package com.example.peaksrecognition;
 
+import android.util.Log;
+
 public class CoordsManager {
     private static final double EARTH_RADIUS = 6371.0;
-    private final double[] latitudeRange;
-    private final double[] longitudeRange;
+    private final int[] latitudeRange;
+    private final int[] longitudeRange;
     private final double altitudeScale = 1.0 / 1000.0;
     private final double[] gridSize;
     private final double[] observerLocationGeo;
 
-    CoordsManager(double[] observerLocationGeo, double[][] coordsRange, double[] gridSize) {
+    public CoordsManager(double[] observerLocationGeo, int[][] coordsRange, double[] gridSize) {
         latitudeRange = coordsRange[0];
         longitudeRange = coordsRange[1];
         this.gridSize = gridSize;
@@ -25,9 +27,10 @@ public class CoordsManager {
     }
 
     public double[] convertGeoToLocalCoords(double latitude, double longitude, double altitude) {
-        double x = (latitudeRange[1] - latitude) * gridSize[0];
-        double z = (longitude - longitudeRange[0]) * gridSize[1];
+        double x = ((double) latitudeRange[1] - latitude) * gridSize[0];
+        double z = (longitude - (double) longitudeRange[0]) * gridSize[1];
         double y = altitude * altitudeScale;
+        Log.d("moje", "Altitude " + y + " " + altitude + " " + altitudeScale);
 
         return new double[]{x, y, z};
     }
