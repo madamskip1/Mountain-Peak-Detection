@@ -13,6 +13,8 @@ public class TerrainModel {
     private final TerrainLoader terrainLoader;
     private final int shader;
     private final int positionAttribute;
+    private final int viewMatrixUniform;
+    private final int projectionMatrixUniform;
     private int vao;
     private int vbo;
     private int ibo;
@@ -29,11 +31,15 @@ public class TerrainModel {
         this.terrainLoader = terrainLoader;
         shader = shaderProgram.getShaderProgram();
         positionAttribute = GLES30.glGetAttribLocation(shader, "vPosition");
+        viewMatrixUniform = GLES30.glGetUniformLocation(shader, "viewMatrix");
+        projectionMatrixUniform = GLES30.glGetUniformLocation(shader, "projectionMatrix");
         prepareBuffers();
     }
 
     public void draw(float[] viewMatrix, float[] projectionMatrix) {
         GLES30.glBindVertexArray(vao);
+        GLES30.glUniformMatrix4fv(viewMatrixUniform, 1, false, viewMatrix, 0);
+        GLES30.glUniformMatrix4fv(projectionMatrixUniform, 1, false, projectionMatrix, 0);
         GLES30.glDrawElements(
                 GLES30.GL_TRIANGLES,
                 trianglesLength,

@@ -6,13 +6,15 @@ import android.opengl.GLES30;
 public class ShaderProgram {
     private final String vertexShaderCode =
             "attribute vec4 vPosition;" +
+                    "uniform mat4 viewMatrix;" +
+                    "uniform mat4 projectionMatrix;" +
                     "void main() {" +
-                    "  gl_Position = vPosition;" +
+                    "  gl_Position = projectionMatrix * viewMatrix * vPosition;" +
                     "}";
     private final String fragmentShaderCode =
             "precision mediump float;" +
                     "void main() {" +
-                    "  gl_FragColor = vec4(1.0, 0.5, 0.5, 1.0);" +
+                    "  gl_FragColor = vec4(1.0, 1.0, 1.0, 1.0);" +
                     "}";
     private final int shaderProgram;
 
