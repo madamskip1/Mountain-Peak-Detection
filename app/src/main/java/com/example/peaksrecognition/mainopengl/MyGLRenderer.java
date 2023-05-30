@@ -1,15 +1,31 @@
 package com.example.peaksrecognition.mainopengl;
 
+import android.Manifest;
 import android.content.Context;
+import android.content.pm.PackageManager;
 import android.opengl.GLES30;
 import android.opengl.GLSurfaceView;
 import android.util.Log;
+
+import androidx.core.app.ActivityCompat;
 
 import com.example.peaksrecognition.Camera;
 import com.example.peaksrecognition.CoordsManager;
 import com.example.peaksrecognition.ScreenManager;
 import com.example.peaksrecognition.terrain.TerrainLoader;
 import com.example.peaksrecognition.terrain.TerrainModel;
+
+import org.opencv.core.Core;
+import org.opencv.core.CvType;
+import org.opencv.core.Mat;
+import org.opencv.core.MatOfByte;
+import org.opencv.imgcodecs.Imgcodecs;
+
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.nio.ByteBuffer;
+import java.nio.ByteOrder;
 
 import javax.microedition.khronos.egl.EGLConfig;
 import javax.microedition.khronos.opengles.GL10;
@@ -21,6 +37,7 @@ public class MyGLRenderer implements GLSurfaceView.Renderer {
     private CoordsManager coordsManager;
     private ScreenManager screenManager;
     private final Context context;
+
 
     public MyGLRenderer(Context context) {
         this.context = context;
@@ -39,11 +56,9 @@ public class MyGLRenderer implements GLSurfaceView.Renderer {
         screenManager = new ScreenManager();
         coordsManager = new CoordsManager(observerLocation, terrainLoader.getCoordsRange(), terrainLoader.getGridSize());
         double[] cameraPositionLocal = coordsManager.convertGeoToLocalCoords(observerLocation[0], observerLocation[1], observerLocation[2]);
-        camera = new Camera(66.0, 0.75f, 0.01f, 31.0f);
+        camera = new Camera(66.0, 0.54573f, 0.01f, 31.0f);
         camera.setPosition(cameraPositionLocal[0], cameraPositionLocal[1], cameraPositionLocal[2]);
         camera.setAngles(observerRotation[0], observerRotation[1], observerRotation[2]);
-
-
     }
 
     @Override

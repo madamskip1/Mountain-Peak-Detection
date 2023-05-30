@@ -9,6 +9,7 @@ public class ShaderProgram {
                     "uniform mat4 viewMatrix;" +
                     "uniform mat4 projectionMatrix;" +
                     "void main() {" +
+                    //"  vPosition = vec4(vPosition.x * -1.0, vPosition.y, vPosition.z, vPosition.w);" +
                     "  gl_Position = projectionMatrix * viewMatrix * vPosition;" +
                     "}";
     private final String fragmentShaderCode =

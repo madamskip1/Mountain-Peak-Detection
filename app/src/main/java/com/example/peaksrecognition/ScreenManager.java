@@ -11,7 +11,7 @@ public class ScreenManager {
         viewport = new int[]{0, 0, 0, 0};
     }
 
-    ScreenManager(int screenWidth, int screenHeight) {
+    public ScreenManager(int screenWidth, int screenHeight) {
         viewport = new int[]{0, 0, screenWidth, screenHeight};
     }
 
