@@ -11,6 +11,7 @@ import com.example.peaksrecognition.Peaks;
 import com.example.peaksrecognition.ScreenManager;
 import com.example.peaksrecognition.terrain.TerrainData;
 import com.example.peaksrecognition.terrain.TerrainLoader;
+import com.example.peaksrecognition.terrain.TerrainLoader.LoadedTerrain;
 import com.example.peaksrecognition.terrain.TerrainModel;
 
 import javax.microedition.khronos.egl.EGLConfig;
@@ -48,7 +49,8 @@ public class MyGLRenderer implements GLSurfaceView.Renderer {
         GLES30.glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
         shaderProgram = new ShaderProgram();
         TerrainLoader terrainLoader = new TerrainLoader(context, config);
-        TerrainData terrainData = new TerrainData(context, config);
+        LoadedTerrain loadedTerrain = terrainLoader.load();
+        TerrainData terrainData = new TerrainData(loadedTerrain, config);
         terrainModel = new TerrainModel(terrainData, shaderProgram);
         screenManager = new ScreenManager();
         coordsManager = new CoordsManager(observerLocation, terrainData.getCoordsRange(), terrainData.getGridSize());

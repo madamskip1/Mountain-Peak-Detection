@@ -1,8 +1,7 @@
 package com.example.peaksrecognition.terrain;
 
-import android.content.Context;
-
 import com.example.peaksrecognition.Config;
+import com.example.peaksrecognition.terrain.TerrainLoader.LoadedTerrain;
 
 public class TerrainData {
     private final double[] scale;
@@ -16,9 +15,7 @@ public class TerrainData {
     private int offsetX;
     private int offsetZ;
 
-    public TerrainData(Context context, Config config) {
-        TerrainLoader terrainLoader = new TerrainLoader(context, config);
-        TerrainLoader.LoadedTerrain loadedTerrain = terrainLoader.load();
+    public TerrainData(LoadedTerrain loadedTerrain, Config config) {
         scale = loadedTerrain.scale;
         gridSize = loadedTerrain.gridSize;
         coordsRange = loadedTerrain.coordsRange;

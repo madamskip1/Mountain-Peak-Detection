@@ -12,6 +12,7 @@ import com.example.peaksrecognition.Camera;
 import com.example.peaksrecognition.CoordsManager;
 import com.example.peaksrecognition.terrain.TerrainData;
 import com.example.peaksrecognition.terrain.TerrainLoader;
+import com.example.peaksrecognition.terrain.TerrainLoader.LoadedTerrain;
 import com.example.peaksrecognition.terrain.TerrainModel;
 
 import java.nio.ByteBuffer;
@@ -37,7 +38,8 @@ public class OffScreenRenderer {
         GLES30.glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
         shaderProgram = new ShaderProgram();
         TerrainLoader terrainLoader = new TerrainLoader(context, null);
-        TerrainData terrainData = new TerrainData(context, null);
+        LoadedTerrain loadedTerrain = terrainLoader.load();
+        TerrainData terrainData = new TerrainData(loadedTerrain, null);
         terrainModel = new TerrainModel(null, shaderProgram);
         coordsManager = new CoordsManager(observerLocation, terrainData.getCoordsRange(), terrainData.getGridSize());
         double[] cameraPositionLocal = coordsManager.convertGeoToLocalCoords(observerLocation[0], observerLocation[1], observerLocation[2]);
