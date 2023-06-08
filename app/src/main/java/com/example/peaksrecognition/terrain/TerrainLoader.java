@@ -2,7 +2,6 @@ package com.example.peaksrecognition.terrain;
 
 import android.content.Context;
 import android.content.res.AssetManager;
-import android.util.Log;
 
 import com.example.peaksrecognition.Config;
 import com.example.peaksrecognition.CoordsManager;
@@ -16,7 +15,7 @@ import java.util.Vector;
 
 public class TerrainLoader {
     private final Context context;
-    private Config config;
+    private final Config config;
 
 
     public TerrainLoader(Context context, Config config) {
@@ -24,41 +23,18 @@ public class TerrainLoader {
         this.config = config;
     }
 
-    public class LoadedTerrain
-    {
-        public short[][] heightMap;
-        public int[][] coordsRange;
-        public double[] gridSize;
-        public int[] hgtSize;
-        public double[] scale;
-
-        public LoadedTerrain(short[][] heightMap, int[][] coordsRange, double[] gridSize, int[] hgtSize, double[] scale) {
-            this.heightMap = heightMap;
-            this.coordsRange = coordsRange;
-            this.gridSize = gridSize;
-            this.hgtSize = hgtSize;
-            this.scale = scale;
-        }
-
-    }
-
-    public LoadedTerrain load()
-    {
+    public LoadedTerrain load() {
         Vector<int[]> coords = prepareCoords(config.initObserverLocation[0], config.initObserverLocation[1], config.maxDistance);
         int[][] coordsRange = getCoordsRange(coords);
         double[][] worldGridSize = calcWorldSize(coordsRange);
-        double[] worldSize = worldGridSize[0];
         double[] gridSize = worldGridSize[1];
-
         String[][] filesNamesGrid = prepareFilesNamesGrid(coords, (int) config.initObserverLocation[0], (int) config.initObserverLocation[1]);
 
         short[][] heightMap = loadHgtGrid(filesNamesGrid, config.initHgtSize, config.simplifyFactor);
-        int[] loadedHgtSize = new int[] { heightMap.length, heightMap[0].length };
-        double[] scale = calcScale(loadedHgtSize, worldSize);
+        int[] loadedHgtSize = new int[]{heightMap.length, heightMap[0].length};
+        double[] scale = calcScale(loadedHgtSize, worldGridSize[0]);
 
-        LoadedTerrain loadedTerrain = new LoadedTerrain(heightMap, coordsRange, gridSize, loadedHgtSize, scale);
-
-        return loadedTerrain;
+        return new LoadedTerrain(heightMap, coordsRange, gridSize, loadedHgtSize, scale);
     }
 
     private short[][] loadHgtFile(String path, int initHgtSize, int simplifyFactor, int initSimplifiedHgtSize) {
@@ -166,7 +142,7 @@ public class TerrainLoader {
         double xScale = worldSize[0] / (loadedHgtSize[0] - 1);
         double yScale = (1.0 / 1000.0);
         double zScale = worldSize[1] / (loadedHgtSize[1] - 1);
-        
+
         return new double[]{xScale, yScale, zScale};
     }
 
@@ -326,15 +302,30 @@ public class TerrainLoader {
         return filesNamesGrid;
     }
 
-    private int calcNewHgtSize(int initHgtSize, int simplifyFactor)
-    {
+    private int calcNewHgtSize(int initHgtSize, int simplifyFactor) {
         int newHgtSize = initHgtSize / simplifyFactor;
-        if (initHgtSize % simplifyFactor != 0)
-        {
+        if (initHgtSize % simplifyFactor != 0) {
             ++newHgtSize;
         }
 
         return newHgtSize;
+    }
+
+    public static class LoadedTerrain {
+        public short[][] heightMap;
+        public int[][] coordsRange;
+        public double[] gridSize;
+        public int[] hgtSize;
+        public double[] scale;
+
+        public LoadedTerrain(short[][] heightMap, int[][] coordsRange, double[] gridSize, int[] hgtSize, double[] scale) {
+            this.heightMap = heightMap;
+            this.coordsRange = coordsRange;
+            this.gridSize = gridSize;
+            this.hgtSize = hgtSize;
+            this.scale = scale;
+        }
+
     }
 
 }
