@@ -42,6 +42,12 @@ public class TerrainData {
         return gridSize;
     }
 
+    public double[] getVertexCoords(int vertexNum)
+    {
+        int vertexCoordsStart = vertexNum * 3;
+        return new double[] { vertices[vertexCoordsStart], vertices[vertexCoordsStart + 1], vertices[vertexCoordsStart + 2] };
+    }
+
     private void initTerrainData(short[][] heightMap, double max_distance, int[] hgtSize) {
         short[][] newHeightMap = dropUnusedData(heightMap, max_distance, hgtSize);
         generateVertices(newHeightMap);

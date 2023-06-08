@@ -56,7 +56,7 @@ public class MyGLRenderer implements GLSurfaceView.Renderer {
         camera = new Camera(66.0, 0.54573f, 0.01f, 31.0f);
         camera.setPosition(cameraPositionLocal[0], cameraPositionLocal[1], cameraPositionLocal[2]);
         camera.setAngles(observerRotation[0], observerRotation[1], observerRotation[2]);
-         //peaks = new Peaks(context, coordsManager, terrainModel, screenManager, shaderProgram);
+         //peaks = new Peaks(context, coordsManager, terrainData, screenManager, shaderProgram);
     }
 
     @Override

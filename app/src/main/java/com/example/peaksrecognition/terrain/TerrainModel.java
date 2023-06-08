@@ -10,29 +10,18 @@ import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
 
 public class TerrainModel {
-    private final TerrainData terrainLoader;
-    private final int shader;
+    private final TerrainData terrainData;
     private final int positionAttribute;
     private final int viewMatrixUniform;
     private final int projectionMatrixUniform;
     private int vao;
     private int vbo;
     private int ibo;
-
-    private FloatBuffer vertexBuffer;
-    private IntBuffer trianglesBuffer;
-
-    private float[] vertices;
-    private int[] triangles;
-
     private int trianglesLength;
 
-    private int[] buffersIds;
-    private int[] vaoIds;
-
-    public TerrainModel(TerrainData terrainLoader, ShaderProgram shaderProgram) {
-        this.terrainLoader = terrainLoader;
-        shader = shaderProgram.getShaderProgram();
+    public TerrainModel(TerrainData terrainData, ShaderProgram shaderProgram) {
+        this.terrainData = terrainData;
+        int shader = shaderProgram.getShaderProgram();
         positionAttribute = GLES30.glGetAttribLocation(shader, "vPosition");
         viewMatrixUniform = GLES30.glGetUniformLocation(shader, "viewMatrix");
         projectionMatrixUniform = GLES30.glGetUniformLocation(shader, "projectionMatrix");
@@ -53,13 +42,6 @@ public class TerrainModel {
 
     }
 
-    public double[] getVertexCoords(int vertexNum)
-    {
-        int vertexCoordsStart = vertexNum * 3;
-        return new double[] { vertices[vertexCoordsStart], vertices[vertexCoordsStart + 1], vertices[vertexCoordsStart + 2] };
-    }
-
-
     private void prepareBuffers() {
         generateBuffersIds();
         generateVboData();
@@ -68,21 +50,21 @@ public class TerrainModel {
     }
 
     private void generateBuffersIds() {
-        buffersIds = new int[2];
+        int[] buffersIds = new int[2];
         GLES30.glGenBuffers(2, buffersIds, 0);
         vbo = buffersIds[0];
         ibo = buffersIds[1];
 
-        vaoIds = new int[1];
+        int[] vaoIds = new int[1];
         GLES30.glGenVertexArrays(1, vaoIds, 0);
         vao = vaoIds[0];
     }
 
     private void generateVboData() {
-        vertices = terrainLoader.getVertices();
+        float[] vertices = terrainData.getVertices();
         ByteBuffer byteBuffer = ByteBuffer.allocateDirect(vertices.length * 4);
         byteBuffer.order(ByteOrder.nativeOrder());
-        vertexBuffer = byteBuffer.asFloatBuffer();
+        FloatBuffer vertexBuffer = byteBuffer.asFloatBuffer();
         vertexBuffer.put(vertices);
         vertexBuffer.position(0);
 
@@ -97,11 +79,11 @@ public class TerrainModel {
     }
 
     private void generateIboData() {
-        triangles = terrainLoader.getTriangles();
+        int[] triangles = terrainData.getTriangles();
         trianglesLength = triangles.length;
         ByteBuffer byteBuffer = ByteBuffer.allocateDirect(triangles.length * 4);
         byteBuffer.order(ByteOrder.nativeOrder());
-        trianglesBuffer = byteBuffer.asIntBuffer();
+        IntBuffer trianglesBuffer = byteBuffer.asIntBuffer();
         trianglesBuffer.put(triangles);
         trianglesBuffer.position(0);
 

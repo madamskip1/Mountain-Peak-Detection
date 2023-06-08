@@ -7,6 +7,7 @@ import android.opengl.GLES30;
 import android.util.Log;
 
 import com.example.peaksrecognition.mainopengl.ShaderProgram;
+import com.example.peaksrecognition.terrain.TerrainData;
 import com.example.peaksrecognition.terrain.TerrainModel;
 import com.opencsv.CSVParser;
 import com.opencsv.CSVParserBuilder;
@@ -22,7 +23,7 @@ import java.util.Vector;
 
 public class Peaks {
     private final CoordsManager coordsManager;
-    private final TerrainModel terrainModel;
+    private final TerrainData terrainData;
     private final ScreenManager screenManager;
     private final int positionAttribute;
     private final double[] scale = new double[] { 0.09266243887046562, 0.001, 0.06015208526040229 };
@@ -36,9 +37,9 @@ public class Peaks {
     private int vertexBufferId;
     private int bufferId;
     private Vector<Peak> peaks;
-    public Peaks(Context context, CoordsManager coordsManager, TerrainModel terrainModel, ScreenManager screenManager, ShaderProgram shaderProgram) {
+    public Peaks(Context context, CoordsManager coordsManager, TerrainData terrainData, ScreenManager screenManager, ShaderProgram shaderProgram) {
         this.coordsManager = coordsManager;
-        this.terrainModel = terrainModel;
+        this.terrainData = terrainData;
         this.screenManager = screenManager;
         int shader = shaderProgram.getShaderProgram();
         positionAttribute = GLES30.glGetAttribLocation(shader, "vPosition");
@@ -113,7 +114,7 @@ public class Peaks {
         for (int x_loop = start_x; x_loop <= end_x; x_loop++) {
             for (int z_loop = start_z; z_loop <= end_z; z_loop++) {
                 int vertex_num = x_loop * cols + z_loop;
-                double[] vertexCoords = terrainModel.getVertexCoords(vertex_num);
+                double[] vertexCoords = terrainData.getVertexCoords(vertex_num);
 
                 if (vertexCoords[1] > max_y)
                 {
