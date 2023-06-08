@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.res.AssetManager;
 import android.util.Log;
 
+import com.example.peaksrecognition.Config;
 import com.example.peaksrecognition.CoordsManager;
 
 import java.io.BufferedInputStream;
@@ -14,76 +15,63 @@ import java.nio.ByteOrder;
 import java.util.Vector;
 
 public class TerrainLoader {
-    private final int[] newHgtSize = new int[]{2402, 2402};
-    private final double max_distance = 30.0;
-    private final int observer_vertex_x = 793;
-    private final int observer_vertex_z = 1298;
-
-    private final double[] worldSize;
-    private final int[] initHgtSize = new int[]{3601, 3601};
-    private final int simplifyFactor = 3;
     private final Context context;
-    private int[] hgtSize;
-    private double[] scale;
+    private Config config;
 
-    private float[] vertices;
-    private int[] triangles;
-    private int heightMapRows;
-    private int heightMapCols;
-    private int heightMapOffsetX;
-    private int heightMapOffsetZ;
 
-    private double[] terrainOrigin;
-
-    private final int[][] coordsRange;
-    private final double[] gridSize;
-
-    public TerrainLoader(Context context, double observerLatitude, double observerLongitude) {
+    public TerrainLoader(Context context, Config config) {
         this.context = context;
+        this.config = config;
+    }
 
-        Vector<int[]> coords = prepareCoords(observerLatitude, observerLongitude, max_distance);
-        coordsRange = getCoordsRange(coords);
+    public class LoadedTerrain
+    {
+        public short[][] heightMap;
+        public int[][] coordsRange;
+        public double[] gridSize;
+        public int[] hgtSize;
+        public double[] scale;
+
+        public LoadedTerrain(short[][] heightMap, int[][] coordsRange, double[] gridSize, int[] hgtSize, double[] scale) {
+            this.heightMap = heightMap;
+            this.coordsRange = coordsRange;
+            this.gridSize = gridSize;
+            this.hgtSize = hgtSize;
+            this.scale = scale;
+        }
+
+    }
+
+    public LoadedTerrain load()
+    {
+        Vector<int[]> coords = prepareCoords(config.initObserverLocation[0], config.initObserverLocation[1], config.maxDistance);
+        int[][] coordsRange = getCoordsRange(coords);
         double[][] worldGridSize = calcWorldSize(coordsRange);
-        worldSize = worldGridSize[0];
-        gridSize = worldGridSize[1];
-        String[][] filesNamesGrid = prepareFilesNamesGrid(coords, (int) observerLatitude, (int) observerLongitude);
+        double[] worldSize = worldGridSize[0];
+        double[] gridSize = worldGridSize[1];
 
-        short[][] heightMap = loadHgtGrid(filesNamesGrid);
+        String[][] filesNamesGrid = prepareFilesNamesGrid(coords, (int) config.initObserverLocation[0], (int) config.initObserverLocation[1]);
 
-        calcScale();
+        short[][] heightMap = loadHgtGrid(filesNamesGrid, config.initHgtSize, config.simplifyFactor);
+        int[] loadedHgtSize = new int[] { heightMap.length, heightMap[0].length };
+        double[] scale = calcScale(loadedHgtSize, worldSize);
 
-        heightMap = dropUnusedData(heightMap);
-        generateVertices(heightMap);
-        generateTriangles();
+        LoadedTerrain loadedTerrain = new LoadedTerrain(heightMap, coordsRange, gridSize, loadedHgtSize, scale);
+
+        return loadedTerrain;
     }
 
-    public float[] getVertices() {
-        return vertices;
-    }
-
-    public int[] getTriangles() {
-        return triangles;
-    }
-
-    public int[][] getCoordsRange() {
-        return coordsRange;
-    }
-
-    public double[] getGridSize() {
-        return gridSize;
-    }
-
-    private short[][] loadHgtFile(String path) {
+    private short[][] loadHgtFile(String path, int initHgtSize, int simplifyFactor, int initSimplifiedHgtSize) {
         byte[] data;
         try {
             data = loadHgtByteData(path);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
-        return convertHgtByteToArray(data);
+        return convertHgtByteToArray(data, initHgtSize, simplifyFactor, initSimplifiedHgtSize);
     }
 
-    private short[][] loadHgtGrid(String[][] filesNamesGrid) {
+    private short[][] loadHgtGrid(String[][] filesNamesGrid, int initHgtSize, int simplifyFactor) {
         int startRow = -1;
         int startCol = -1;
         int endRow = -1;
@@ -111,10 +99,13 @@ public class TerrainLoader {
         int rows = endRow - startRow + 1;
         int cols = endCol - startCol + 1;
 
-        short[][] elevation = new short[rows * 1201][cols * 1201];
+        int initSimplifiedHgtSize = calcNewHgtSize(initHgtSize, simplifyFactor);
+        short[][] elevation = new short[rows * initSimplifiedHgtSize][cols * initSimplifiedHgtSize];
         for (int i = 0; i < rows; ++i) {
             for (int j = 0; j < cols; ++j) {
-                short[][] fileData = loadHgtFile("srtm_data/" + filesNamesGrid[i + startRow][j + startCol]);
+                short[][] fileData = loadHgtFile("srtm_data/" + filesNamesGrid[i + startRow][j + startCol],
+                        initHgtSize, simplifyFactor, initSimplifiedHgtSize);
+
                 int xOffset = i * fileData.length;
                 int zOffset = j * fileData[0].length;
 
@@ -130,40 +121,7 @@ public class TerrainLoader {
             }
         }
 
-        hgtSize = new int[]{elevation.length, elevation[0].length};
         return elevation;
-    }
-
-    private short[][] dropUnusedData(short[][] heightMap) {
-        int range_x = (int) Math.ceil(max_distance / scale[0]);
-        int range_z = (int) Math.ceil(max_distance / scale[2]);
-
-        int x_start = observer_vertex_x - range_x;
-        int x_end = observer_vertex_x + range_x;
-        int z_start = observer_vertex_z - range_z;
-        int z_end = observer_vertex_z + range_z;
-        x_start = Math.max(0, x_start);
-        z_start = Math.max(0, z_start);
-        x_end = Math.min(x_end, newHgtSize[0]);
-        z_end = Math.min(z_end, newHgtSize[1]);
-
-        double origin_x = 0.0f + x_start * scale[0];
-        double origin_z = 0.0f + z_start * scale[2];
-
-        short[][] newHeightMap = new short[x_end - x_start + 1][z_end - z_start + 1];
-        for (int i = x_start; i <= x_end; i++) {
-            if (z_end + 1 - z_start >= 0)
-                System.arraycopy(heightMap[i], z_start, newHeightMap[i - x_start], 0, z_end + 1 - z_start);
-        }
-        heightMap = null;
-
-        terrainOrigin = new double[]{origin_x, 0.0, origin_z};
-        heightMapRows = x_end - x_start + 1;
-        heightMapCols = z_end - z_start + 1;
-        heightMapOffsetX = x_start;
-        heightMapOffsetZ = z_start;
-
-        return newHeightMap;
     }
 
     private byte[] loadHgtByteData(String path) throws IOException {
@@ -177,13 +135,10 @@ public class TerrainLoader {
         return data;
     }
 
-    private short[][] convertHgtByteToArray(byte[] data) {
-        int initHgtSize = 3601;
-        int numRows = 1201;
-        int numColumns = 1201;
-        short[][] heightMap = new short[numRows][numColumns];
+    private short[][] convertHgtByteToArray(byte[] data, int initHgtSize, int simplifyFactor, int initSimplifiedHgtSize) {
+        short[][] heightMap = new short[initSimplifiedHgtSize][initSimplifiedHgtSize];
         ByteBuffer byteBuffer = ByteBuffer.wrap(data);
-        byteBuffer.order(ByteOrder.BIG_ENDIAN);  // The byte order may vary, adjust accordingly
+        byteBuffer.order(ByteOrder.BIG_ENDIAN);
         int arrayRow;
         int arrayCol;
 
@@ -207,64 +162,12 @@ public class TerrainLoader {
         return heightMap;
     }
 
-    private void calcScale() {
-        double xScale = worldSize[0] / (hgtSize[0] - 1);
+    private double[] calcScale(int[] loadedHgtSize, double[] worldSize) {
+        double xScale = worldSize[0] / (loadedHgtSize[0] - 1);
         double yScale = (1.0 / 1000.0);
-        double zScale = worldSize[1] / (hgtSize[1] - 1);
-
-        scale = new double[]{xScale, yScale, zScale};
-    }
-
-    private void generateVertices(short[][] heightMap) {
-        float[] vertices = new float[heightMapRows * heightMapCols * 3];
-        int verticesIndex = 0;
-
-        for (int x = 0; x < heightMapRows; ++x) {
-            for (int z = 0; z < heightMapCols; ++z) {
-                short y = heightMap[x][z];
-                float xCoord = (float) (terrainOrigin[0] + scale[0] * x);
-                float yCoord = (float) (terrainOrigin[1] + scale[1] * y);
-                float zCoord = (float) (terrainOrigin[2] + scale[2] * z);
-                vertices[verticesIndex] = xCoord;
-                vertices[verticesIndex + 1] = yCoord;
-                vertices[verticesIndex + 2] = zCoord;
-                verticesIndex += 3;
-            }
-        }
-        this.vertices = vertices;
-    }
-
-    private void generateTriangles() {
-        int trianglesNum = (heightMapRows - 1) * (heightMapCols - 1) * 2;
-        int[] triangles = new int[trianglesNum * 3];
-
-        int trianglesIndex = 0;
-        int index = 0;
-        int xMax = heightMapRows - 1;
-        int zMax = heightMapCols - 1;
-
-        for (int x = 0; x < xMax; ++x) {
-            for (int z = 0; z < zMax; ++z) {
-                int a = index;
-                int b = index + 1;
-                int c = index + heightMapCols + 1;
-                int d = index + heightMapCols;
-                ++index;
-
-                triangles[trianglesIndex] = a;
-                triangles[trianglesIndex + 1] = b;
-                triangles[trianglesIndex + 2] = c;
-
-                triangles[trianglesIndex + 3] = a;
-                triangles[trianglesIndex + 4] = c;
-                triangles[trianglesIndex + 5] = d;
-
-                trianglesIndex += 6;
-            }
-            ++index;
-        }
-
-        this.triangles = triangles;
+        double zScale = worldSize[1] / (loadedHgtSize[1] - 1);
+        
+        return new double[]{xScale, yScale, zScale};
     }
 
     private String convertCoordsToFileName(int latitude, int longitude) {
@@ -405,7 +308,7 @@ public class TerrainLoader {
         longitudeDistance /= 2.0;
         double latitudeGridSize = latitudeDistance / (double) Math.abs(latitudeRange[1] - latitudeRange[0]);
         double longitudeGridSize = longitudeDistance / (double) Math.abs(longitudeRange[1] - longitudeRange[0]);
-        Log.d("moje", "range " + latitudeDistance + " " + longitudeDistance + " " + latitudeGridSize + " " + longitudeGridSize + " ");
+
         return new double[][]{{latitudeDistance, longitudeDistance}, {latitudeGridSize, longitudeGridSize}};
     }
 
@@ -421,6 +324,17 @@ public class TerrainLoader {
             filesNamesGrid[1 - latitudeDiff][1 + longitudeDiff] = convertCoordsToFileName(coord[0], coord[1]) + ".hgt";
         }
         return filesNamesGrid;
+    }
+
+    private int calcNewHgtSize(int initHgtSize, int simplifyFactor)
+    {
+        int newHgtSize = initHgtSize / simplifyFactor;
+        if (initHgtSize % simplifyFactor != 0)
+        {
+            ++newHgtSize;
+        }
+
+        return newHgtSize;
     }
 
 }

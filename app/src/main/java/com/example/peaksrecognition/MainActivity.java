@@ -4,12 +4,18 @@ import android.Manifest;
 import android.content.pm.PackageManager;
 import android.opengl.GLSurfaceView;
 import android.os.Bundle;
+import android.util.Log;
 import android.widget.ImageView;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 
+import com.example.peaksrecognition.mainopengl.MyGLSurfaceView;
 import com.example.peaksrecognition.mainopengl.OffScreenRenderer;
+import com.example.peaksrecognition.mainopengl.ShaderProgram;
+import com.example.peaksrecognition.terrain.TerrainLoader;
+import com.example.peaksrecognition.terrain.TerrainModel;
+import com.opencsv.exceptions.CsvValidationException;
 
 import org.opencv.android.OpenCVLoader;
 import org.opencv.core.Core;
@@ -31,17 +37,38 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        Log.d("moje", "main");
         super.onCreate(savedInstanceState);
         checkSaveToDeviceMemoryPermissions();
         OpenCVLoader.initDebug();
+        /*double[] observerLocation = new double[]{49.339045, 20.081936, 991.1};
 
+        ShaderProgram shaderProgram = new ShaderProgram();
+        TerrainLoader terrainLoader = new TerrainLoader(this, observerLocation[0], observerLocation[1]);
+        TerrainModel terrainModel = new TerrainModel(terrainLoader, shaderProgram);
+        CoordsManager coordsManager = new CoordsManager(observerLocation, new int[][] {{49, 50}, {19, 21}}, new double[] { 111.19492664455873, 72.21257835511295 });
+        ScreenManager screenManager = new ScreenManager(768, 1024);
+        Camera camera = new Camera(66.0, 0.75f, 0.01f, 31.0f);
+        double[] cameraPositionLocal = coordsManager.convertGeoToLocalCoords(observerLocation[0], observerLocation[1], observerLocation[2]);
+        double[] observerRotation = new double[]{144.31152, 2.3836904, -2.0597333};
+        camera.setPosition(cameraPositionLocal[0], cameraPositionLocal[1], cameraPositionLocal[2]);
+        camera.setAngles(observerRotation[0], observerRotation[1], observerRotation[2]);
+        screenManager.setMVPMatrices(camera.getViewMatrix(), camera.getProjectionMatrix());
+
+        OffScreenRenderer renderer = new OffScreenRenderer(this);
+        renderer.render();
+        System.out.print("qweqwe");
+        Peaks peaks = new Peaks(this, coordsManager, terrainModel, screenManager, shaderProgram);
+
+*/
         // Surface Rendering
-        /*
+
         glView = new MyGLSurfaceView(this);
         setContentView(glView);
-         */
+
 
         // Off-screen rendering
+/*
         setContentView(R.layout.activity_main);
         renderer2 = new OffScreenRenderer(this);
         imageView = findViewById(R.id.renderedImageView);
@@ -54,6 +81,7 @@ public class MainActivity extends AppCompatActivity {
         Core.flip(image, image, 0);
 
         saveMatToDeviceMemory(image);
+*/
     }
 
     private void checkSaveToDeviceMemoryPermissions() {

@@ -30,7 +30,6 @@ public class CoordsManager {
         double x = ((double) latitudeRange[1] - latitude) * gridSize[0];
         double z = (longitude - (double) longitudeRange[0]) * gridSize[1];
         double y = altitude * altitudeScale;
-        Log.d("moje", "Altitude " + y + " " + altitude + " " + altitudeScale);
 
         return new double[]{x, y, z};
     }

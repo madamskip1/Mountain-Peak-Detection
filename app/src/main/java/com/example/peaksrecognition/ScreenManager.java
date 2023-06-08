@@ -1,6 +1,7 @@
 package com.example.peaksrecognition;
 
 import android.opengl.GLU;
+import android.util.Log;
 
 public class ScreenManager {
     private final int[] viewport;
@@ -33,9 +34,13 @@ public class ScreenManager {
     }
 
     public boolean checkIfPointOnScreen(float[] screenPoint) {
+   /*     Log.d("moje", "viewport " + viewport[2] + " " + viewport[3]);
+        Log.d("moje", "bool " + (screenPoint[0] >= 0 && screenPoint[0] <= viewport[2]));
+        Log.d("moje", "bool " + (screenPoint[1] >= 0 && screenPoint[1] <= viewport[3]));
+        Log.d("moje", "bool " + (screenPoint[2] >= 0 && screenPoint[2] <= 1));*/
         return screenPoint[0] >= 0 && screenPoint[0] <= viewport[2]
-                && screenPoint[1] >= 0 && screenPoint[0] <= viewport[3]
-                && screenPoint[2] >= 0 && screenPoint[0] <= 1;
+                && screenPoint[1] >= 0 && screenPoint[1] <= viewport[3]
+                && screenPoint[2] >= 0 && screenPoint[2] <= 1;
     }
 
 }

@@ -10,7 +10,7 @@ import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
 
 public class TerrainModel {
-    private final TerrainLoader terrainLoader;
+    private final TerrainData terrainLoader;
     private final int shader;
     private final int positionAttribute;
     private final int viewMatrixUniform;
@@ -30,7 +30,7 @@ public class TerrainModel {
     private int[] buffersIds;
     private int[] vaoIds;
 
-    public TerrainModel(TerrainLoader terrainLoader, ShaderProgram shaderProgram) {
+    public TerrainModel(TerrainData terrainLoader, ShaderProgram shaderProgram) {
         this.terrainLoader = terrainLoader;
         shader = shaderProgram.getShaderProgram();
         positionAttribute = GLES30.glGetAttribLocation(shader, "vPosition");
@@ -51,6 +51,12 @@ public class TerrainModel {
         );
         GLES30.glBindVertexArray(0);
 
+    }
+
+    public double[] getVertexCoords(int vertexNum)
+    {
+        int vertexCoordsStart = vertexNum * 3;
+        return new double[] { vertices[vertexCoordsStart], vertices[vertexCoordsStart + 1], vertices[vertexCoordsStart + 2] };
     }
 
 

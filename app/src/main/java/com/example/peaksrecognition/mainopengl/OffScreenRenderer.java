@@ -10,6 +10,7 @@ import android.opengl.GLES30;
 
 import com.example.peaksrecognition.Camera;
 import com.example.peaksrecognition.CoordsManager;
+import com.example.peaksrecognition.terrain.TerrainData;
 import com.example.peaksrecognition.terrain.TerrainLoader;
 import com.example.peaksrecognition.terrain.TerrainModel;
 
@@ -35,9 +36,10 @@ public class OffScreenRenderer {
 
         GLES30.glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
         shaderProgram = new ShaderProgram();
-        TerrainLoader terrainLoader = new TerrainLoader(context, observerLocation[0], observerLocation[1]);
-        terrainModel = new TerrainModel(terrainLoader, shaderProgram);
-        coordsManager = new CoordsManager(observerLocation, terrainLoader.getCoordsRange(), terrainLoader.getGridSize());
+        TerrainLoader terrainLoader = new TerrainLoader(context, null);
+        TerrainData terrainData = new TerrainData(context, null);
+        terrainModel = new TerrainModel(null, shaderProgram);
+        coordsManager = new CoordsManager(observerLocation, terrainData.getCoordsRange(), terrainData.getGridSize());
         double[] cameraPositionLocal = coordsManager.convertGeoToLocalCoords(observerLocation[0], observerLocation[1], observerLocation[2]);
         camera = new Camera(66.0, 0.75f, 0.01f, 31.0f);
         camera.setPosition(cameraPositionLocal[0], cameraPositionLocal[1], cameraPositionLocal[2]);
