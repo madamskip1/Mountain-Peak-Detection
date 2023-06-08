@@ -1,60 +1,49 @@
 package com.example.peaksrecognition.terrain;
 
 import android.content.Context;
-import android.util.Log;
 
 import com.example.peaksrecognition.Config;
 
 public class TerrainData {
+    private final double[] scale;
+    private final double[] gridSize;
+    private final int[][] coordsRange;
     private float[] vertices;
     private int[] triangles;
-    private double[] worldSize;
-    private double[] scale;
-
     private int rows;
     private int cols;
     private double[] origin;
-
     private int offsetX;
     private int offsetZ;
-    private double[] gridSize;
-    private int[][] coordsRange;
 
-    public TerrainData(Context context, Config config)
-    {
+    public TerrainData(Context context, Config config) {
         TerrainLoader terrainLoader = new TerrainLoader(context, config);
         TerrainLoader.LoadedTerrain loadedTerrain = terrainLoader.load();
         scale = loadedTerrain.scale;
         gridSize = loadedTerrain.gridSize;
         coordsRange = loadedTerrain.coordsRange;
-        initTerrainData(loadedTerrain.heightMap, loadedTerrain.hgtSize);
+        initTerrainData(loadedTerrain.heightMap, config.maxDistance, loadedTerrain.hgtSize);
         loadedTerrain.heightMap = null;
-        loadedTerrain = null;
     }
 
-    public float[] getVertices()
-    {
+    public float[] getVertices() {
         return vertices;
     }
-    public int[] getTriangles()
-    {
+
+    public int[] getTriangles() {
         return triangles;
     }
 
-    public int[][] getCoordsRange()
-    {
+    public int[][] getCoordsRange() {
         return coordsRange;
     }
 
-    public double[] getGridSize()
-    {
+    public double[] getGridSize() {
         return gridSize;
     }
 
-
-    private void initTerrainData(short[][] heightMap, int[] hgtSize)
-    {
-        short[][] newHeightMap = dropUnusedData(heightMap, 30.0, hgtSize);
+    private void initTerrainData(short[][] heightMap, double max_distance, int[] hgtSize) {
+        short[][] newHeightMap = dropUnusedData(heightMap, max_distance, hgtSize);
         generateVertices(newHeightMap);
         heightMap = null;
         generateTriangles();
@@ -64,7 +53,7 @@ public class TerrainData {
         final int observer_vertex_x = 793;
         final int observer_vertex_z = 1298;
         int range_x = (int) Math.ceil((max_distance + 1.0) / scale[0]);
-        int range_z = (int) Math.ceil((max_distance + 1.0)  / scale[2]);
+        int range_z = (int) Math.ceil((max_distance + 1.0) / scale[2]);
 
         int x_start = observer_vertex_x - range_x;
         int x_end = observer_vertex_x + range_x;
@@ -84,16 +73,16 @@ public class TerrainData {
             if (z_end + 1 - z_start >= 0)
                 System.arraycopy(heightMap[i], z_start, newHeightMap[i - x_start], 0, z_end + 1 - z_start);
         }
-        heightMap = null;
 
         origin = new double[]{origin_x, 0.0, origin_z};
-        Log.d("moje", "arraylen rows : " + newHeightMap.length + " cols: " + newHeightMap[0].length);
-        rows = newHeightMap.length;;
+        rows = newHeightMap.length;
         cols = newHeightMap[0].length;
         offsetX = x_start;
         offsetZ = z_start;
+
         return newHeightMap;
     }
+
     private void generateVertices(short[][] heightMap) {
         float[] vertices = new float[rows * cols * 3];
         int verticesIndex = 0;
