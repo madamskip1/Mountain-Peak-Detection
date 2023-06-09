@@ -1,6 +1,7 @@
-package com.example.peaksrecognition;
+package com.example.peaksrecognition.activities;
 
 import android.Manifest;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.opengl.GLSurfaceView;
 import android.os.Bundle;
@@ -8,6 +9,7 @@ import android.os.Bundle;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 
+import com.example.peaksrecognition.R;
 import com.example.peaksrecognition.mainopengl.OffScreenRenderer;
 
 import org.opencv.android.OpenCVLoader;
@@ -37,13 +39,16 @@ public class MainActivity extends AppCompatActivity {
 */
 
         // Off-screen rendering
-
+/*
         setContentView(R.layout.activity_main);
         renderer = new OffScreenRenderer(this);
         renderer.render();
         Mat image = renderer.getRenderedMat();
 
         saveMatToDeviceMemory(image);
+        */
+        Intent displayRender = new Intent(this, DisplayRender.class);
+        startActivity(displayRender);
     }
 
     private void checkSaveToDeviceMemoryPermissions() {
