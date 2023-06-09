@@ -1,5 +1,7 @@
 package com.example.peaksrecognition.terrain;
 
+import android.util.Log;
+
 import com.example.peaksrecognition.Config;
 import com.example.peaksrecognition.terrain.TerrainLoader.LoadedTerrain;
 
@@ -31,6 +33,18 @@ public class TerrainData {
         return triangles;
     }
 
+    public int[] getOffset() {
+        return new int[]{offsetX, 0, offsetZ};
+    }
+
+    public int getRows() {
+        return rows;
+    }
+
+    public int getCols() {
+        return cols;
+    }
+
     public int[][] getCoordsRange() {
         return coordsRange;
     }
@@ -39,10 +53,13 @@ public class TerrainData {
         return gridSize;
     }
 
-    public double[] getVertexCoords(int vertexNum)
-    {
+    public double[] getScale() {
+        return scale;
+    }
+
+    public double[] getVertexCoords(int vertexNum) {
         int vertexCoordsStart = vertexNum * 3;
-        return new double[] { vertices[vertexCoordsStart], vertices[vertexCoordsStart + 1], vertices[vertexCoordsStart + 2] };
+        return new double[]{vertices[vertexCoordsStart], vertices[vertexCoordsStart + 1], vertices[vertexCoordsStart + 2]};
     }
 
     private void initTerrainData(short[][] heightMap, double max_distance, int[] hgtSize) {
@@ -55,8 +72,10 @@ public class TerrainData {
     private short[][] dropUnusedData(short[][] heightMap, double max_distance, int[] loadedHgtSize) {
         final int observer_vertex_x = 793;
         final int observer_vertex_z = 1298;
+
         int range_x = (int) Math.ceil((max_distance + 1.0) / scale[0]);
         int range_z = (int) Math.ceil((max_distance + 1.0) / scale[2]);
+        Log.d("moje", "range " + range_x + " " + range_z);
 
         int x_start = observer_vertex_x - range_x;
         int x_end = observer_vertex_x + range_x;
@@ -67,6 +86,9 @@ public class TerrainData {
         z_start = Math.max(0, z_start);
         x_end = Math.min(x_end, loadedHgtSize[0]);
         z_end = Math.min(z_end, loadedHgtSize[1]);
+
+        Log.d("moje", "x " + x_start + " " + x_end);
+        Log.d("moje", "z " + z_start + " " + z_end);
 
         double origin_x = 0.0f + x_start * scale[0];
         double origin_z = 0.0f + z_start * scale[2];

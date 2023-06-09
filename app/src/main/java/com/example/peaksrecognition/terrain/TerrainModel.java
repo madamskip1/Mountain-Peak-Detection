@@ -39,7 +39,6 @@ public class TerrainModel {
                 0
         );
         GLES30.glBindVertexArray(0);
-
     }
 
     private void prepareBuffers() {

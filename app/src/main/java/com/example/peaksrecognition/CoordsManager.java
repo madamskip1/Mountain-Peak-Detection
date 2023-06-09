@@ -1,7 +1,5 @@
 package com.example.peaksrecognition;
 
-import android.util.Log;
-
 public class CoordsManager {
     private static final double EARTH_RADIUS = 6371.0;
     private final int[] latitudeRange;

@@ -9,11 +9,18 @@ import android.opengl.EGLSurface;
 import android.opengl.GLES30;
 
 import com.example.peaksrecognition.Camera;
+import com.example.peaksrecognition.Config;
 import com.example.peaksrecognition.CoordsManager;
+import com.example.peaksrecognition.Peaks;
+import com.example.peaksrecognition.ScreenManager;
 import com.example.peaksrecognition.terrain.TerrainData;
 import com.example.peaksrecognition.terrain.TerrainLoader;
 import com.example.peaksrecognition.terrain.TerrainLoader.LoadedTerrain;
 import com.example.peaksrecognition.terrain.TerrainModel;
+
+import org.opencv.core.Core;
+import org.opencv.core.CvType;
+import org.opencv.core.Mat;
 
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
@@ -22,30 +29,46 @@ public class OffScreenRenderer {
     private final int width = 768;
     private final int height = 1024;
     private final TerrainModel terrainModel;
-    private final ShaderProgram shaderProgram;
     private final Camera camera;
     private final CoordsManager coordsManager;
+    private final ScreenManager screenManager;
+    private final Peaks peaks;
     private EGLContext eglContext;
     private EGLDisplay eglDisplay;
     private EGLConfig eglConfig;
 
     public OffScreenRenderer(Context context) {
         createContext();
-        double[] observerLocation = new double[]{49.339045, 20.081936, 991.1};
-        double[] observerRotation = new double[]{144.31152, 2.3836904, -2.0597333};
         createSurface();
 
+        double[] observerLocation = new double[]{49.339045, 20.081936, 991.1};
+        double[] observerRotation = new double[]{144.31152, 2.3836904, -2.0597333};
+
+        Config config = new Config();
+        config.initObserverLocation = observerLocation;
+        config.initObserverRotation = observerRotation;
+        config.maxDistance = 30.0;
+        config.minDistance = 0.01;
+        config.FOVHorizontal = 66.0f;
+        config.simplifyFactor = 3;
+        config.initHgtSize = 3601;
+
         GLES30.glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
-        shaderProgram = new ShaderProgram();
-        TerrainLoader terrainLoader = new TerrainLoader(context, null);
+
+        ShaderProgram shaderProgram = new ShaderProgram();
+        TerrainLoader terrainLoader = new TerrainLoader(context, config);
         LoadedTerrain loadedTerrain = terrainLoader.load();
-        TerrainData terrainData = new TerrainData(loadedTerrain, null);
-        terrainModel = new TerrainModel(null, shaderProgram);
+        TerrainData terrainData = new TerrainData(loadedTerrain, config);
+        terrainModel = new TerrainModel(terrainData, shaderProgram);
+
         coordsManager = new CoordsManager(observerLocation, terrainData.getCoordsRange(), terrainData.getGridSize());
         double[] cameraPositionLocal = coordsManager.convertGeoToLocalCoords(observerLocation[0], observerLocation[1], observerLocation[2]);
-        camera = new Camera(66.0, 0.75f, 0.01f, 31.0f);
+        camera = new Camera(config.FOVHorizontal, (float) width / (float) height, (float) config.minDistance, (float) config.maxDistance);
         camera.setPosition(cameraPositionLocal[0], cameraPositionLocal[1], cameraPositionLocal[2]);
         camera.setAngles(observerRotation[0], observerRotation[1], observerRotation[2]);
+        screenManager = new ScreenManager();
+        screenManager.setViewportDimensions(width, height);
+        peaks = new Peaks(context, coordsManager, terrainData, screenManager, shaderProgram);
     }
 
     public ByteBuffer getBuffer() {
@@ -55,6 +78,17 @@ public class OffScreenRenderer {
         return buffer;
     }
 
+    public Mat getRenderedMat() {
+        ByteBuffer buffer = getBuffer();
+        Mat image = new Mat(height, width, CvType.CV_8UC4);
+        byte[] imageData = new byte[height * width * 4];
+        buffer.get(imageData);
+        image.put(0, 0, imageData);
+        Core.flip(image, image, 0);
+
+        return image;
+    }
+
     public void render() {
         GLES30.glViewport(0, 0, width, height);
         GLES30.glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
@@ -62,9 +96,9 @@ public class OffScreenRenderer {
         float[] viewMatrix = camera.getViewMatrix();
         float[] projectionMatrix = camera.getProjectionMatrix();
         terrainModel.draw(viewMatrix, projectionMatrix);
-
+        screenManager.setMVPMatrices(viewMatrix, projectionMatrix);
+        peaks.test();
     }
-
 
     private void createContext() {
         eglDisplay = EGL14.eglGetDisplay(EGL14.EGL_DEFAULT_DISPLAY);

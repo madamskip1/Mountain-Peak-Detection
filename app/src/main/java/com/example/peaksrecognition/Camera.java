@@ -28,7 +28,6 @@ public class Camera {
         position[0] = x;
         position[1] = y;
         position[2] = z;
-
     }
 
     public void setAngles(double yawDegree, double pitchDegree, double rollDegree) {
@@ -131,8 +130,6 @@ public class Camera {
         for (int i = 0; i < 3; ++i) {
             upVector[i] = rotationMatrix[i][0] * upVector[0] + rotationMatrix[i][1] * upVector[1] + rotationMatrix[i][2] * upVector[2];
         }
-
-
     }
 
     private void updateTargetVector() {
@@ -140,5 +137,4 @@ public class Camera {
             targetVector[i] = position[i] + directionVector[i];
         }
     }
-
 }

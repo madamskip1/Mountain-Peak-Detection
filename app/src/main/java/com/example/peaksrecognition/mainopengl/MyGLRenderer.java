@@ -20,7 +20,6 @@ import javax.microedition.khronos.opengles.GL10;
 public class MyGLRenderer implements GLSurfaceView.Renderer {
     private final Context context;
     private TerrainModel terrainModel;
-    private ShaderProgram shaderProgram;
     private Camera camera;
     private CoordsManager coordsManager;
     private ScreenManager screenManager;
@@ -47,7 +46,7 @@ public class MyGLRenderer implements GLSurfaceView.Renderer {
 
 
         GLES30.glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
-        shaderProgram = new ShaderProgram();
+        ShaderProgram shaderProgram = new ShaderProgram();
         TerrainLoader terrainLoader = new TerrainLoader(context, config);
         LoadedTerrain loadedTerrain = terrainLoader.load();
         TerrainData terrainData = new TerrainData(loadedTerrain, config);

@@ -17,7 +17,6 @@ public class TerrainLoader {
     private final Context context;
     private final Config config;
 
-
     public TerrainLoader(Context context, Config config) {
         this.context = context;
         this.config = config;
@@ -237,7 +236,6 @@ public class TerrainLoader {
             }
         }
 
-
         for (double[] coordsData : coordsToCheck) {
             double distance = CoordsManager.equirectangularApproximation(coordsData[0], coordsData[1],
                     observerLatitude, observerLongitude);
@@ -325,7 +323,6 @@ public class TerrainLoader {
             this.hgtSize = hgtSize;
             this.scale = scale;
         }
-
     }
 
 }
