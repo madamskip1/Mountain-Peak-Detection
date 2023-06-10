@@ -12,6 +12,9 @@
         android:theme="@style/Theme.PeaksRecognition"
         tools:targetApi="31">
         <activity
+            android:name=".activities.DisplayRenderConfiguration"
+            android:exported="false" />
+        <activity
             android:name=".activities.DisplayRender"
             android:exported="false" />
         <activity

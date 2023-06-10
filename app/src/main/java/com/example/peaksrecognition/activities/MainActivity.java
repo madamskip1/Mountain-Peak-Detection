@@ -47,7 +47,7 @@ public class MainActivity extends AppCompatActivity {
 
         saveMatToDeviceMemory(image);
         */
-        Intent displayRender = new Intent(this, DisplayRender.class);
+        Intent displayRender = new Intent(this, DisplayRenderConfiguration.class);
         startActivity(displayRender);
     }
 

@@ -37,21 +37,12 @@ public class OffScreenRenderer {
     private EGLDisplay eglDisplay;
     private EGLConfig eglConfig;
 
-    public OffScreenRenderer(Context context) {
+    public OffScreenRenderer(Context context, Config config) {
         createContext();
         createSurface();
 
         double[] observerLocation = new double[]{49.339045, 20.081936, 991.1};
         double[] observerRotation = new double[]{144.31152, 2.3836904, -2.0597333};
-
-        Config config = new Config();
-        config.initObserverLocation = observerLocation;
-        config.initObserverRotation = observerRotation;
-        config.maxDistance = 30.0;
-        config.minDistance = 0.01;
-        config.FOVHorizontal = 66.0f;
-        config.simplifyFactor = 3;
-        config.initHgtSize = 3601;
 
         GLES30.glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
 
@@ -61,11 +52,11 @@ public class OffScreenRenderer {
         TerrainData terrainData = new TerrainData(loadedTerrain, config);
         terrainModel = new TerrainModel(terrainData, shaderProgram);
 
-        coordsManager = new CoordsManager(observerLocation, terrainData.getCoordsRange(), terrainData.getGridSize());
-        double[] cameraPositionLocal = coordsManager.convertGeoToLocalCoords(observerLocation[0], observerLocation[1], observerLocation[2]);
+        coordsManager = new CoordsManager(config.initObserverLocation, terrainData.getCoordsRange(), terrainData.getGridSize());
+        double[] cameraPositionLocal = coordsManager.convertGeoToLocalCoords(config.initObserverLocation[0], config.initObserverLocation[1], config.initObserverLocation[2]);
         camera = new Camera(config.FOVHorizontal, (float) width / (float) height, (float) config.minDistance, (float) config.maxDistance);
         camera.setPosition(cameraPositionLocal[0], cameraPositionLocal[1], cameraPositionLocal[2]);
-        camera.setAngles(observerRotation[0], observerRotation[1], observerRotation[2]);
+        camera.setAngles(config.initObserverRotation[0], config.initObserverRotation[1], config.initObserverRotation[2]);
         screenManager = new ScreenManager();
         screenManager.setViewportDimensions(width, height);
         peaks = new Peaks(context, coordsManager, terrainData, screenManager, shaderProgram);
