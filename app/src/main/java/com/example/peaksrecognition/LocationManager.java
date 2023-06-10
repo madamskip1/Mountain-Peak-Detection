@@ -27,6 +27,7 @@ public class LocationManager {
     private final Context context;
     private LocationListener locationListener;
     private LocationRequest locationRequest = null;
+    private LocationCallback locationCallback;
 
     public LocationManager(Context context) {
         this.context = context;
@@ -38,7 +39,7 @@ public class LocationManager {
             defaultLocationRequest();
         }
         this.locationListener = locationListener;
-        LocationCallback locationCallback = new LocationCallback() {
+        locationCallback = new LocationCallback() {
             @Override
             public void onLocationAvailability(@NonNull LocationAvailability locationAvailability) {
                 super.onLocationAvailability(locationAvailability);
@@ -52,10 +53,6 @@ public class LocationManager {
                 locationListener.onLocationUpdate(lastLocation);
             }
         };
-
-        checkPermission();
-        fusedLocationProviderClient.requestLocationUpdates(locationRequest, locationCallback, Looper.getMainLooper());
-        requestLocationUpdate();
     }
 
     public void requestLocationUpdate() {
@@ -70,6 +67,18 @@ public class LocationManager {
 
     public void setLocationRequest(LocationRequest locationRequest) {
         this.locationRequest = locationRequest;
+    }
+
+    public void start() {
+        checkPermission();
+        fusedLocationProviderClient.requestLocationUpdates(locationRequest, locationCallback, Looper.getMainLooper());
+        requestLocationUpdate();
+    }
+
+    public void stop() {
+        if (fusedLocationProviderClient != null) {
+            fusedLocationProviderClient.removeLocationUpdates(locationCallback);
+        }
     }
 
     public void askForLocationPermissions(AppCompatActivity activity, Context context) {

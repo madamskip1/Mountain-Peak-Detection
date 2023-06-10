@@ -7,21 +7,26 @@ import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
 
 public class RotationManager implements SensorEventListener {
-    private RotationListener rotationListener;
     private final SensorManager sensorManager;
     private final Sensor rotationSensor;
+    private RotationListener rotationListener;
 
     public RotationManager(Context context) {
-        ,,sensorManager = (SensorManager) context.getSystemService(Context.SENSOR_SERVICE);
+        sensorManager = (SensorManager) context.getSystemService(Context.SENSOR_SERVICE);
         rotationSensor = sensorManager.getDefaultSensor(Sensor.TYPE_ROTATION_VECTOR);
     }
 
-    public void addRotationListener(RotationListener rotationListener)
-    {
+    public void addRotationListener(RotationListener rotationListener) {
         this.rotationListener = rotationListener;
+    }
+
+    public void start() {
         sensorManager.registerListener(this, rotationSensor, SensorManager.SENSOR_DELAY_FASTEST);
     }
 
+    public void stop() {
+        sensorManager.unregisterListener(this);
+    }
 
     @Override
     public void onSensorChanged(SensorEvent sensorEvent) {
@@ -31,16 +36,9 @@ public class RotationManager implements SensorEventListener {
 
     @Override
     public void onAccuracyChanged(Sensor sensor, int i) {
-
     }
 
-    public interface RotationListener
-    {
-        void onRotationChanged(float[] rotationVector);
-    }
-
-    private float[] calcRotationVector(SensorEvent sensorEvent)
-    {
+    private float[] calcRotationVector(SensorEvent sensorEvent) {
         float[] rotationMatrix = new float[9];
         SensorManager.getRotationMatrixFromVector(rotationMatrix, sensorEvent.values);
 
@@ -51,10 +49,14 @@ public class RotationManager implements SensorEventListener {
         float[] orientation = new float[3];
         SensorManager.getOrientation(adjustedRotationMatrix, orientation);
 
-        for(int i = 0; i < 3; i++) {
-            orientation[i] = (float)(Math.toDegrees(orientation[i]));
+        for (int i = 0; i < 3; i++) {
+            orientation[i] = (float) (Math.toDegrees(orientation[i]));
         }
 
         return orientation;
+    }
+
+    public interface RotationListener {
+        void onRotationChanged(float[] rotationVector);
     }
 }
