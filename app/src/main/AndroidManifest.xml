@@ -16,6 +16,9 @@
         android:theme="@style/Theme.PeaksRecognition"
         tools:targetApi="31">
         <activity
+            android:name=".activities.DisplayRenderLiveActivity"
+            android:exported="false" />
+        <activity
             android:name=".activities.LocationRotationTestActivity"
             android:exported="false" />
         <activity

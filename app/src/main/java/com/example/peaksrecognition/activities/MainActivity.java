@@ -24,12 +24,17 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void DisplayRender_button_onClick(View view) {
-        Intent displayRender = new Intent(this, DisplayRenderConfiguration.class);
-        startActivity(displayRender);
+        Intent displayRenderIntent = new Intent(this, DisplayRenderConfiguration.class);
+        startActivity(displayRenderIntent);
     }
 
     public void LocationRotationTest_button_onClick(View view) {
-        Intent displayRender = new Intent(this, LocationRotationTestActivity.class);
-        startActivity(displayRender);
+        Intent locationRotationTestIntent = new Intent(this, LocationRotationTestActivity.class);
+        startActivity(locationRotationTestIntent);
+    }
+
+    public void DisplayRenderLive_button_onClick(View view) {
+        Intent displayRenderLiveIntent = new Intent(this, DisplayRenderLiveActivity.class);
+        startActivity(displayRenderLiveIntent);
     }
 }

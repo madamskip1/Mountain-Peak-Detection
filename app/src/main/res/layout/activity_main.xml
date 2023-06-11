@@ -26,10 +26,18 @@
             android:text="Display Render" />
 
         <Button
+            android:id="@+id/button"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:onClick="DisplayRenderLive_button_onClick"
+            android:text="Display Render Live" />
+
+        <Button
             android:id="@+id/button3"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:onClick="LocationRotationTest_button_onClick"
             android:text="Location/Rotation Test" />
+
     </LinearLayout>
 </androidx.constraintlayout.widget.ConstraintLayout>

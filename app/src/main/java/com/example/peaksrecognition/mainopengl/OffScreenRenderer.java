@@ -91,6 +91,10 @@ public class OffScreenRenderer {
         //peaks.test();
     }
 
+    public Camera getCamera() {
+        return camera;
+    }
+
     private void createContext() {
         eglDisplay = EGL14.eglGetDisplay(EGL14.EGL_DEFAULT_DISPLAY);
         int[] version = new int[2];

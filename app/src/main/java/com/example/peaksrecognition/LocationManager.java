@@ -64,6 +64,18 @@ public class LocationManager {
                 });
     }
 
+    public void requestLocationUpdate(LocationRequestListener locationRequestListener)
+    {
+        checkPermission();
+        fusedLocationProviderClient.getLastLocation()
+                .addOnSuccessListener(location -> {
+                    if (location != null) {
+                        locationRequestListener.onRequestSuccess(location);
+                    }
+                });
+    }
+
+
     public void setLocationRequest(LocationRequest locationRequest) {
         this.locationRequest = locationRequest;
     }
@@ -149,5 +161,9 @@ public class LocationManager {
         void onLocationUpdate(Location location);
 
         void onLocationAvailabilityChange(boolean isAvailable);
+    }
+
+    public interface LocationRequestListener {
+        void onRequestSuccess(Location location);
     }
 }
