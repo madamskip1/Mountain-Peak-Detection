@@ -8,7 +8,7 @@ public class Camera {
     private final double[] upVector;
     private final double[] position;
     private final double[] targetVector;
-    private double[] angles;
+    private float[] angles;
     private double[] directionVector;
 
     public Camera(double fovHorizontal, float aspectRatio, float near, float far) {
@@ -18,7 +18,7 @@ public class Camera {
         this.far = far;
 
         position = new double[]{0.0, 0.0, 0.0};
-        angles = new double[]{0.0, 0.0, 0.0};
+        angles = new float[]{0.0f, 0.0f, 0.0f};
         upVector = new double[]{0.0, 1.0, 0.0};
         targetVector = new double[]{0.0, 0.0, 0.0};
         directionVector = new double[]{0.0, 0.0, 0.0};
@@ -30,7 +30,7 @@ public class Camera {
         position[2] = z;
     }
 
-    public void setAngles(double yawDegree, double pitchDegree, double rollDegree) {
+    public void setAngles(float yawDegree, float pitchDegree, float rollDegree) {
         angles = fixAngles(yawDegree, pitchDegree, rollDegree);
         updateVectors();
     }
@@ -73,18 +73,18 @@ public class Camera {
         };
     }
 
-    private double[] fixAngles(double yawDegree, double pitchDegree, double rollDegree) {
-        yawDegree = 180.0 - yawDegree;
-        if (yawDegree < 0.0) {
-            yawDegree = 360.0 + yawDegree;
-        } else if (yawDegree >= 360.0) {
-            yawDegree = yawDegree - 360.0;
+    private float[] fixAngles(float yawDegree, float pitchDegree, float rollDegree) {
+        yawDegree = 180.0f - yawDegree;
+        if (yawDegree < 0.0f) {
+            yawDegree = 360.0f + yawDegree;
+        } else if (yawDegree >= 360.0f) {
+            yawDegree = yawDegree - 360.0f;
         }
 
-        pitchDegree = (-1.0) * pitchDegree;
-        rollDegree = (-1.0) * rollDegree;
+        pitchDegree = (-1.0f) * pitchDegree;
+        rollDegree = (-1.0f) * rollDegree;
 
-        return new double[]{yawDegree, pitchDegree, rollDegree};
+        return new float[]{yawDegree, pitchDegree, rollDegree};
     }
 
     private void updateVectors() {

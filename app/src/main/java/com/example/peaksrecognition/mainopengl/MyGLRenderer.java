@@ -34,7 +34,7 @@ public class MyGLRenderer implements GLSurfaceView.Renderer {
         Config config = new Config();
 
         double[] observerLocation = new double[]{49.339045, 20.081936, 991.1};
-        double[] observerRotation = new double[]{144.31152, 2.3836904, -2.0597333};
+        float[] observerRotation = new float[]{(float) 144.31152, (float) 2.3836904, (float) -2.0597333};
 
         config.initObserverLocation = observerLocation;
         config.initObserverRotation = observerRotation;

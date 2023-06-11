@@ -42,7 +42,7 @@ public class OffScreenRenderer {
         createSurface();
 
         double[] observerLocation = new double[]{49.339045, 20.081936, 991.1};
-        double[] observerRotation = new double[]{144.31152, 2.3836904, -2.0597333};
+        float[] observerRotation = new float[]{144.31152f, 2.3836904f, -2.0597333f};
 
         GLES30.glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
 
@@ -88,7 +88,7 @@ public class OffScreenRenderer {
         float[] projectionMatrix = camera.getProjectionMatrix();
         terrainModel.draw(viewMatrix, projectionMatrix);
         screenManager.setMVPMatrices(viewMatrix, projectionMatrix);
-        peaks.test();
+        //peaks.test();
     }
 
     private void createContext() {

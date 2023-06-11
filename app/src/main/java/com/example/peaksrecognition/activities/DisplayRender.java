@@ -14,6 +14,7 @@ import com.example.peaksrecognition.mainopengl.OffScreenRenderer;
 
 import org.opencv.android.Utils;
 import org.opencv.core.Mat;
+import org.opencv.imgproc.Imgproc;
 
 public class DisplayRender extends AppCompatActivity {
 
@@ -30,12 +31,26 @@ public class DisplayRender extends AppCompatActivity {
         OffScreenRenderer offScreenRenderer = new OffScreenRenderer(this, config);
         offScreenRenderer.render();
         Mat renderedImage = offScreenRenderer.getRenderedMat();
+
+        if(getIntent().getBooleanExtra("edges", false))
+        {
+            renderedImage = detectEdges(renderedImage);
+        }
+
         Bitmap bitmap = Bitmap.createBitmap(renderedImage.cols(), renderedImage.rows(), Bitmap.Config.ARGB_8888);
         Utils.matToBitmap(renderedImage, bitmap);
 
         ImageView imageView = findViewById(R.id.displayRenderImageView);
         imageView.setImageBitmap(bitmap);
     }
+
+    private Mat detectEdges(Mat image)
+    {
+        Mat edgesImage = new Mat();
+        Imgproc.Canny(image, edgesImage, 20, 100);
+        return edgesImage;
+    }
+
 
     private Config prepareConfig()
     {
@@ -44,15 +59,15 @@ public class DisplayRender extends AppCompatActivity {
         double latitude = intent.getDoubleExtra("latitude", 0.0);
         double longitude = intent.getDoubleExtra("longitude", 0.0);
         double altitude = intent.getDoubleExtra("altitude", 0.0);
-        double yaw = intent.getDoubleExtra("yaw", 0.0);
-        double pitch = intent.getDoubleExtra("pitch", 0.0);
-        double roll = intent.getDoubleExtra("roll", 0.0);
+        float yaw = intent.getFloatExtra("yaw", 0.0f);
+        float pitch = intent.getFloatExtra("pitch", 0.0f);
+        float roll = intent.getFloatExtra("roll", 0.0f);
         double minDistance = intent.getDoubleExtra("minDistance", 0.0);
         double maxDistance = intent.getDoubleExtra("maxDistance", 0.0);
 
         Config config = new Config();
         config.initObserverLocation = new double[] { latitude, longitude, altitude };
-        config.initObserverRotation = new double[] { yaw, pitch, roll };
+        config.initObserverRotation = new float[] { yaw, pitch, roll };
         config.maxDistance = maxDistance;
         config.minDistance = minDistance;
         config.FOVHorizontal = 66.0f;
