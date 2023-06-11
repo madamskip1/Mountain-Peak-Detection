@@ -1,4 +1,4 @@
-package com.example.locationrotationclass;
+package com.example.peaksrecognition;
 
 import android.content.Context;
 import android.hardware.Sensor;

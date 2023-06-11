@@ -6,10 +6,30 @@
     android:layout_height="match_parent"
     tools:context=".activities.MainActivity">
 
-    <ImageView
-        android:id="@+id/renderedImageView"
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:scaleType="fitXY" />
+        android:orientation="vertical">
 
+        <Button
+            android:id="@+id/LiveTest_button"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:onClick="LiveTest_button_onClick"
+            android:text="Live Test" />
+
+        <Button
+            android:id="@+id/DisplayRender_button"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:onClick="DisplayRender_button_onClick"
+            android:text="Display Render" />
+
+        <Button
+            android:id="@+id/button3"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:onClick="LocationRotationTest_button_onClick"
+            android:text="Location/Rotation Test" />
+    </LinearLayout>
 </androidx.constraintlayout.widget.ConstraintLayout>

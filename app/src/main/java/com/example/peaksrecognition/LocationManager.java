@@ -1,6 +1,5 @@
-package com.example.locationrotationclass;
+package com.example.peaksrecognition;
 
-import android.Manifest;
 import android.content.Context;
 import android.content.pm.PackageManager;
 import android.location.Location;
@@ -115,7 +114,7 @@ public class LocationManager {
             } else {
                 ActivityCompat.requestPermissions(
                         activity,
-                        new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, 1);
+                        new String[]{android.Manifest.permission.ACCESS_FINE_LOCATION}, 1);
             }
         }
     }
