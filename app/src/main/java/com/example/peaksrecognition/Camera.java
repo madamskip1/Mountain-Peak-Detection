@@ -1,14 +1,17 @@
 package com.example.peaksrecognition;
 
+import android.util.Log;
+
 public class Camera {
     private final double fovHorizontal;
     private final float aspectRatio;
     private final float near;
     private final float far;
-    private final double[] upVector;
+    private double[] upVector;
     private final double[] position;
     private final double[] targetVector;
     private float[] angles;
+    private float lastRollAngle;
     private double[] directionVector;
 
     public Camera(double fovHorizontal, float aspectRatio, float near, float far) {
@@ -19,12 +22,14 @@ public class Camera {
 
         position = new double[]{0.0, 0.0, 0.0};
         angles = new float[]{0.0f, 0.0f, 0.0f};
+        lastRollAngle = 0.0f;
         upVector = new double[]{0.0, 1.0, 0.0};
         targetVector = new double[]{0.0, 0.0, 0.0};
         directionVector = new double[]{0.0, 0.0, 0.0};
     }
 
     public void setPosition(double x, double y, double z) {
+        Log.d("moje", "set Position " + x + " " + y + " " + z);
         position[0] = x;
         position[1] = y;
         position[2] = z;
@@ -32,6 +37,10 @@ public class Camera {
 
     public void setAngles(float yawDegree, float pitchDegree, float rollDegree) {
         angles = fixAngles(yawDegree, pitchDegree, rollDegree);
+        float rollDegreeDiff = angles[2] - lastRollAngle;
+        lastRollAngle = angles[2];
+        angles[2] = rollDegreeDiff;
+
         updateVectors();
     }
 
@@ -88,7 +97,6 @@ public class Camera {
     }
 
     private void updateVectors() {
-
         updateDirectionVector();
         updateUpVector();
         updateTargetVector();
@@ -127,9 +135,11 @@ public class Camera {
                 {(z * x * (1 - cosAngle) - y * sinAngle), (z * y * (1 - cosAngle) + x * sinAngle), (cosAngle + z * z * (1 - cosAngle))}
         };
 
+        double[] newUpVector = new double[3];
         for (int i = 0; i < 3; ++i) {
-            upVector[i] = rotationMatrix[i][0] * upVector[0] + rotationMatrix[i][1] * upVector[1] + rotationMatrix[i][2] * upVector[2];
+            newUpVector[i] = rotationMatrix[i][0] * upVector[0] + rotationMatrix[i][1] * upVector[1] + rotationMatrix[i][2] * upVector[2];
         }
+        upVector = newUpVector;
     }
 
     private void updateTargetVector() {
