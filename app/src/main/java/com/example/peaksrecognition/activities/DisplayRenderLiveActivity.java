@@ -5,6 +5,7 @@ import android.location.Location;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
+import android.util.Log;
 import android.widget.ImageView;
 
 import androidx.appcompat.app.AppCompatActivity;
@@ -27,6 +28,8 @@ public class DisplayRenderLiveActivity extends AppCompatActivity {
     private OffScreenRenderer offScreenRenderer;
     private Camera camera;
     private ImageView imageView;
+    private RotationManager rotationManager;
+    private LocationManager locationManager;
 
 
     @Override
@@ -46,6 +49,7 @@ public class DisplayRenderLiveActivity extends AppCompatActivity {
         handler.post(new Runnable() {
             @Override
             public void run() {
+                Log.d("moje", "loop");
                 startTime[0] = System.currentTimeMillis();
                 camera.setPosition(curLocation.getLatitude(), curLocation.getLongitude(), curLocation.getAltitude());
                 camera.setAngles(curRotation[0], curRotation[1], curRotation[2]);
@@ -73,7 +77,7 @@ public class DisplayRenderLiveActivity extends AppCompatActivity {
     }
 
     private void prepareLocationManager() {
-        LocationManager locationManager = new LocationManager(this);
+        locationManager = new LocationManager(this);
         locationManager.askForLocationPermissions(this, this);
         locationManager.setLocationUpdateCallback(new LocationManager.LocationListener() {
             @Override
@@ -106,11 +110,11 @@ public class DisplayRenderLiveActivity extends AppCompatActivity {
 
 
     private void prepareRotationManager() {
-        RotationManager rotationManager = new RotationManager(this);
+        rotationManager = new RotationManager(this);
         AtomicBoolean rotationLoaded = new AtomicBoolean(false);
         rotationManager.addRotationListener(rotationVector -> {
             curRotation = rotationVector;
-
+            Log.d("moje", "rotation Update");
             if (!rotationLoaded.get()) {
                 rotationLoaded.set(true);
                 afterRotationLoaded();
@@ -134,4 +138,30 @@ public class DisplayRenderLiveActivity extends AppCompatActivity {
         offScreenRenderer = new OffScreenRenderer(this, config);
     }
 
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        if (locationManager != null)
+            locationManager.stop();
+        if (rotationManager != null)
+            rotationManager.stop();
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        if (locationManager != null)
+            locationManager.stop();
+        if (rotationManager != null)
+            rotationManager.stop();
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        if (locationManager != null)
+            locationManager.start();
+        if (rotationManager != null)
+            rotationManager.start();
+    }
 }

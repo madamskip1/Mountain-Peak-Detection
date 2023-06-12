@@ -2,6 +2,7 @@ package com.example.peaksrecognition.activities;
 
 import android.location.Location;
 import android.os.Bundle;
+import android.util.Log;
 import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatActivity;
@@ -54,6 +55,7 @@ public class LocationRotationTestActivity extends AppCompatActivity {
 
         rotationManager = new RotationManager(this);
         rotationManager.addRotationListener(rotationVector -> {
+            Log.d("moje", "dupa");
             yawTextView.setText(String.valueOf(rotationVector[0]));
             rollTextView.setText(String.valueOf(rotationVector[1]));
             pitchTextView.setText(String.valueOf(rotationVector[2]));
@@ -61,5 +63,32 @@ public class LocationRotationTestActivity extends AppCompatActivity {
 
         locationManager.start();
         rotationManager.start();
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        if (locationManager != null)
+            locationManager.stop();
+        if (rotationManager != null)
+            rotationManager.stop();
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        if (locationManager != null)
+            locationManager.stop();
+        if (rotationManager != null)
+            rotationManager.stop();
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        if (locationManager != null)
+            locationManager.start();
+        if (rotationManager != null)
+            rotationManager.start();
     }
 }
