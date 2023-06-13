@@ -5,16 +5,15 @@ import androidx.appcompat.app.AppCompatActivity;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.os.Bundle;
-import android.util.Log;
 import android.widget.ImageView;
 
 import com.example.peaksrecognition.Config;
 import com.example.peaksrecognition.R;
+import com.example.peaksrecognition.edgedetectors.CannyEdgeDetector;
 import com.example.peaksrecognition.mainopengl.OffScreenRenderer;
 
 import org.opencv.android.Utils;
 import org.opencv.core.Mat;
-import org.opencv.imgproc.Imgproc;
 
 public class DisplayRender extends AppCompatActivity {
 
@@ -46,9 +45,8 @@ public class DisplayRender extends AppCompatActivity {
 
     private Mat detectEdges(Mat image)
     {
-        Mat edgesImage = new Mat();
-        Imgproc.Canny(image, edgesImage, 20, 100);
-        return edgesImage;
+        CannyEdgeDetector cannyEdgeDetector = new CannyEdgeDetector(20, 100);
+        return cannyEdgeDetector.detect(image);
     }
 
 
