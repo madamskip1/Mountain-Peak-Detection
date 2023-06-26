@@ -1,6 +1,7 @@
 package com.example.peaksrecognition.activities;
 
 import android.content.pm.PackageManager;
+import android.location.Location;
 import android.os.Bundle;
 import android.widget.SeekBar;
 import android.widget.TextView;
@@ -10,7 +11,12 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 
+import com.example.peaksrecognition.Camera;
+import com.example.peaksrecognition.CoordsManager;
+import com.example.peaksrecognition.LocationManager;
 import com.example.peaksrecognition.R;
+import com.example.peaksrecognition.RotationManager;
+import com.example.peaksrecognition.mainopengl.OffScreenRenderer;
 
 import org.opencv.android.BaseLoaderCallback;
 import org.opencv.android.CameraBridgeViewBase;
@@ -19,7 +25,7 @@ import org.opencv.android.OpenCVLoader;
 import org.opencv.core.Mat;
 import org.opencv.imgproc.Imgproc;
 
-public class FullscreenActivityLiveCamera extends AppCompatActivity implements CameraBridgeViewBase.CvCameraViewListener2 {
+public class CannyThresholdLiveActivity extends AppCompatActivity implements CameraBridgeViewBase.CvCameraViewListener2 {
     private static final int MY_CAMERA_REQUEST_CODE = 100;
 
     static {
@@ -34,6 +40,14 @@ public class FullscreenActivityLiveCamera extends AppCompatActivity implements C
     int highThreshold = 0;
     JavaCameraView javaCameraView;
     int activeCamera = CameraBridgeViewBase.CAMERA_ID_BACK;
+
+    private Location curLocation;
+    private float[] curRotation;
+    private OffScreenRenderer offScreenRenderer;
+    private Camera camera;
+    private CoordsManager coordsManager;
+    private RotationManager rotationManager;
+    private LocationManager locationManager;
     BaseLoaderCallback baseLoaderCallback = new BaseLoaderCallback(this) {
         @Override
         public void onManagerConnected(int status) {
@@ -122,7 +136,7 @@ public class FullscreenActivityLiveCamera extends AppCompatActivity implements C
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_fullscreen_live_camera);
+        setContentView(R.layout.activity_canny_threshold_live);
         lowTextView = findViewById(R.id.liveThresholdLowText);
         highTextView = findViewById(R.id.liveThresholdHighText);
         lowTextView.setText(String.valueOf(lowThreshold));
