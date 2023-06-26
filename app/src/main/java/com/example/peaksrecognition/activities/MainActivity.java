@@ -37,4 +37,9 @@ public class MainActivity extends AppCompatActivity {
         Intent displayRenderLiveIntent = new Intent(this, DisplayRenderLiveActivity.class);
         startActivity(displayRenderLiveIntent);
     }
+
+    public void LiveCamera_button_onClick(View view) {
+        Intent liveCameraIntent = new Intent(this, FullscreenActivityLiveCamera.class);
+        startActivity(liveCameraIntent);
+    }
 }

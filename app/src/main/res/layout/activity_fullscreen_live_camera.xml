@@ -4,46 +4,44 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".activities.MainActivity">
+    tools:context=".activities.FullscreenActivityLiveCamera">
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:orientation="vertical">
 
-        <Button
-            android:id="@+id/LiveTest_button"
+        <SeekBar
+            android:id="@+id/liveThresholdLowBar"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:onClick="LiveTest_button_onClick"
-            android:text="Live Test" />
+            android:max="255" />
 
-        <Button
-            android:id="@+id/DisplayRender_button"
+        <TextView
+            android:id="@+id/liveThresholdLowText"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:onClick="DisplayRender_button_onClick"
-            android:text="Display Render" />
+            android:layout_weight="0"
+            android:text="TextView" />
 
-        <Button
-            android:id="@+id/button"
+        <SeekBar
+            android:id="@+id/liveThresholdHighBar"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:onClick="DisplayRenderLive_button_onClick"
-            android:text="Display Render Live" />
+            android:max="255" />
 
-        <Button
-            android:id="@+id/button3"
+        <TextView
+            android:id="@+id/liveThresholdHighText"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:onClick="LocationRotationTest_button_onClick"
-            android:text="Location/Rotation Test" />
+            android:layout_weight="0"
+            android:text="TextView" />
 
-        <Button
+        <org.opencv.android.JavaCameraView
+            android:id="@+id/java_camera_view"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:onClick="LiveCamera_button_onClick"
-            android:text="Location/Live Camera" />
-
+            android:layout_height="match_parent" />
     </LinearLayout>
+
+
 </androidx.constraintlayout.widget.ConstraintLayout>

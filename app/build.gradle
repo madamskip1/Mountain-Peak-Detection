@@ -6,6 +6,10 @@ android {
     namespace 'com.example.peaksrecognition'
     compileSdk 33
 
+    dataBinding {
+        enabled=true
+    }
+
     defaultConfig {
         applicationId "com.example.peaksrecognition"
         minSdk 29
@@ -25,6 +29,9 @@ android {
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_1_8
         targetCompatibility JavaVersion.VERSION_1_8
+    }
+    buildFeatures {
+        viewBinding true
     }
 }
 
