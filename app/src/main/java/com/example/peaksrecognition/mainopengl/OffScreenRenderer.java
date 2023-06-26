@@ -91,6 +91,10 @@ public class OffScreenRenderer {
         //peaks.test();
     }
 
+    public CoordsManager getCoordsManager() {
+        return coordsManager;
+    }
+
     public Camera getCamera() {
         return camera;
     }

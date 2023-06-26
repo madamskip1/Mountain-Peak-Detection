@@ -12,6 +12,7 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.peaksrecognition.Camera;
 import com.example.peaksrecognition.Config;
+import com.example.peaksrecognition.CoordsManager;
 import com.example.peaksrecognition.LocationManager;
 import com.example.peaksrecognition.R;
 import com.example.peaksrecognition.RotationManager;
@@ -27,6 +28,7 @@ public class DisplayRenderLiveActivity extends AppCompatActivity {
     private float[] curRotation;
     private OffScreenRenderer offScreenRenderer;
     private Camera camera;
+    private CoordsManager coordsManager;
     private ImageView imageView;
     private RotationManager rotationManager;
     private LocationManager locationManager;
@@ -49,9 +51,10 @@ public class DisplayRenderLiveActivity extends AppCompatActivity {
         handler.post(new Runnable() {
             @Override
             public void run() {
-                Log.d("moje", "loop");
                 startTime[0] = System.currentTimeMillis();
-                camera.setPosition(curLocation.getLatitude(), curLocation.getLongitude(), curLocation.getAltitude());
+                double[] cameraCoords = coordsManager.convertGeoToLocalCoords(curLocation.getLatitude(), curLocation.getLongitude(), curLocation.getAltitude());
+                camera.setPosition(cameraCoords[0], cameraCoords[1], cameraCoords[2]);
+
                 camera.setAngles(curRotation[0], curRotation[1], curRotation[2]);
                 offScreenRenderer.render();
 
@@ -114,7 +117,6 @@ public class DisplayRenderLiveActivity extends AppCompatActivity {
         AtomicBoolean rotationLoaded = new AtomicBoolean(false);
         rotationManager.addRotationListener(rotationVector -> {
             curRotation = rotationVector;
-            Log.d("moje", "rotation Update");
             if (!rotationLoaded.get()) {
                 rotationLoaded.set(true);
                 afterRotationLoaded();
@@ -136,6 +138,7 @@ public class DisplayRenderLiveActivity extends AppCompatActivity {
         config.initHgtSize = 3601;
 
         offScreenRenderer = new OffScreenRenderer(this, config);
+        coordsManager = offScreenRenderer.getCoordsManager();
     }
 
     @Override
