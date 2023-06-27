@@ -12,6 +12,13 @@
         android:orientation="vertical">
 
         <Button
+            android:id="@+id/button2"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:onClick="BlendRenderAndLive_button_onClick"
+            android:text="Blend Render And Live" />
+
+        <Button
             android:id="@+id/LiveTest_button"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"

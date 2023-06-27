@@ -39,7 +39,12 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void LiveCamera_button_onClick(View view) {
-        Intent liveCameraIntent = new Intent(this, FullscreenActivityLiveCamera.class);
+        Intent liveCameraIntent = new Intent(this, CannyThresholdLiveActivity.class);
         startActivity(liveCameraIntent);
+    }
+
+    public void BlendRenderAndLive_button_onClick(View view) {
+        Intent blendRenderIntent = new Intent(this, BlendRenderAndLiveActivity.class);
+        startActivity(blendRenderIntent);
     }
 }
