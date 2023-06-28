@@ -1,9 +1,7 @@
 package com.example.peaksrecognition;
 
-import android.util.Log;
-
 public class Camera {
-    private final double fovHorizontal;
+    private final double fovVertical;
     private final float aspectRatio;
     private final float near;
     private final float far;
@@ -13,12 +11,14 @@ public class Camera {
     private float[] angles;
     private float lastRollAngle;
     private double[] directionVector;
+    private Config.DeviceOrientation deviceOrientation;
 
-    public Camera(double fovHorizontal, float aspectRatio, float near, float far) {
-        this.fovHorizontal = fovHorizontal;
+    public Camera(double fovVertical, float aspectRatio, float near, float far, Config.DeviceOrientation deviceOrientation) {
+        this.fovVertical = fovVertical;
         this.aspectRatio = aspectRatio;
         this.near = near;
         this.far = far;
+        this.deviceOrientation = deviceOrientation;
 
         position = new double[]{0.0, 0.0, 0.0};
         angles = new float[]{0.0f, 0.0f, 0.0f};
@@ -29,13 +29,14 @@ public class Camera {
     }
 
     public void setPosition(double x, double y, double z) {
-        Log.d("moje", "set Position " + x + " " + y + " " + z);
+       //Log.d("moje", "set Position " + x + " " + y + " " + z);
         position[0] = x;
         position[1] = y;
         position[2] = z;
     }
 
     public void setAngles(float yawDegree, float pitchDegree, float rollDegree) {
+        if (deviceOrientation == Config.DeviceOrientation.LANDSCAPE) rollDegree += 90.0f;
         angles = fixAngles(yawDegree, pitchDegree, rollDegree);
         float rollDegreeDiff = angles[2] - lastRollAngle;
         lastRollAngle = angles[2];
@@ -45,7 +46,7 @@ public class Camera {
     }
 
     public float[] getProjectionMatrix() {
-        float f = 1.0f / (float) Math.tan(Math.toRadians(fovHorizontal / 2.0));
+        float f = 1.0f / (float) Math.tan(Math.toRadians(fovVertical / 2.0));
 
         return new float[]{
                 (f / aspectRatio), 0.0f, 0.0f, 0.0f,  // col 1

@@ -41,13 +41,7 @@ public class CannyThresholdLiveActivity extends AppCompatActivity implements Cam
     JavaCameraView javaCameraView;
     int activeCamera = CameraBridgeViewBase.CAMERA_ID_BACK;
 
-    private Location curLocation;
-    private float[] curRotation;
-    private OffScreenRenderer offScreenRenderer;
-    private Camera camera;
-    private CoordsManager coordsManager;
-    private RotationManager rotationManager;
-    private LocationManager locationManager;
+
     BaseLoaderCallback baseLoaderCallback = new BaseLoaderCallback(this) {
         @Override
         public void onManagerConnected(int status) {

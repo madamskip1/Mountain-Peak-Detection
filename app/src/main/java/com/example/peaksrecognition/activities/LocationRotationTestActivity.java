@@ -55,7 +55,6 @@ public class LocationRotationTestActivity extends AppCompatActivity {
 
         rotationManager = new RotationManager(this);
         rotationManager.addRotationListener(rotationVector -> {
-            Log.d("moje", "dupa");
             yawTextView.setText(String.valueOf(rotationVector[0]));
             rollTextView.setText(String.valueOf(rotationVector[1]));
             pitchTextView.setText(String.valueOf(rotationVector[2]));

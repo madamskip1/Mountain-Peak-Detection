@@ -3,6 +3,7 @@ package com.example.peaksrecognition;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.location.Location;
+import android.util.Log;
 import android.widget.ImageView;
 
 import androidx.appcompat.app.AppCompatActivity;
@@ -56,6 +57,7 @@ public class BlendRenderAndLive extends FrameAnalyser {
         Mat renderMat = offScreenRenderer.getRenderedMat();
 
         Mat blended = new Mat();
+        blended = rgbaMat;
         Core.addWeighted(rgbaMat, 0.5, renderMat, 0.5, 0.0, blended);
         Bitmap bitmap = Bitmap.createBitmap(blended.cols(), blended.rows(), Bitmap.Config.ARGB_8888);
         Utils.matToBitmap(blended, bitmap);
@@ -102,14 +104,18 @@ public class BlendRenderAndLive extends FrameAnalyser {
     }
 
     private void prepareRenderer() {
+        FieldOfView fieldOfView = new FieldOfView(parentContext);
+        fieldOfView.setDeviceOrientation(FieldOfView.DeviceOrientation.LANDSCAPE);
+
         Config config = new Config();
         config.initObserverLocation = new double[]{curLocation.getLatitude(), curLocation.getLongitude(), curLocation.getAltitude()};
         config.initObserverRotation = curRotation;
         config.maxDistance = 30.0;
         config.minDistance = 0.001;
-        config.FOVHorizontal = 66.0f;
+        config.FovVertical = (float) fieldOfView.getVerticalFOV();
         config.simplifyFactor = 3;
         config.initHgtSize = 3601;
+        config.deviceOrientation = Config.DeviceOrientation.LANDSCAPE;
 
         offScreenRenderer = new OffScreenRenderer(parentContext, config);
         coordsManager = offScreenRenderer.getCoordsManager();

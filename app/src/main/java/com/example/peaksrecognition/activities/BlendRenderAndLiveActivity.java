@@ -1,6 +1,7 @@
 package com.example.peaksrecognition.activities;
 
 import android.os.Bundle;
+import android.view.Window;
 
 import androidx.appcompat.app.AppCompatActivity;
 
@@ -34,6 +35,8 @@ public class BlendRenderAndLiveActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        this.supportRequestWindowFeature(Window.FEATURE_NO_TITLE);
+
         setContentView(R.layout.activity_blend_render_and_live);
         blendRenderAndLive = new BlendRenderAndLive(this, this, findViewById(R.id.imageViewBlendRenderLive));
         blendRenderAndLive.prepareAndStart();

@@ -68,7 +68,7 @@ public class DisplayRender extends AppCompatActivity {
         config.initObserverRotation = new float[] { yaw, pitch, roll };
         config.maxDistance = maxDistance;
         config.minDistance = minDistance;
-        config.FOVHorizontal = 66.0f;
+        config.FovVertical = 66.0f;
         config.simplifyFactor = 3;
         config.initHgtSize = 3601;
 

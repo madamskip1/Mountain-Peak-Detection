@@ -66,14 +66,14 @@ public class ImageProxyToMatConverter {
             Imgproc.cvtColorTwoPlane(y_mat, uv_mat2, rgbaMat, Imgproc.COLOR_YUV2RGBA_NV21);
         }
 
-        rotateAndFlip(rgbaMat);
+        //rotateAndFlip(rgbaMat);
 
         return rgbaMat;
     }
 
 
     private static void rotateAndFlip(Mat matToRotate) {
-        Core.rotate(matToRotate, matToRotate, Core.ROTATE_90_COUNTERCLOCKWISE);
-        Core.flip(matToRotate, matToRotate, 1);
+        Core.rotate(matToRotate, matToRotate, Core.ROTATE_90_CLOCKWISE);
+       // Core.flip(matToRotate, matToRotate, 1);
     }
 }

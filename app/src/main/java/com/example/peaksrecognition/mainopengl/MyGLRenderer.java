@@ -40,9 +40,10 @@ public class MyGLRenderer implements GLSurfaceView.Renderer {
         config.initObserverRotation = observerRotation;
         config.maxDistance = 30.0;
         config.minDistance = 0.01;
-        config.FOVHorizontal = 66.0f;
+        config.FovVertical = 66.0f;
         config.simplifyFactor = 3;
         config.initHgtSize = 3601;
+        config.deviceOrientation = Config.DeviceOrientation.PORTRAIT;
 
 
         GLES30.glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
@@ -54,7 +55,7 @@ public class MyGLRenderer implements GLSurfaceView.Renderer {
         screenManager = new ScreenManager();
         coordsManager = new CoordsManager(observerLocation, terrainData.getCoordsRange(), terrainData.getGridSize());
         double[] cameraPositionLocal = coordsManager.convertGeoToLocalCoords(observerLocation[0], observerLocation[1], observerLocation[2]);
-        camera = new Camera(66.0, 0.54573f, 0.01f, 31.0f);
+        camera = new Camera(66.0, 0.54573f, 0.01f, 31.0f, config.deviceOrientation);
         camera.setPosition(cameraPositionLocal[0], cameraPositionLocal[1], cameraPositionLocal[2]);
         camera.setAngles(observerRotation[0], observerRotation[1], observerRotation[2]);
          //peaks = new Peaks(context, coordsManager, terrainData, screenManager, shaderProgram);

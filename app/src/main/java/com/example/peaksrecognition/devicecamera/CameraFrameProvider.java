@@ -1,5 +1,7 @@
 package com.example.peaksrecognition.devicecamera;
 
+import android.util.Size;
+
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.camera.core.CameraSelector;
 import androidx.camera.core.ImageAnalysis;
@@ -45,12 +47,13 @@ public class CameraFrameProvider {
 
     private CameraSelector prepareCameraSelector() {
         return new CameraSelector.Builder()
-                .requireLensFacing(CameraSelector.LENS_FACING_FRONT)
+                .requireLensFacing(CameraSelector.LENS_FACING_BACK)
                 .build();
     }
 
     private ImageAnalysis prepareImageAnalysis() {
         ImageAnalysis imageAnalysis = new ImageAnalysis.Builder()
+                .setTargetResolution(new Size(1280, 960))
                 .setBackpressureStrategy(ImageAnalysis.STRATEGY_KEEP_ONLY_LATEST)
                 .build();
 

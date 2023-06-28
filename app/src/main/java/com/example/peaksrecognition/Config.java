@@ -5,7 +5,13 @@ public class Config {
     public float[] initObserverRotation;
     public double maxDistance;
     public double minDistance;
-    public float FOVHorizontal;
+    public float FovVertical;
     public int simplifyFactor;
     public int initHgtSize;
+    public DeviceOrientation deviceOrientation = DeviceOrientation.PORTRAIT;
+
+    public enum DeviceOrientation {
+        PORTRAIT,
+        LANDSCAPE
+    }
 }
