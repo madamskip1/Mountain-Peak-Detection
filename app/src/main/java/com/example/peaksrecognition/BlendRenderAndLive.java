@@ -3,7 +3,6 @@ package com.example.peaksrecognition;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.location.Location;
-import android.util.Log;
 import android.widget.ImageView;
 
 import androidx.appcompat.app.AppCompatActivity;
@@ -11,6 +10,7 @@ import androidx.camera.core.ImageProxy;
 
 import com.example.peaksrecognition.devicecamera.FrameAnalyser;
 import com.example.peaksrecognition.devicecamera.ImageProxyToMatConverter;
+import com.example.peaksrecognition.mainopengl.Camera;
 import com.example.peaksrecognition.mainopengl.OffScreenRenderer;
 
 import org.opencv.android.OpenCVLoader;
@@ -25,6 +25,8 @@ public class BlendRenderAndLive extends FrameAnalyser {
         OpenCVLoader.initDebug();
     }
 
+    private final AppCompatActivity parentActivity;
+    private final Context parentContext;
     ImageView imageView;
     private Location curLocation;
     private float[] curRotation;
@@ -33,11 +35,9 @@ public class BlendRenderAndLive extends FrameAnalyser {
     private CoordsManager coordsManager;
     private RotationManager rotationManager;
     private LocationManager locationManager;
-    private final AppCompatActivity parentActivity;
-    private final Context parentContext;
 
     public BlendRenderAndLive(AppCompatActivity activity, Context context, ImageView imageView) {
-        super(activity);
+        super(activity, 640, 480);
         parentActivity = activity;
         parentContext = context;
         this.imageView = imageView;
@@ -56,11 +56,9 @@ public class BlendRenderAndLive extends FrameAnalyser {
         offScreenRenderer.render();
         Mat renderMat = offScreenRenderer.getRenderedMat();
 
-        Mat blended = new Mat();
-        blended = rgbaMat;
-        Core.addWeighted(rgbaMat, 0.5, renderMat, 0.5, 0.0, blended);
-        Bitmap bitmap = Bitmap.createBitmap(blended.cols(), blended.rows(), Bitmap.Config.ARGB_8888);
-        Utils.matToBitmap(blended, bitmap);
+        Core.addWeighted(rgbaMat, 0.5, renderMat, 0.5, 0.0, rgbaMat);
+        Bitmap bitmap = Bitmap.createBitmap(rgbaMat.cols(), rgbaMat.rows(), Bitmap.Config.ARGB_8888);
+        Utils.matToBitmap(rgbaMat, bitmap);
         imageView.setImageBitmap(bitmap);
     }
 

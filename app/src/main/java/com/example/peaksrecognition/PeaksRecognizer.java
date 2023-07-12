@@ -11,15 +11,13 @@ import androidx.camera.core.ImageProxy;
 import com.example.peaksrecognition.devicecamera.FrameAnalyser;
 import com.example.peaksrecognition.devicecamera.ImageProxyToMatConverter;
 import com.example.peaksrecognition.edgedetectors.CannyEdgeDetector;
+import com.example.peaksrecognition.mainopengl.Camera;
 import com.example.peaksrecognition.mainopengl.OffScreenRenderer;
 
 import org.opencv.android.OpenCVLoader;
 import org.opencv.android.Utils;
 import org.opencv.core.Core;
 import org.opencv.core.Mat;
-import org.opencv.core.Point;
-import org.opencv.core.Scalar;
-import org.opencv.imgproc.Imgproc;
 
 import java.util.Vector;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -33,6 +31,8 @@ public class PeaksRecognizer extends FrameAnalyser {
     private final AppCompatActivity parentActivity;
     private final CannyEdgeDetector cannyRender;
     private final CannyEdgeDetector cannyLive;
+    private final int width;
+    private final int height;
     ImageView imageView;
     private Location curLocation;
     private float[] curRotation;
@@ -42,11 +42,14 @@ public class PeaksRecognizer extends FrameAnalyser {
     private RotationManager rotationManager;
     private LocationManager locationManager;
 
-    public PeaksRecognizer(AppCompatActivity activity, Context context, ImageView imageView) {
-        super(activity);
+
+    public PeaksRecognizer(AppCompatActivity activity, Context context, ImageView imageView, int width, int height) {
+        super(activity, width, height);
         parentContext = context;
         parentActivity = activity;
         this.imageView = imageView;
+        this.width = width;
+        this.height = height;
         cannyRender = new CannyEdgeDetector(50, 100);
         cannyLive = new CannyEdgeDetector(50, 100);
     }

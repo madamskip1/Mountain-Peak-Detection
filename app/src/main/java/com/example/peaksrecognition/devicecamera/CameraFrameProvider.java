@@ -16,12 +16,19 @@ public class CameraFrameProvider {
     private final ListenableFuture<ProcessCameraProvider> cameraProviderFuture;
     private final AppCompatActivity activity;
     private final FrameAnalyser frameAnalyser;
+    private final int width;
+    private final int height;
 
-    public CameraFrameProvider(AppCompatActivity activity, FrameAnalyser frameAnalyser) {
+    public CameraFrameProvider(AppCompatActivity activity, FrameAnalyser frameAnalyser, int width, int height) {
         this.activity = activity;
         this.frameAnalyser = frameAnalyser;
+        this.width = width;
+        this.height = height;
+
+
         cameraProviderFuture = ProcessCameraProvider.getInstance(this.activity);
     }
+
 
     public void start() {
         cameraProviderFuture.addListener(prepareCameraProviderRunnable(), ContextCompat.getMainExecutor(activity));
@@ -41,7 +48,6 @@ public class CameraFrameProvider {
     private void bindImageAnalysis(ProcessCameraProvider cameraProvider) {
         ImageAnalysis imageAnalysis = prepareImageAnalysis();
         CameraSelector cameraSelector = prepareCameraSelector();
-
         cameraProvider.bindToLifecycle(activity, cameraSelector, imageAnalysis);
     }
 
@@ -53,7 +59,7 @@ public class CameraFrameProvider {
 
     private ImageAnalysis prepareImageAnalysis() {
         ImageAnalysis imageAnalysis = new ImageAnalysis.Builder()
-                .setTargetResolution(new Size(1280, 960))
+                .setTargetResolution(new Size(width, height))
                 .setBackpressureStrategy(ImageAnalysis.STRATEGY_KEEP_ONLY_LATEST)
                 .build();
 
