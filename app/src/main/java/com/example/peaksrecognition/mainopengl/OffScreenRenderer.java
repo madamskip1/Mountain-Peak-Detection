@@ -66,7 +66,6 @@ public class OffScreenRenderer {
         byte[] imageData = new byte[height * width * 4];
         buffer.get(imageData);
         image.put(0, 0, imageData);
-        Core.flip(image, image, 0);
         return image;
     }
 

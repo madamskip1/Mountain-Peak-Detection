@@ -1,17 +1,20 @@
-package com.example.peaksrecognition;
+package com.example.peaksrecognition.mainopengl;
+
+import com.example.peaksrecognition.Config;
+import com.example.peaksrecognition.Utility;
 
 public class Camera {
     private final double fovVertical;
     private final float aspectRatio;
     private final float near;
     private final float far;
-    private double[] upVector;
     private final double[] position;
     private final double[] targetVector;
+    private final Config.DeviceOrientation deviceOrientation;
+    private double[] upVector;
     private float[] angles;
     private float lastRollAngle;
     private double[] directionVector;
-    private Config.DeviceOrientation deviceOrientation;
 
     public Camera(double fovVertical, float aspectRatio, float near, float far, Config.DeviceOrientation deviceOrientation) {
         this.fovVertical = fovVertical;
@@ -29,14 +32,15 @@ public class Camera {
     }
 
     public void setPosition(double x, double y, double z) {
-       //Log.d("moje", "set Position " + x + " " + y + " " + z);
         position[0] = x;
         position[1] = y;
         position[2] = z;
     }
 
     public void setAngles(float yawDegree, float pitchDegree, float rollDegree) {
-        if (deviceOrientation == Config.DeviceOrientation.LANDSCAPE) rollDegree += 90.0f;
+        if (deviceOrientation == Config.DeviceOrientation.LANDSCAPE) {
+            rollDegree += 90.0f;
+        }
         angles = fixAngles(yawDegree, pitchDegree, rollDegree);
         float rollDegreeDiff = angles[2] - lastRollAngle;
         lastRollAngle = angles[2];
@@ -76,10 +80,10 @@ public class Camera {
         float zTranslation = (float) Utility.dotProduct(zMatrix, 3, negatedEye, 3);
 
         return new float[]{
-                -(float) xMatrix[0], (float) yMatrix[0], (float) zMatrix[0], 0.0f,  // col 1
-                -(float) xMatrix[1], (float) yMatrix[1], (float) zMatrix[1], 0.0f,  // col 2
-                -(float) xMatrix[2], (float) yMatrix[2], (float) zMatrix[2], 0.0f,  // col 3
-                -xTranslation, yTranslation, zTranslation, 1.0f,  // col 1
+                -(float) xMatrix[0], -(float) yMatrix[0], (float) zMatrix[0], 0.0f,  // col 1
+                -(float) xMatrix[1], -(float) yMatrix[1], (float) zMatrix[1], 0.0f,  // col 2
+                -(float) xMatrix[2], -(float) yMatrix[2], (float) zMatrix[2], 0.0f,  // col 3
+                -xTranslation, -yTranslation, zTranslation, 1.0f,  // col 1
         };
     }
 
