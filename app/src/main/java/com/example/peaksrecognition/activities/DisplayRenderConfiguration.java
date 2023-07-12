@@ -1,16 +1,14 @@
 package com.example.peaksrecognition.activities;
 
-import androidx.appcompat.app.AppCompatActivity;
-
 import android.content.Intent;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.Switch;
 
+import androidx.appcompat.app.AppCompatActivity;
+
 import com.example.peaksrecognition.R;
-import com.opencsv.bean.validators.StringValidator;
 
 import java.text.DecimalFormatSymbols;
 
@@ -58,6 +56,7 @@ public class DisplayRenderConfiguration extends AppCompatActivity {
         double maxDistance = getDecimalFromInput(maxDistanceEditText);
 
         boolean edges = ((Switch) findViewById(R.id.displayRender_edgeSwitch)).isChecked();
+        boolean peaks = ((Switch) findViewById(R.id.displayRender_peaksSwitch)).isChecked();
 
         Intent intent = new Intent(this, DisplayRender.class);
         intent.putExtra("latitude", latitude);
@@ -72,16 +71,16 @@ public class DisplayRenderConfiguration extends AppCompatActivity {
         intent.putExtra("maxDistance", maxDistance);
 
         intent.putExtra("edges", edges);
+        intent.putExtra("peaks", peaks);
 
         startActivity(intent);
     }
 
-    private double getDecimalFromInput(EditText editText)
-    {
+    private double getDecimalFromInput(EditText editText) {
         String input = editText.getText().toString();
         DecimalFormatSymbols symbols = DecimalFormatSymbols.getInstance();
         char decimalSeparator = symbols.getDecimalSeparator();
-        input = input.replace(',', decimalSeparator); // Replace comma with decimal separator if necessary
+        input = input.replace(',', decimalSeparator);
 
         return Double.parseDouble(input);
     }
@@ -89,7 +88,7 @@ public class DisplayRenderConfiguration extends AppCompatActivity {
     public void displayRender_fillButton_onClick(View view) {
         final double[] observerLocation = new double[]{49.339045, 20.081936, 991.1};
         final float[] observerRotation = new float[]{144.31152f, 2.3836904f, -2.0597333f};
-        final double[] distance = new double[] {0.001, 30.0};
+        final double[] distance = new double[]{0.00001, 30.0};
 
         latitudeEditText.setText(String.valueOf(observerLocation[0]));
         longitudeEditText.setText(String.valueOf(observerLocation[1]));
