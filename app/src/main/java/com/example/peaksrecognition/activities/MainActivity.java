@@ -20,7 +20,8 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void LiveTest_button_onClick(View view) {
-
+        Intent peaksRecognitionIntent = new Intent(this, PeaksRecognitionActivity.class);
+        startActivity(peaksRecognitionIntent);
     }
 
     public void DisplayRender_button_onClick(View view) {
