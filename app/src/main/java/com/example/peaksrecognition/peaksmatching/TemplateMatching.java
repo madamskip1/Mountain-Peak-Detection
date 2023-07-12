@@ -6,9 +6,13 @@ import org.opencv.core.Mat;
 import org.opencv.core.Point;
 import org.opencv.imgproc.Imgproc;
 
-public class TemplateMatching implements PeaksMatching {
-    private static final int METHOD = Imgproc.TM_CCOEFF_NORMED;
+public class TemplateMatching extends PeaksMatching {
+    private static final int METHOD = Imgproc.TM_CCORR_NORMED;
     private static final double THRESHOLD = 0.15;
+
+    public TemplateMatching() {
+        super(true, true);
+    }
 
     @Override
     public double[] match(Mat template, Mat image) {
