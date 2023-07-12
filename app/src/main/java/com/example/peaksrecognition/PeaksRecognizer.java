@@ -72,10 +72,7 @@ public class PeaksRecognizer extends FrameAnalyser {
 
         Vector<Peaks.Peak> visiblePeaks = offScreenRenderer.getVisiblePeaks();
         for (Peaks.Peak peak : visiblePeaks) {
-            int x = (int) peak.screenPosition[0];
-            int y = 480 - (int) peak.screenPosition[1];
-            Imgproc.line(rgba, new Point(x, y), new Point(x, y - 50), new Scalar(0, 0, 255), 5);
-            Imgproc.putText(rgba, peak.name, new Point(x, y - 50), Imgproc.FONT_HERSHEY_SIMPLEX, 1.0, new Scalar(0, 0, 255), 2);
+            peak.writeNameOnImage(rgba, 480, 20, 20);
         }
 
         Mat blended = new Mat();

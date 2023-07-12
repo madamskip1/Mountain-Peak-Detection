@@ -12,6 +12,11 @@ import com.opencsv.CSVReader;
 import com.opencsv.CSVReaderBuilder;
 import com.opencsv.exceptions.CsvValidationException;
 
+import org.opencv.core.Mat;
+import org.opencv.core.Point;
+import org.opencv.core.Scalar;
+import org.opencv.imgproc.Imgproc;
+
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.Vector;
@@ -171,6 +176,20 @@ public class Peaks {
             this.dem = dem;
             this.elevation = elevation;
             this.vertexCoords = vertexCoords;
+        }
+
+        public void writeNameOnImage(Mat image, int screenHeight, int offsetBottom, int offsetTop)
+        {
+            final Scalar lineColor = new Scalar(0, 0, 255);
+            final Scalar textColor = new Scalar(0, 0, 255);
+            final int lineThickness = 5;
+            final int textThickness = 1;
+
+            int x = (int) screenPosition[0];
+            int y = screenHeight - (int) screenPosition[1];
+            int yName = (int) (Math.random() * (y - offsetBottom)) + offsetTop;
+            Imgproc.line(image, new Point(screenPosition[0], screenPosition[1]), new Point(x, yName), lineColor, lineThickness);
+            Imgproc.putText(image, name, new Point(x + 5, yName), Imgproc.FONT_HERSHEY_SIMPLEX, 1.0, textColor, textThickness);
         }
     }
 }
