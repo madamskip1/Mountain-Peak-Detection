@@ -39,38 +39,29 @@ public class OffScreenRenderer {
     private EGLConfig eglConfig;
 
     public OffScreenRenderer(Context context, Config config) {
-        createContext();
-        createSurface();
-
-        GLES30.glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
+        width = config.width;
+        height = config.height;
+        createEGLContext();
+        createEGLSurface();
 
         ShaderProgram shaderProgram = new ShaderProgram();
         TerrainLoader terrainLoader = new TerrainLoader(context, config);
         LoadedTerrain loadedTerrain = terrainLoader.load();
         TerrainData terrainData = new TerrainData(loadedTerrain, config);
         terrainModel = new TerrainModel(terrainData, shaderProgram);
-        width = config.width;
-        height = config.height;
-
         coordsManager = new CoordsManager(config.initObserverLocation, terrainData.getCoordsRange(), terrainData.getGridSize());
-        double[] cameraPositionLocal = coordsManager.convertGeoToLocalCoords(config.initObserverLocation[0], config.initObserverLocation[1], config.initObserverLocation[2]);
         camera = new Camera(config.FovVertical, (float) width / (float) height, (float) config.minDistance, (float) config.maxDistance, config.deviceOrientation);
-        camera.setPosition(cameraPositionLocal[0], cameraPositionLocal[1], cameraPositionLocal[2]);
-        camera.setAngles(config.initObserverRotation[0], config.initObserverRotation[1], config.initObserverRotation[2]);
         screenManager = new ScreenManager();
         screenManager.setViewportDimensions(width, height);
         peaks = new Peaks(context, coordsManager, terrainData, screenManager, shaderProgram);
-    }
 
-    public ByteBuffer getBuffer() {
-        ByteBuffer buffer = ByteBuffer.allocateDirect(width * height * 4);
-        buffer.order(ByteOrder.nativeOrder());
-        GLES30.glReadPixels(0, 0, width, height, GLES30.GL_RGBA, GLES30.GL_UNSIGNED_BYTE, buffer);
-        return buffer;
+        double[] cameraPositionLocal = coordsManager.convertGeoToLocalCoords(config.initObserverLocation[0], config.initObserverLocation[1], config.initObserverLocation[2]);
+        camera.setPosition(cameraPositionLocal[0], cameraPositionLocal[1], cameraPositionLocal[2]);
+        camera.setAngles(config.initObserverRotation[0], config.initObserverRotation[1], config.initObserverRotation[2]);
     }
 
     public Mat getRenderedMat() {
-        ByteBuffer buffer = getBuffer();
+        ByteBuffer buffer = getRenderBuffer();
         Mat image = new Mat(height, width, CvType.CV_8UC4);
         byte[] imageData = new byte[height * width * 4];
         buffer.get(imageData);
@@ -89,11 +80,9 @@ public class OffScreenRenderer {
         screenManager.setMVPMatrices(viewMatrix, projectionMatrix);
     }
 
-    public Vector<Peak> getVisiblePeaks()
-    {
+    public Vector<Peak> getVisiblePeaks() {
         return peaks.getVisiblePeaks();
     }
-
 
     public CoordsManager getCoordsManager() {
         return coordsManager;
@@ -103,7 +92,14 @@ public class OffScreenRenderer {
         return camera;
     }
 
-    private void createContext() {
+    private ByteBuffer getRenderBuffer() {
+        ByteBuffer buffer = ByteBuffer.allocateDirect(width * height * 4);
+        buffer.order(ByteOrder.nativeOrder());
+        GLES30.glReadPixels(0, 0, width, height, GLES30.GL_RGBA, GLES30.GL_UNSIGNED_BYTE, buffer);
+        return buffer;
+    }
+
+    private void createEGLContext() {
         eglDisplay = EGL14.eglGetDisplay(EGL14.EGL_DEFAULT_DISPLAY);
         int[] version = new int[2];
         EGL14.eglInitialize(eglDisplay, version, 0, version, 1);
@@ -121,17 +117,15 @@ public class OffScreenRenderer {
         int[] numConfigs = new int[1];
         EGL14.eglChooseConfig(eglDisplay, attribList, 0, configs, 0, 1, numConfigs, 0);
 
-        eglConfig = configs[0];
-
         int[] contextAttribs = {
                 EGL14.EGL_CONTEXT_CLIENT_VERSION, 3,
                 EGL14.EGL_NONE
         };
-
+        eglConfig = configs[0];
         eglContext = EGL14.eglCreateContext(eglDisplay, eglConfig, EGL14.EGL_NO_CONTEXT, contextAttribs, 0);
     }
 
-    private void createSurface() {
+    private void createEGLSurface() {
         int[] surfaceAttribs = {
                 EGL14.EGL_WIDTH, width,
                 EGL14.EGL_HEIGHT, height,
