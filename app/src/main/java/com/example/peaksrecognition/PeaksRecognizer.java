@@ -137,7 +137,8 @@ public class PeaksRecognizer extends FrameAnalyser {
         config.simplifyFactor = 3;
         config.initHgtSize = 3601;
         config.deviceOrientation = Config.DeviceOrientation.LANDSCAPE;
-
+        config.width = width;
+        config.height = height;
         offScreenRenderer = new OffScreenRenderer(parentContext, config);
         coordsManager = offScreenRenderer.getCoordsManager();
         camera = offScreenRenderer.getCamera();

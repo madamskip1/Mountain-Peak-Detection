@@ -9,6 +9,8 @@ public class Config {
     public int simplifyFactor;
     public int initHgtSize;
     public DeviceOrientation deviceOrientation = DeviceOrientation.PORTRAIT;
+    public int width;
+    public int height;
 
     public enum DeviceOrientation {
         PORTRAIT,

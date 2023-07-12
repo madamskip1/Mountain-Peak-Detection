@@ -24,7 +24,8 @@ public class BlendRenderAndLive extends FrameAnalyser {
     static {
         OpenCVLoader.initDebug();
     }
-
+    private final int width;
+    private final int height;
     private final AppCompatActivity parentActivity;
     private final Context parentContext;
     ImageView imageView;
@@ -38,6 +39,8 @@ public class BlendRenderAndLive extends FrameAnalyser {
 
     public BlendRenderAndLive(AppCompatActivity activity, Context context, ImageView imageView) {
         super(activity, 640, 480);
+        width = 640;
+        height = 480;
         parentActivity = activity;
         parentContext = context;
         this.imageView = imageView;
@@ -114,6 +117,8 @@ public class BlendRenderAndLive extends FrameAnalyser {
         config.simplifyFactor = 3;
         config.initHgtSize = 3601;
         config.deviceOrientation = Config.DeviceOrientation.LANDSCAPE;
+        config.width = width;
+        config.height = height;
 
         offScreenRenderer = new OffScreenRenderer(parentContext, config);
         coordsManager = offScreenRenderer.getCoordsManager();

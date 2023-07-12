@@ -8,7 +8,6 @@ import android.opengl.EGLDisplay;
 import android.opengl.EGLSurface;
 import android.opengl.GLES30;
 
-import com.example.peaksrecognition.Camera;
 import com.example.peaksrecognition.Config;
 import com.example.peaksrecognition.CoordsManager;
 import com.example.peaksrecognition.Peaks;
@@ -28,8 +27,8 @@ import java.nio.ByteOrder;
 import java.util.Vector;
 
 public class OffScreenRenderer {
-    private final int width = 1280;
-    private final int height = 960;
+    private final int width;
+    private final int height;
     private final TerrainModel terrainModel;
     private final Camera camera;
     private final CoordsManager coordsManager;
@@ -50,6 +49,8 @@ public class OffScreenRenderer {
         LoadedTerrain loadedTerrain = terrainLoader.load();
         TerrainData terrainData = new TerrainData(loadedTerrain, config);
         terrainModel = new TerrainModel(terrainData, shaderProgram);
+        width = config.width;
+        height = config.height;
 
         coordsManager = new CoordsManager(config.initObserverLocation, terrainData.getCoordsRange(), terrainData.getGridSize());
         double[] cameraPositionLocal = coordsManager.convertGeoToLocalCoords(config.initObserverLocation[0], config.initObserverLocation[1], config.initObserverLocation[2]);
@@ -75,7 +76,6 @@ public class OffScreenRenderer {
         buffer.get(imageData);
         image.put(0, 0, imageData);
         Core.flip(image, image, 0);
-
         return image;
     }
 
