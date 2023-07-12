@@ -3,7 +3,6 @@ package com.example.peaksrecognition;
 import android.content.Context;
 import android.content.res.AssetManager;
 import android.opengl.GLES30;
-import android.util.Log;
 
 import com.example.peaksrecognition.mainopengl.ShaderProgram;
 import com.example.peaksrecognition.terrain.TerrainData;
@@ -15,8 +14,6 @@ import com.opencsv.exceptions.CsvValidationException;
 
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.nio.FloatBuffer;
-import java.nio.IntBuffer;
 import java.util.Vector;
 
 public class Peaks {
@@ -28,10 +25,7 @@ public class Peaks {
     private final int offsetZ;
     private final int rows;
     private final int cols;
-    private final int bufferId;
     private final Vector<Peak> peaks;
-    private int vertexArrayId;
-    private int vertexBufferId;
 
     public Peaks(Context context, CoordsManager coordsManager, TerrainData terrainData, ScreenManager screenManager, ShaderProgram shaderProgram) {
         this.terrainData = terrainData;
@@ -47,17 +41,46 @@ public class Peaks {
 
         peaks = new Vector<>();
         preparePeaks(context, coordsManager);
-
-        int[] bufferIds = new int[1];
-        GLES30.glGenBuffers(1, bufferIds, 0);
-        bufferId = bufferIds[0];
     }
 
-    public void test() {
-        Vector<Peak> peaksPassedFrustumTest = frustumTest(peaks);
-        Log.d("moje", "name " + peaksPassedFrustumTest.size());
-        //occlusionTest(peaksPassedFrustumTest);
-        dumbOcclusion(peaksPassedFrustumTest);
+    public Vector<Peak> getVisiblePeaks() {
+        Vector<Peak> passedFrutsum = frustumTest(peaks);
+        return occlusionTest(passedFrutsum);
+    }
+
+    private Vector<Peak> frustumTest(Vector<Peak> peaks) {
+        Vector<Peak> peaksPassedFrustumTest = new Vector<>();
+        for (Peak peak : peaks) {
+            float[] screenPoint = screenManager.getScreenPosition(peak.vertexCoords[0], peak.vertexCoords[1], peak.vertexCoords[2]);
+
+            if (screenManager.checkIfPointOnScreen(screenPoint)) {
+                peaksPassedFrustumTest.add(peak);
+                peak.screenPosition = screenPoint;
+            }
+        }
+
+        return peaksPassedFrustumTest;
+    }
+
+    private Vector<Peak> occlusionTest(Vector<Peak> peaks) {
+        int peaksLength = peaks.size();
+        int[] queryIds = new int[peaksLength];
+        int[] queryResults = new int[peaksLength];
+        GLES30.glGenQueries(peaksLength, queryIds, 0);
+        Vector<Peak> peaksPassedOcclusionTest = new Vector<>();
+        for (int i = 0; i < peaksLength; ++i) {
+            Peak peak = peaks.get(i);
+            GLES30.glBeginQuery(GLES30.GL_ANY_SAMPLES_PASSED, queryIds[i]);
+            GLES30.glVertexAttrib3f(positionAttribute, peak.vertexCoords[0], peak.vertexCoords[1], peak.vertexCoords[2]);
+            GLES30.glDrawArrays(GLES30.GL_POINTS, 0, 1);
+            GLES30.glEndQuery(GLES30.GL_ANY_SAMPLES_PASSED);
+            GLES30.glGetQueryObjectuiv(queryIds[i], GLES30.GL_QUERY_RESULT, queryResults, i);
+            if (queryResults[i] != 0) {
+                peaksPassedOcclusionTest.add(peak);
+            }
+        }
+
+        return peaksPassedOcclusionTest;
     }
 
     private void preparePeaks(Context context, CoordsManager coordsManager) {
@@ -73,7 +96,7 @@ public class Peaks {
                 int elevation = Integer.parseInt(nextLine[4]);
                 float[] vertexCoords = getPeakVertexCoords(coordsManager, latitude, longitude);
                 if (vertexCoords[0] != -1) {
-                    vertexCoords[1] += 0.000001;
+                    vertexCoords[1] -= 0.000001;
                     peaks.add(new Peak(name, latitude, longitude, dem, elevation, vertexCoords));
                 }
             }
@@ -86,7 +109,7 @@ public class Peaks {
         AssetManager assetManager = context.getAssets();
         InputStreamReader inputStreamReader;
         try {
-            inputStreamReader = new InputStreamReader(assetManager.open("peaks_data/test_2.csv"));
+            inputStreamReader = new InputStreamReader(assetManager.open("peaks_data/havran.csv"));
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
@@ -132,158 +155,7 @@ public class Peaks {
         return new float[]{(float) max_x, (float) max_y, (float) max_z};
     }
 
-    private Vector<Peak> frustumTest(Vector<Peak> peaks) {
-        Vector<Peak> peaksPassedFrustumTest = new Vector<>();
-        for (Peak peak : peaks) {
-            float[] screenPoint = screenManager.getScreenPosition(peak.vertexCoords[0], peak.vertexCoords[1], peak.vertexCoords[2]);
-            if (screenManager.checkIfPointOnScreen(screenPoint)) {
-                peaksPassedFrustumTest.add(peak);
-                peak.screenPosition = screenPoint;
-            }
-        }
-
-        return peaksPassedFrustumTest;
-    }
-
-    private void dumbOcclusion(Vector<Peak> peaks) {
-        Log.d("moje", "name " + peaks.get(0).name);
-        float[] vertex = peaks.get(0).vertexCoords;
-        vertex[1] += 1.0;
-        GLES30.glEnable(GLES30.GL_DEPTH_TEST);
-        GLES30.glBindBuffer(GLES30.GL_ARRAY_BUFFER, bufferId);
-
-        // Transfer data to the buffer
-        FloatBuffer floatBuffer = FloatBuffer.allocate(3);
-        floatBuffer.put(vertex).position(0);
-        GLES30.glBufferData(GLES30.GL_ARRAY_BUFFER, floatBuffer.capacity() * Float.BYTES, floatBuffer, GLES30.GL_STATIC_DRAW);
-
-        // Unbind the buffer
-        GLES30.glBindBuffer(GLES30.GL_ARRAY_BUFFER, 0);
-
-        // GLES30.glClear(GLES30.GL_COLOR_BUFFER_BIT | GLES30.GL_DEPTH_BUFFER_BIT);
-
-        // Bind the vertex buffer
-        GLES30.glBindBuffer(GLES30.GL_ARRAY_BUFFER, vertexBufferId);
-
-        // Specify the vertex position attribute
-        GLES30.glEnableVertexAttribArray(positionAttribute);
-        GLES30.glVertexAttribPointer(positionAttribute, 3, GLES30.GL_FLOAT, false, 0, 0);
-
-        // Perform the occlusion test
-        int[] occlusionResult = new int[1];
-        GLES30.glGenQueries(1, occlusionResult, 0);
-        GLES30.glBeginQuery(GLES30.GL_ANY_SAMPLES_PASSED, occlusionResult[0]);
-        GLES30.glDrawArrays(GLES30.GL_TRIANGLE_FAN, 0, 1);
-        GLES30.glEndQuery(GLES30.GL_ANY_SAMPLES_PASSED);
-
-        // Check if the occlusion test passed
-        IntBuffer queryResult = IntBuffer.allocate(1);
-        GLES30.glGetQueryObjectuiv(occlusionResult[0], GLES30.GL_QUERY_RESULT, queryResult);
-        int occlusionPassed = queryResult.get(0);
-        Log.d("moje", "dupa1");
-        if (occlusionPassed != 0) {
-            // Draw the vertex only if it passes the occlusion test
-            Log.d("moje", "dupa2");
-            GLES30.glDrawArrays(GLES30.GL_TRIANGLE_FAN, 0, 1);
-        }
-
-        // Clean up
-        GLES30.glDisableVertexAttribArray(positionAttribute);
-        GLES30.glBindBuffer(GLES30.GL_ARRAY_BUFFER, 0);
-        GLES30.glDeleteQueries(1, occlusionResult, 0);
-    }
-
-    private Vector<Peak> occlusionTest(Vector<Peak> peaks) {
-        GLES30.glEnable(GLES30.GL_DEPTH_TEST);
-        GLES30.glEnable(GLES30.GL_SAMPLE_ALPHA_TO_COVERAGE);
-        int peaksLength = peaks.size();
-        Vector<Peak> peaksPassedOcclusionTest = new Vector<>();
-        int[] queryIds = new int[peaksLength];
-        int[] queryResults = new int[peaksLength];
-        GLES30.glGenQueries(peaksLength, queryIds, 0);
-        int queryId = 0;
-        GLES30.glBindVertexArray(vertexArrayId);
-        GLES30.glEnableVertexAttribArray(positionAttribute);
-        // Set vertex attribute pointer
-        GLES30.glVertexAttribPointer(positionAttribute, 3, GLES30.GL_FLOAT, false, 0, 0);
-        for (Peak peak : peaks) {
-            GLES30.glBeginQuery(GLES30.GL_ANY_SAMPLES_PASSED, queryIds[queryId]);
-            GLES30.glVertexAttrib3f(positionAttribute, peak.vertexCoords[0], peak.vertexCoords[1], peak.vertexCoords[2]);
-            GLES30.glDrawArrays(GLES30.GL_POINTS, 0, 1);
-            GLES30.glEndQuery(GLES30.GL_ANY_SAMPLES_PASSED);
-            //GLES30.glGetQueryObjectuiv(queryIds[queryId], GLES30.GL_QUERY_RESULT_AVAILABLE, queryResults, queryId);
-
-            /*
-            GLES30.glBeginQuery(GLES30.GL_ANY_SAMPLES_PASSED, queryIds[queryId]);
-
-            // Bind vertex array
-
-
-            // Bind vertex buffer
-            GLES30.glBindBuffer(GLES30.GL_ARRAY_BUFFER, vertexBufferId);
-
-            // Specify vertex data
-            peak.vertexCoords[1] += 1.0;
-            FloatBuffer vertexBuffer = FloatBuffer.wrap(peak.vertexCoords);
-            GLES30.glBufferData(GLES30.GL_ARRAY_BUFFER, vertexBuffer.capacity() * Float.BYTES, vertexBuffer, GLES30.GL_STATIC_DRAW);
-
-            // Enable vertex attribute
-
-
-
-
-            // Draw the points
-            GLES30.glDrawArrays(GLES30.GL_POINTS, 0, 1);
-
-
-
-            // End query
-            GLES30.glEndQuery(GLES30.GL_ANY_SAMPLES_PASSED);
-            //GLES30.glGetQueryObjectuiv(queryIds[0], GLES30.GL_QUERY_RESULT, queryResults, 0);
-
-             */
-            ++queryId;
-        }
-        Log.d("moje", "dupa1");
-        // Disable vertex attribute
-        GLES30.glDisableVertexAttribArray(positionAttribute);
-
-        // Unbind vertex buffer
-        GLES30.glBindBuffer(GLES30.GL_ARRAY_BUFFER, 0);
-
-        // Unbind vertex array
-        GLES30.glBindVertexArray(0);
-        int[] queryAv = new int[peaksLength];
-        boolean allResultsAvailable = false;
-        while (!allResultsAvailable) {
-
-            allResultsAvailable = true;
-            for (int i = 0; i < peaksLength; i++) {
-                GLES30.glGetQueryObjectuiv(queryIds[i], GLES30.GL_QUERY_RESULT_AVAILABLE, queryAv, i);
-
-                if (queryAv[i] == GLES30.GL_FALSE) {
-                    allResultsAvailable = false;
-                    break;
-                }
-            }
-
-        }
-        Log.d("moje", "dupa2");
-        for (int i = 0; i < peaksLength; ++i) {
-            // Log.d("moje", "loop " + i + " " + peaksLength);
-            GLES30.glGetQueryObjectuiv(queryIds[i], GLES30.GL_QUERY_RESULT, queryResults, i);
-            // Log.d("moje", "is " + queryResults[i]);
-            if (queryResults[i] != 0) {
-                peaksPassedOcclusionTest.add(peaks.get(i));
-            }
-        }
-        Log.d("moje", "dupa3");
-        GLES30.glDeleteQueries(peaksLength, queryIds, 0);
-        Log.d("moje", "peaksPassedOcclusionTest " + peaksPassedOcclusionTest.size());
-        return peaksPassedOcclusionTest;
-    }
-
-    private static class Peak {
+    public static class Peak {
         public String name;
         public double latitude;
         public double longitude;
