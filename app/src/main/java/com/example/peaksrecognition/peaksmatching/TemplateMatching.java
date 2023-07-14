@@ -19,7 +19,7 @@ public class TemplateMatching extends PeaksMatching {
     }
 
     @Override
-    public double[] match(Mat template, Mat subject) {
+    protected double[] match(Mat template, Mat subject) {
         Mat matchResult = new Mat();
         Imgproc.matchTemplate(subject, template, matchResult, METHOD);
 
@@ -48,7 +48,7 @@ public class TemplateMatching extends PeaksMatching {
     @Override
     Rect prepareSubjectROI(int x, int y) {
         int xRect = x - subjectXOffset;
-        int yRect = y -subjectYOffset;
+        int yRect = y - subjectYOffset;
         int width = subjectXOffset * 2;
         int height = subjectYOffset * 2;
 

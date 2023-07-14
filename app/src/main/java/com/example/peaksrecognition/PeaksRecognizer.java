@@ -18,9 +18,6 @@ import com.example.peaksrecognition.peaksmatching.TemplateMatching;
 import org.opencv.android.OpenCVLoader;
 import org.opencv.android.Utils;
 import org.opencv.core.Mat;
-import org.opencv.core.Rect;
-import org.opencv.core.Scalar;
-import org.opencv.imgproc.Imgproc;
 
 import java.util.Vector;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -65,24 +62,18 @@ public class PeaksRecognizer extends FrameAnalyser {
 
     @Override
     protected void analyse(ImageProxy image) {
-        Mat rgba = ImageProxyToMatConverter.rgba(image);
-        Mat liveEdges = cannyLive.detect(rgba);
-        Mat liveSkyline = cannyLive.detectSkyline(liveEdges);
-        if (templateMatching.shouldImageBeDilated()) {
-            liveSkyline = templateMatching.dilate(liveSkyline);
-        }
-
         double[] cameraCoords = coordsManager.convertGeoToLocalCoords(curLocation.getLatitude(), curLocation.getLongitude(), curLocation.getAltitude());
         camera.setPosition(cameraCoords[0], cameraCoords[1], cameraCoords[2]);
         camera.setAngles(curRotation[0], curRotation[1], curRotation[2]);
         offScreenRenderer.render();
 
+        Mat rgba = ImageProxyToMatConverter.rgba(image);
+        Mat liveEdges = cannyLive.detect(rgba);
+        Mat liveSkyline = cannyLive.detectSkyline(liveEdges);
+
         Mat renderedScene = offScreenRenderer.getRenderedMat();
         Mat renderedEdges = cannyRender.detect(renderedScene);
         Mat renderedSkyline = cannyRender.detectSkyline(renderedEdges);
-        if (templateMatching.shouldRenderBeDilated()) {
-            renderedSkyline = templateMatching.dilate(renderedSkyline);
-        }
 
         Vector<Peaks.Peak> visiblePeaks = peaks.getVisiblePeaks();
         Vector<Peaks.Peak> visiblePeaksAfterMatching = templateMatching.matchAll(visiblePeaks, renderedSkyline, liveSkyline);

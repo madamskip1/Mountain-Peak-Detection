@@ -25,11 +25,14 @@ public abstract class PeaksMatching {
         }
     }
 
-    public Vector<Peaks.Peak> matchAll(Vector<Peaks.Peak> peaks, Mat render, Mat image)
-    {
+    public Vector<Peaks.Peak> matchAll(Vector<Peaks.Peak> peaks, Mat render, Mat image) {
+        if (dilationOnRender)
+            render = dilate(render);
+        if (dilationOnImage)
+            image = dilate(image);
+
         Vector<Peaks.Peak> matchedPeaks = new Vector<>();
-        for (Peaks.Peak peak : peaks)
-        {
+        for (Peaks.Peak peak : peaks) {
             int renderedX = Math.round(peak.screenPosition[0]);
             int renderedY = Math.round(peak.screenPosition[1]);
 
@@ -40,27 +43,18 @@ public abstract class PeaksMatching {
             Mat subject = image.submat(subjectROI);
 
             double[] predicted = match(template, subject);
-            if (predicted != null)
-            {
+            if (predicted != null) {
                 int realX = (int) Math.round(predicted[0] + subjectROI.x);
                 int realY = (int) Math.round(predicted[1] + subjectROI.y);
 
-                peak.realImagePosition = new int[] { realX, realY };
+                peak.realImagePosition = new int[]{realX, realY};
                 matchedPeaks.add(peak);
             }
         }
         return matchedPeaks;
     }
 
-    public boolean shouldRenderBeDilated() {
-        return dilationOnRender;
-    }
-
-    public boolean shouldImageBeDilated() {
-        return dilationOnImage;
-    }
-
-    public Mat dilate(Mat img) {
+    private Mat dilate(Mat img) {
         Mat dilatedImg = new Mat();
         Imgproc.dilate(img, dilatedImg, dilationKernel);
         return dilatedImg;
