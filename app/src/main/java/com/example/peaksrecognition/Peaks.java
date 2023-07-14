@@ -92,20 +92,23 @@ public class Peaks {
     }
 
     private void preparePeaks(Context context, CoordsManager coordsManager) {
-        CSVReader csvReader = getPeaksReader(context);
 
+        String[] listOfPeaksFiles = getListOfPeaksFiles(coordsManager);
         String[] nextLine;
         try {
-            while ((nextLine = csvReader.readNext()) != null) {
-                String name = nextLine[0];
-                double latitude = Double.parseDouble(nextLine[1]);
-                double longitude = Double.parseDouble(nextLine[2]);
-                int dem = (int) Double.parseDouble(nextLine[3]);
-                int elevation = Integer.parseInt(nextLine[4]);
-                float[] vertexCoords = getPeakVertexCoords(coordsManager, latitude, longitude);
-                if (vertexCoords[0] != -1) {
-                    vertexCoords[1] -= 0.000001;
-                    peaks.add(new Peak(name, latitude, longitude, dem, elevation, vertexCoords));
+            for (String peaksFilePath : listOfPeaksFiles) {
+                CSVReader csvReader = getPeaksReader(context, peaksFilePath);
+                while ((nextLine = csvReader.readNext()) != null) {
+                    String name = nextLine[0];
+                    double latitude = Double.parseDouble(nextLine[1]);
+                    double longitude = Double.parseDouble(nextLine[2]);
+                    int dem = (int) Double.parseDouble(nextLine[3]);
+                    int elevation = Integer.parseInt(nextLine[4]);
+                    float[] vertexCoords = getPeakVertexCoords(coordsManager, latitude, longitude);
+                    if (vertexCoords[0] != -1) {
+                        vertexCoords[1] -= 0.000001;
+                        peaks.add(new Peak(name, latitude, longitude, dem, elevation, vertexCoords));
+                    }
                 }
             }
         } catch (IOException | CsvValidationException e) {
@@ -113,16 +116,34 @@ public class Peaks {
         }
     }
 
-    private CSVReader getPeaksReader(Context context) {
+    private CSVReader getPeaksReader(Context context, String peaksFilePath) {
         AssetManager assetManager = context.getAssets();
         InputStreamReader inputStreamReader;
         try {
-            inputStreamReader = new InputStreamReader(assetManager.open("peaks_data/havran.csv"));
+            inputStreamReader = new InputStreamReader(assetManager.open(peaksFilePath));
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
         CSVParser parser = new CSVParserBuilder().withSeparator(';').build();
         return new CSVReaderBuilder(inputStreamReader).withCSVParser(parser).build();
+    }
+
+    private String[] getListOfPeaksFiles(CoordsManager coordsManager) {
+        final String peaksDir = "peaks_data/";
+        int[] latitudeRange = coordsManager.getLatitudeRange();
+        int[] longitudeRange = coordsManager.getLongitudeRange();
+        int numOfPeaksFiles = (latitudeRange[1] - latitudeRange[0]) * (longitudeRange[1] - longitudeRange[0]);
+        String[] listOfPeaksFiles = new String[numOfPeaksFiles];
+        int counter = 0;
+
+        for (int latitude = latitudeRange[0]; latitude < latitudeRange[1]; ++latitude) {
+            for (int longitude = longitudeRange[0]; longitude < longitudeRange[1]; ++longitude) {
+                String filePath = peaksDir + latitude + "_" + longitude + ".csv";
+                listOfPeaksFiles[counter] = filePath;
+                ++counter;
+            }
+        }
+        return listOfPeaksFiles;
     }
 
     private float[] getPeakVertexCoords(CoordsManager coordsManager, double latitude, double longitude) {
