@@ -13,10 +13,14 @@ import com.example.peaksrecognition.devicecamera.ImageProxyToMatConverter;
 import com.example.peaksrecognition.edgedetectors.CannyEdgeDetector;
 import com.example.peaksrecognition.mainopengl.Camera;
 import com.example.peaksrecognition.mainopengl.OffScreenRenderer;
+import com.example.peaksrecognition.peaksmatching.TemplateMatching;
 
 import org.opencv.android.OpenCVLoader;
 import org.opencv.android.Utils;
 import org.opencv.core.Mat;
+import org.opencv.core.Rect;
+import org.opencv.core.Scalar;
+import org.opencv.imgproc.Imgproc;
 
 import java.util.Vector;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -32,6 +36,7 @@ public class PeaksRecognizer extends FrameAnalyser {
     private final CannyEdgeDetector cannyLive;
     private final int width;
     private final int height;
+    private final TemplateMatching templateMatching;
     ImageView imageView;
     private Location curLocation;
     private float[] curRotation;
@@ -50,7 +55,8 @@ public class PeaksRecognizer extends FrameAnalyser {
         this.width = width;
         this.height = height;
         cannyRender = new CannyEdgeDetector(50, 100);
-        cannyLive = new CannyEdgeDetector(140, 200);
+        cannyLive = new CannyEdgeDetector(50, 130);
+        templateMatching = new TemplateMatching();
     }
 
     public void prepareAndStart() {
@@ -62,6 +68,9 @@ public class PeaksRecognizer extends FrameAnalyser {
         Mat rgba = ImageProxyToMatConverter.rgba(image);
         Mat liveEdges = cannyLive.detect(rgba);
         Mat liveSkyline = cannyLive.detectSkyline(liveEdges);
+        if (templateMatching.shouldImageBeDilated()) {
+            liveSkyline = templateMatching.dilate(liveSkyline);
+        }
 
         double[] cameraCoords = coordsManager.convertGeoToLocalCoords(curLocation.getLatitude(), curLocation.getLongitude(), curLocation.getAltitude());
         camera.setPosition(cameraCoords[0], cameraCoords[1], cameraCoords[2]);
@@ -71,13 +80,37 @@ public class PeaksRecognizer extends FrameAnalyser {
         Mat renderedScene = offScreenRenderer.getRenderedMat();
         Mat renderedEdges = cannyRender.detect(renderedScene);
         Mat renderedSkyline = cannyRender.detectSkyline(renderedEdges);
+        if (templateMatching.shouldRenderBeDilated()) {
+            renderedSkyline = templateMatching.dilate(renderedSkyline);
+        }
 
         Vector<Peaks.Peak> visiblePeaks = peaks.getVisiblePeaks();
-        // TODO: Matching visible peaks
+        Vector<Peaks.Peak> visiblePeaksAfterMatching = new Vector<>();
+        for (Peaks.Peak peak : visiblePeaks) {
+            int templateOffset = 40;
+            int subjectXOffset = 117;
+            int subjectYOffset = 97;
+            int peakX = Math.round(peak.screenPosition[0]);
+            int peakY = Math.round(peak.screenPosition[1]);
+
+            Rect templateROI = new Rect(peakX - templateOffset, peakY - templateOffset, templateOffset * 2, templateOffset * 2);
+            Rect subjectROI = new Rect(peakX - subjectXOffset, peakY - subjectYOffset, subjectXOffset * 2, subjectYOffset * 2);
+            Mat template = renderedSkyline.submat(templateROI);
+            Mat subject = liveSkyline.submat(subjectROI);
+            Imgproc.rectangle(rgba, templateROI, new Scalar(255, 0, 0));
+            Imgproc.rectangle(rgba, subjectROI, new Scalar(255, 0, 0));
+            double[] predicted = templateMatching.match(template, subject);
+            if (predicted != null) {
+                predicted[0] += subjectROI.x;
+                predicted[1] += subjectROI.y;
+                peak.realImagePosition = new int[]{(int) Math.round(predicted[0]), (int) Math.round(predicted[1])};
+                visiblePeaksAfterMatching.add(peak);
+            }
+        }
 
         Bitmap bitmap = Bitmap.createBitmap(rgba.cols(), rgba.rows(), Bitmap.Config.ARGB_8888);
         Utils.matToBitmap(rgba, bitmap);
-        bitmap = peaks.drawPeakNames(bitmap, visiblePeaks);
+        bitmap = peaks.drawPeakNames(bitmap, visiblePeaksAfterMatching);
         imageView.setImageBitmap(bitmap);
     }
 

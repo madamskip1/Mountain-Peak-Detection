@@ -183,8 +183,8 @@ public class Peaks {
         Canvas canvas = new Canvas(bitmap);
 
         for (Peak peak : peaks) {
-            int x = Math.round(peak.screenPosition[0]);
-            int y = Math.round(peak.screenPosition[1]);
+            int x = peak.realImagePosition[0];
+            int y = peak.realImagePosition[1];
             int yText = y - 30;
 
             canvas.save();
@@ -204,6 +204,7 @@ public class Peaks {
         public int elevation;
         public float[] vertexCoords;
         public float[] screenPosition;
+        public int[] realImagePosition;
 
         Peak(String name, double latitude, double longitude, int dem, int elevation, float[] vertexCoords) {
             this.name = name;
