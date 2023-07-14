@@ -1,19 +1,22 @@
 package com.example.peaksrecognition.activities;
 
-import androidx.appcompat.app.AppCompatActivity;
-
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.widget.ImageView;
 
+import androidx.appcompat.app.AppCompatActivity;
+
 import com.example.peaksrecognition.Config;
+import com.example.peaksrecognition.Peaks;
 import com.example.peaksrecognition.R;
 import com.example.peaksrecognition.edgedetectors.CannyEdgeDetector;
 import com.example.peaksrecognition.mainopengl.OffScreenRenderer;
 
 import org.opencv.android.Utils;
 import org.opencv.core.Mat;
+
+import java.util.Vector;
 
 public class DisplayRender extends AppCompatActivity {
 
@@ -24,16 +27,16 @@ public class DisplayRender extends AppCompatActivity {
         renderToLayout();
     }
 
-    private void renderToLayout()
-    {
+    private void renderToLayout() {
         Config config = prepareConfig();
         OffScreenRenderer offScreenRenderer = new OffScreenRenderer(this, config);
         offScreenRenderer.render();
         Mat renderedImage = offScreenRenderer.getRenderedMat();
 
-        if(getIntent().getBooleanExtra("edges", false))
-        {
+        if (getIntent().getBooleanExtra("edges", false)) {
             renderedImage = detectEdges(renderedImage);
+        } else if (getIntent().getBooleanExtra("peaks", false)) {
+            Vector<Peaks.Peak> peaks = offScreenRenderer.getPeaks().getVisiblePeaks();
         }
 
         Bitmap bitmap = Bitmap.createBitmap(renderedImage.cols(), renderedImage.rows(), Bitmap.Config.ARGB_8888);
@@ -43,15 +46,13 @@ public class DisplayRender extends AppCompatActivity {
         imageView.setImageBitmap(bitmap);
     }
 
-    private Mat detectEdges(Mat image)
-    {
+    private Mat detectEdges(Mat image) {
         CannyEdgeDetector cannyEdgeDetector = new CannyEdgeDetector(20, 100);
         return cannyEdgeDetector.detect(image);
     }
 
 
-    private Config prepareConfig()
-    {
+    private Config prepareConfig() {
         Intent intent = getIntent();
 
         double latitude = intent.getDoubleExtra("latitude", 0.0);
@@ -64,8 +65,8 @@ public class DisplayRender extends AppCompatActivity {
         double maxDistance = intent.getDoubleExtra("maxDistance", 0.0);
 
         Config config = new Config();
-        config.initObserverLocation = new double[] { latitude, longitude, altitude };
-        config.initObserverRotation = new float[] { yaw, pitch, roll };
+        config.initObserverLocation = new double[]{latitude, longitude, altitude};
+        config.initObserverRotation = new float[]{yaw, pitch, roll};
         config.maxDistance = maxDistance;
         config.minDistance = minDistance;
         config.FovVertical = 66.0f;

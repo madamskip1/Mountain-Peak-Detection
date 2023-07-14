@@ -49,7 +49,7 @@ public class PeaksRecognitionActivity extends AppCompatActivity {
         }
 
         setContentView(R.layout.activity_peaks_recognition);
-        peaksRecognizer = new PeaksRecognizer(this, this, findViewById(R.id.imageViewRecognize));
+        peaksRecognizer = new PeaksRecognizer(this, this, findViewById(R.id.imageViewRecognize), 640, 480);
         peaksRecognizer.prepareAndStart();
     }
 

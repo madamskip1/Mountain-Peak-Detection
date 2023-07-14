@@ -2,6 +2,11 @@ package com.example.peaksrecognition;
 
 import android.content.Context;
 import android.content.res.AssetManager;
+import android.graphics.Bitmap;
+import android.graphics.Canvas;
+import android.graphics.Color;
+import android.graphics.Paint;
+import android.graphics.Typeface;
 import android.opengl.GLES30;
 
 import com.example.peaksrecognition.mainopengl.ShaderProgram;
@@ -11,11 +16,6 @@ import com.opencsv.CSVParserBuilder;
 import com.opencsv.CSVReader;
 import com.opencsv.CSVReaderBuilder;
 import com.opencsv.exceptions.CsvValidationException;
-
-import org.opencv.core.Mat;
-import org.opencv.core.Point;
-import org.opencv.core.Scalar;
-import org.opencv.imgproc.Imgproc;
 
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -31,6 +31,7 @@ public class Peaks {
     private final int rows;
     private final int cols;
     private final Vector<Peak> peaks;
+    private Paint paint;
 
     public Peaks(Context context, CoordsManager coordsManager, TerrainData terrainData, ScreenManager screenManager, ShaderProgram shaderProgram) {
         this.terrainData = terrainData;
@@ -46,11 +47,13 @@ public class Peaks {
 
         peaks = new Vector<>();
         preparePeaks(context, coordsManager);
+        preparePaintForDrawingText();
     }
 
     public Vector<Peak> getVisiblePeaks() {
         Vector<Peak> passedFrutsum = frustumTest(peaks);
-        return occlusionTest(passedFrutsum);
+        //return occlusionTest(passedFrutsum);
+        return passedFrutsum;
     }
 
     private Vector<Peak> frustumTest(Vector<Peak> peaks) {
@@ -160,6 +163,39 @@ public class Peaks {
         return new float[]{(float) max_x, (float) max_y, (float) max_z};
     }
 
+    private void preparePaintForDrawingText() {
+        int textSize = 30;
+        int textColor = Color.MAGENTA;
+        int fontStyle = Typeface.NORMAL;
+        String fontName = Typeface.DEFAULT_BOLD.toString();
+
+        paint = new Paint();
+        paint.setTextSize(textSize);
+        paint.setColor(textColor);
+        paint.setTypeface(Typeface.create(fontName, fontStyle));
+        paint.setStrokeWidth(2);
+    }
+
+    public Bitmap drawPeakNames(Bitmap bitmap, Vector<Peak> peaks) {
+        final float rotationAngle = -45.0f;
+
+        bitmap = bitmap.copy(Bitmap.Config.ARGB_8888, true); // mutable copy
+        Canvas canvas = new Canvas(bitmap);
+
+        for (Peak peak : peaks) {
+            int x = Math.round(peak.screenPosition[0]);
+            int y = Math.round(peak.screenPosition[1]);
+            int yText = y - 30;
+
+            canvas.save();
+            canvas.drawLine(x, y, x, yText, paint);
+            canvas.rotate(rotationAngle, x, yText);
+            canvas.drawText(peak.name, x, yText, paint);
+            canvas.restore();
+        }
+        return bitmap;
+    }
+
     public static class Peak {
         public String name;
         public double latitude;
@@ -176,20 +212,6 @@ public class Peaks {
             this.dem = dem;
             this.elevation = elevation;
             this.vertexCoords = vertexCoords;
-        }
-
-        public void writeNameOnImage(Mat image, int screenHeight, int offsetBottom, int offsetTop)
-        {
-            final Scalar lineColor = new Scalar(0, 0, 255);
-            final Scalar textColor = new Scalar(0, 0, 255);
-            final int lineThickness = 5;
-            final int textThickness = 1;
-
-            int x = (int) screenPosition[0];
-            int y = screenHeight - (int) screenPosition[1];
-            int yName = (int) (Math.random() * (y - offsetBottom)) + offsetTop;
-            Imgproc.line(image, new Point(screenPosition[0], screenPosition[1]), new Point(x, yName), lineColor, lineThickness);
-            Imgproc.putText(image, name, new Point(x + 5, yName), Imgproc.FONT_HERSHEY_SIMPLEX, 1.0, textColor, textThickness);
         }
     }
 }

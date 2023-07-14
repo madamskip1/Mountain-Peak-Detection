@@ -16,7 +16,6 @@ import com.example.peaksrecognition.mainopengl.OffScreenRenderer;
 
 import org.opencv.android.OpenCVLoader;
 import org.opencv.android.Utils;
-import org.opencv.core.Core;
 import org.opencv.core.Mat;
 
 import java.util.Vector;
@@ -38,10 +37,10 @@ public class PeaksRecognizer extends FrameAnalyser {
     private float[] curRotation;
     private OffScreenRenderer offScreenRenderer;
     private Camera camera;
+    private Peaks peaks;
     private CoordsManager coordsManager;
     private RotationManager rotationManager;
     private LocationManager locationManager;
-
 
     public PeaksRecognizer(AppCompatActivity activity, Context context, ImageView imageView, int width, int height) {
         super(activity, width, height);
@@ -51,7 +50,7 @@ public class PeaksRecognizer extends FrameAnalyser {
         this.width = width;
         this.height = height;
         cannyRender = new CannyEdgeDetector(50, 100);
-        cannyLive = new CannyEdgeDetector(50, 100);
+        cannyLive = new CannyEdgeDetector(140, 200);
     }
 
     public void prepareAndStart() {
@@ -73,15 +72,12 @@ public class PeaksRecognizer extends FrameAnalyser {
         Mat renderedEdges = cannyRender.detect(renderedScene);
         Mat renderedSkyline = cannyRender.detectSkyline(renderedEdges);
 
-        Vector<Peaks.Peak> visiblePeaks = offScreenRenderer.getVisiblePeaks();
-        for (Peaks.Peak peak : visiblePeaks) {
-            peak.writeNameOnImage(rgba, 480, 20, 20);
-        }
+        Vector<Peaks.Peak> visiblePeaks = peaks.getVisiblePeaks();
+        // TODO: Matching visible peaks
 
-        Mat blended = new Mat();
-        Core.addWeighted(rgba, 0.5, renderedScene, 0.5, 0.0, blended);
         Bitmap bitmap = Bitmap.createBitmap(rgba.cols(), rgba.rows(), Bitmap.Config.ARGB_8888);
         Utils.matToBitmap(rgba, bitmap);
+        bitmap = peaks.drawPeakNames(bitmap, visiblePeaks);
         imageView.setImageBitmap(bitmap);
     }
 
@@ -127,7 +123,6 @@ public class PeaksRecognizer extends FrameAnalyser {
     private void prepareRenderer() {
         FieldOfView fieldOfView = new FieldOfView(parentContext);
         fieldOfView.setDeviceOrientation(FieldOfView.DeviceOrientation.LANDSCAPE);
-
         Config config = new Config();
         config.initObserverLocation = new double[]{curLocation.getLatitude(), curLocation.getLongitude(), curLocation.getAltitude()};
         config.initObserverRotation = curRotation;
@@ -142,6 +137,7 @@ public class PeaksRecognizer extends FrameAnalyser {
         offScreenRenderer = new OffScreenRenderer(parentContext, config);
         coordsManager = offScreenRenderer.getCoordsManager();
         camera = offScreenRenderer.getCamera();
+        peaks = offScreenRenderer.getPeaks();
         start();
     }
 

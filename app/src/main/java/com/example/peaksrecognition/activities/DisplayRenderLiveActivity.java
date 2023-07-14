@@ -9,13 +9,13 @@ import android.widget.ImageView;
 
 import androidx.appcompat.app.AppCompatActivity;
 
-import com.example.peaksrecognition.Camera;
 import com.example.peaksrecognition.Config;
 import com.example.peaksrecognition.CoordsManager;
 import com.example.peaksrecognition.LocationManager;
 import com.example.peaksrecognition.Peaks;
 import com.example.peaksrecognition.R;
 import com.example.peaksrecognition.RotationManager;
+import com.example.peaksrecognition.mainopengl.Camera;
 import com.example.peaksrecognition.mainopengl.OffScreenRenderer;
 
 import org.opencv.android.Utils;
@@ -55,12 +55,9 @@ public class DisplayRenderLiveActivity extends AppCompatActivity {
                 startTime[0] = System.currentTimeMillis();
                 double[] cameraCoords = coordsManager.convertGeoToLocalCoords(curLocation.getLatitude(), curLocation.getLongitude(), curLocation.getAltitude());
                 camera.setPosition(cameraCoords[0], cameraCoords[1], cameraCoords[2]);
-                float[] observerRotation = new float[]{144.31152f, 2.3836904f, -2.0597333f};
-                curRotation = observerRotation;
                 camera.setAngles(curRotation[0], curRotation[1], curRotation[2]);
                 offScreenRenderer.render();
-                Vector<Peaks.Peak> visiblePeaks = offScreenRenderer.getVisiblePeaks();
-//                Log.d("moje", "Peaków: " + visiblePeaks.size());
+                Vector<Peaks.Peak> visiblePeaks = offScreenRenderer.getPeaks().getVisiblePeaks();
                 Mat renderedImage = offScreenRenderer.getRenderedMat();
 
                 Bitmap bitmap = Bitmap.createBitmap(renderedImage.cols(), renderedImage.rows(), Bitmap.Config.ARGB_8888);
@@ -70,14 +67,7 @@ public class DisplayRenderLiveActivity extends AppCompatActivity {
                 elapsedTime[0] = System.currentTimeMillis() - startTime[0];
 
                 long sleepTime = targetTime - elapsedTime[0];
-               /* if (sleepTime > 0) {
-                    try {
-                        Thread.sleep(sleepTime);
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
-                    }
-                }
-*/
+
                 handler.post(this);
             }
         });
