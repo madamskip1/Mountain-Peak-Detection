@@ -36,7 +36,7 @@ public class TemplateMatching extends PeaksMatching {
     }
 
     @Override
-    Rect prepareTemplateROI(int x, int y) {
+    Rect prepareTemplateROI(int x, int y, int matWidth, int matHeight) {
         int xRect = x - templateOffset;
         int yRect = xRect;
         int width = templateOffset * 2;
@@ -46,12 +46,12 @@ public class TemplateMatching extends PeaksMatching {
     }
 
     @Override
-    Rect prepareSubjectROI(int x, int y) {
-        int xRect = x - subjectXOffset;
-        int yRect = y - subjectYOffset;
-        int width = subjectXOffset * 2;
-        int height = subjectYOffset * 2;
+    Rect prepareSubjectROI(int x, int y, int matWidth, int matHeight) {
+        int x1 = x - subjectXOffset;
+        int y1 = y - subjectYOffset;
+        int x2 = x1 + subjectXOffset * 2;
+        int y2 = y1 + subjectYOffset * 2;
 
-        return new Rect(xRect, yRect, width, height);
+        return prepareROI(x1, y1, x2, y2, matWidth, matHeight);
     }
 }

@@ -1,5 +1,7 @@
 package com.example.peaksrecognition.peaksmatching;
 
+import android.util.Log;
+
 import com.example.peaksrecognition.Peaks;
 
 import org.opencv.core.Mat;
@@ -31,13 +33,16 @@ public abstract class PeaksMatching {
         if (dilationOnImage)
             image = dilate(image);
 
+        int width = image.cols();
+        int height = image.rows();
+
         Vector<Peaks.Peak> matchedPeaks = new Vector<>();
         for (Peaks.Peak peak : peaks) {
             int renderedX = Math.round(peak.screenPosition[0]);
             int renderedY = Math.round(peak.screenPosition[1]);
 
-            Rect templateROI = prepareTemplateROI(renderedX, renderedY);
-            Rect subjectROI = prepareSubjectROI(renderedX, renderedY);
+            Rect templateROI = prepareTemplateROI(renderedX, renderedY, width, height);
+            Rect subjectROI = prepareSubjectROI(renderedX, renderedY, width, height);
 
             Mat template = render.submat(templateROI);
             Mat subject = image.submat(subjectROI);
@@ -62,7 +67,25 @@ public abstract class PeaksMatching {
 
     abstract double[] match(Mat template, Mat subject); // should return screen coordinates [x, y] if peaks matched, otherwise null
 
-    abstract Rect prepareTemplateROI(int x, int y);
+    abstract Rect prepareTemplateROI(int x, int y, int matWidth, int matHeight);
 
-    abstract Rect prepareSubjectROI(int x, int y);
+    abstract Rect prepareSubjectROI(int x, int y, int matWidth, int matHeight);
+
+    protected Rect prepareROI(int x1, int y1, int x2, int y2, int matWidth, int matHeight)
+    {
+        if (x1 < 0)
+            x1 = 0;
+        if (y1 < 0)
+            y1 = 0;
+
+        if (x2 >= matWidth)
+            x2 = matWidth - 1;
+        if (y2 >= matHeight)
+            y2 = matHeight - 1;
+
+        int width = x2 - x1;
+        int height = y2 - y1;
+
+        return new Rect(x1, y1, width, height);
+    }
 }
