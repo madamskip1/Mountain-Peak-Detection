@@ -85,28 +85,7 @@ public class PeaksRecognizer extends FrameAnalyser {
         }
 
         Vector<Peaks.Peak> visiblePeaks = peaks.getVisiblePeaks();
-        Vector<Peaks.Peak> visiblePeaksAfterMatching = new Vector<>();
-        for (Peaks.Peak peak : visiblePeaks) {
-            int templateOffset = 40;
-            int subjectXOffset = 117;
-            int subjectYOffset = 97;
-            int peakX = Math.round(peak.screenPosition[0]);
-            int peakY = Math.round(peak.screenPosition[1]);
-
-            Rect templateROI = new Rect(peakX - templateOffset, peakY - templateOffset, templateOffset * 2, templateOffset * 2);
-            Rect subjectROI = new Rect(peakX - subjectXOffset, peakY - subjectYOffset, subjectXOffset * 2, subjectYOffset * 2);
-            Mat template = renderedSkyline.submat(templateROI);
-            Mat subject = liveSkyline.submat(subjectROI);
-            Imgproc.rectangle(rgba, templateROI, new Scalar(255, 0, 0));
-            Imgproc.rectangle(rgba, subjectROI, new Scalar(255, 0, 0));
-            double[] predicted = templateMatching.match(template, subject);
-            if (predicted != null) {
-                predicted[0] += subjectROI.x;
-                predicted[1] += subjectROI.y;
-                peak.realImagePosition = new int[]{(int) Math.round(predicted[0]), (int) Math.round(predicted[1])};
-                visiblePeaksAfterMatching.add(peak);
-            }
-        }
+        Vector<Peaks.Peak> visiblePeaksAfterMatching = templateMatching.matchAll(visiblePeaks, renderedSkyline, liveSkyline);
 
         Bitmap bitmap = Bitmap.createBitmap(rgba.cols(), rgba.rows(), Bitmap.Config.ARGB_8888);
         Utils.matToBitmap(rgba, bitmap);
