@@ -19,6 +19,7 @@ import com.opencsv.exceptions.CsvValidationException;
 
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.text.DecimalFormat;
 import java.util.Vector;
 
 public class Peaks {
@@ -99,15 +100,17 @@ public class Peaks {
             for (String peaksFilePath : listOfPeaksFiles) {
                 CSVReader csvReader = getPeaksReader(context, peaksFilePath);
                 while ((nextLine = csvReader.readNext()) != null) {
-                    String name = nextLine[0];
                     double latitude = Double.parseDouble(nextLine[1]);
                     double longitude = Double.parseDouble(nextLine[2]);
-                    int dem = (int) Double.parseDouble(nextLine[3]);
-                    int elevation = Integer.parseInt(nextLine[4]);
+
                     float[] vertexCoords = getPeakVertexCoords(coordsManager, latitude, longitude);
                     if (vertexCoords[0] != -1) {
+                        String name = nextLine[0];
+                        int dem = (int) Double.parseDouble(nextLine[3]);
+                        int elevation = Integer.parseInt(nextLine[4]);
+                        double distance = coordsManager.calcDistanceObserverToPoint(latitude, longitude);
                         vertexCoords[1] -= 0.000001;
-                        peaks.add(new Peak(name, latitude, longitude, dem, elevation, vertexCoords));
+                        peaks.add(new Peak(name, latitude, longitude, dem, elevation, vertexCoords, distance));
                     }
                 }
             }
@@ -143,6 +146,7 @@ public class Peaks {
                 ++counter;
             }
         }
+
         return listOfPeaksFiles;
     }
 
@@ -199,6 +203,7 @@ public class Peaks {
 
     public Bitmap drawPeakNames(Bitmap bitmap, Vector<Peak> peaks) {
         final float rotationAngle = -45.0f;
+        DecimalFormat decimalFormat = new DecimalFormat("#0.0");
 
         bitmap = bitmap.copy(Bitmap.Config.ARGB_8888, true); // mutable copy
         Canvas canvas = new Canvas(bitmap);
@@ -207,11 +212,11 @@ public class Peaks {
             int x = peak.realImagePosition[0];
             int y = peak.realImagePosition[1];
             int yText = y - 30;
-
+            String text = peak.name + " (" + decimalFormat.format(peak.distance) + " km)";
             canvas.save();
             canvas.drawLine(x, y, x, yText, paint);
             canvas.rotate(rotationAngle, x, yText);
-            canvas.drawText(peak.name, x, yText, paint);
+            canvas.drawText(text, x, yText, paint);
             canvas.restore();
         }
         return bitmap;
@@ -226,14 +231,16 @@ public class Peaks {
         public float[] vertexCoords;
         public float[] screenPosition;
         public int[] realImagePosition;
+        public double distance;
 
-        Peak(String name, double latitude, double longitude, int dem, int elevation, float[] vertexCoords) {
+        Peak(String name, double latitude, double longitude, int dem, int elevation, float[] vertexCoords, double distance) {
             this.name = name;
             this.latitude = latitude;
             this.longitude = longitude;
             this.dem = dem;
             this.elevation = elevation;
             this.vertexCoords = vertexCoords;
+            this.distance = distance;
         }
     }
 }
