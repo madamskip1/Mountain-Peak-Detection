@@ -139,6 +139,13 @@
             android:text="Krawędzie"
             tools:ignore="UseSwitchCompatOrMaterialXml" />
 
+        <Switch
+            android:id="@+id/displayRender_peaksSwitch"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Szczyty"
+            tools:ignore="UseSwitchCompatOrMaterialXml" />
+
         <Button
             android:id="@+id/displayRender_fillButton"
             android:layout_width="wrap_content"
