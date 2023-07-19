@@ -22,27 +22,27 @@
         android:theme="@style/Theme.PeaksRecognition"
         tools:targetApi="31">
         <activity
-            android:name=".activities.PeaksRecognitionActivity"
+            android:name="org.pw.masterthesis.peaksrecognition.activities.PeaksRecognitionActivity"
             android:exported="false"
             android:screenOrientation="landscape" />
         <activity
-            android:name=".activities.CannyThresholdLiveActivity"
+            android:name="org.pw.masterthesis.peaksrecognition.activities.CannyThresholdLiveActivity"
             android:exported="false"
             android:screenOrientation="landscape" />
         <activity
-            android:name=".activities.DisplayRenderLiveActivity"
+            android:name="org.pw.masterthesis.peaksrecognition.activities.DisplayRenderLiveActivity"
             android:exported="false" />
         <activity
-            android:name=".activities.LocationRotationTestActivity"
+            android:name="org.pw.masterthesis.peaksrecognition.activities.LocationRotationTestActivity"
             android:exported="false" />
         <activity
-            android:name=".activities.DisplayRenderConfiguration"
+            android:name="org.pw.masterthesis.peaksrecognition.activities.DisplayRenderConfiguration"
             android:exported="false" />
         <activity
-            android:name=".activities.DisplayRender"
+            android:name="org.pw.masterthesis.peaksrecognition.activities.DisplayRender"
             android:exported="false" />
         <activity
-            android:name=".activities.MainActivity"
+            android:name="org.pw.masterthesis.peaksrecognition.activities.MainActivity"
             android:exported="true">
 
             <intent-filter>
