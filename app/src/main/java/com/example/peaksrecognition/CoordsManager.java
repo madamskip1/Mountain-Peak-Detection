@@ -36,4 +36,13 @@ public class CoordsManager {
         return equirectangularApproximation(latitude, longitude,
                 observerLocationGeo[0], observerLocationGeo[1]);
     }
+
+    public int[] getLatitudeRange()
+    {
+        return latitudeRange;
+    }
+
+    public int[] getLongitudeRange() {
+        return longitudeRange;
+    }
 }
