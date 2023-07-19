@@ -3,6 +3,7 @@ package org.pw.masterthesis.peaksrecognition.activities;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.os.Bundle;
+import android.util.Log;
 import android.widget.ImageView;
 
 import androidx.appcompat.app.AppCompatActivity;
@@ -34,13 +35,19 @@ public class DisplayRender extends AppCompatActivity {
 
         if (getIntent().getBooleanExtra("edges", false)) {
             renderedImage = detectEdges(renderedImage);
-        } else if (getIntent().getBooleanExtra("peaks", false)) {
-            Vector<Peaks.Peak> peaks = offScreenRenderer.getPeaks().getVisiblePeaks();
         }
 
         Bitmap bitmap = Bitmap.createBitmap(renderedImage.cols(), renderedImage.rows(), Bitmap.Config.ARGB_8888);
-        Utils.matToBitmap(renderedImage, bitmap);
 
+        if (getIntent().getBooleanExtra("peaks", false)) {
+            Peaks peaks = offScreenRenderer.getPeaks();
+            Vector<Peaks.Peak> visiblePeaks = peaks.getVisiblePeaks();
+            Log.d("moje", "peaks " + visiblePeaks.size());
+            Log.d("moje", "peaks");
+            bitmap = peaks.drawPeakNames(bitmap, visiblePeaks);
+        }
+
+        Utils.matToBitmap(renderedImage, bitmap);
         ImageView imageView = findViewById(R.id.displayRenderImageView);
         imageView.setImageBitmap(bitmap);
     }
@@ -62,7 +69,7 @@ public class DisplayRender extends AppCompatActivity {
         float roll = intent.getFloatExtra("roll", 0.0f);
         double minDistance = intent.getDoubleExtra("minDistance", 0.0);
         double maxDistance = intent.getDoubleExtra("maxDistance", 0.0);
-
+        Log.d("moje", "dupa " + latitude + " " + yaw + " " + minDistance);
         Config config = new Config();
         config.initObserverLocation = new double[]{latitude, longitude, altitude};
         config.initObserverRotation = new float[]{yaw, pitch, roll};
@@ -71,6 +78,10 @@ public class DisplayRender extends AppCompatActivity {
         config.FovVertical = 66.0f;
         config.simplifyFactor = 3;
         config.initHgtSize = 3601;
+        config.deviceOrientation = Config.DeviceOrientation.PORTRAIT;
+        config.width = 768;
+        config.height = 1024;
+
 
         return config;
     }
