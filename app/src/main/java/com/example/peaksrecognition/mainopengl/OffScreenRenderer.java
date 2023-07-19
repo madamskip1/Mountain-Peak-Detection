@@ -79,8 +79,8 @@ public class OffScreenRenderer {
         screenManager.setMVPMatrices(viewMatrix, projectionMatrix);
     }
 
-    public Vector<Peak> getVisiblePeaks() {
-        return peaks.getVisiblePeaks();
+    public Peaks getPeaks() {
+        return peaks;
     }
 
     public CoordsManager getCoordsManager() {
