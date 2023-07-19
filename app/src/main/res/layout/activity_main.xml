@@ -52,5 +52,11 @@
             android:onClick="LiveCamera_button_onClick"
             android:text="Location/Live Camera" />
 
+        <Button
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:onClick="CannyThresholdsLive_onClick"
+            android:text="Canny Thresholds Live" />
+
     </LinearLayout>
 </androidx.constraintlayout.widget.ConstraintLayout>

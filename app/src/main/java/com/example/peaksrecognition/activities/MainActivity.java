@@ -48,4 +48,9 @@ public class MainActivity extends AppCompatActivity {
         Intent blendRenderIntent = new Intent(this, BlendRenderAndLiveActivity.class);
         startActivity(blendRenderIntent);
     }
+
+    public void CannyThresholdsLive_onClick(View view) {
+        Intent cannyThresholdsLiveIntent = new Intent(this, CannyThresholdLiveActivity.class);
+        startActivity(cannyThresholdsLiveIntent);
+    }
 }
