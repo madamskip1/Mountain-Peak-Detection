@@ -104,6 +104,7 @@ public class TerrainLoader {
         InputStream inputStream = assetManager.open(path);
         BufferedInputStream bufferedInputStream = new BufferedInputStream(inputStream);
         byte[] data = new byte[bufferedInputStream.available()];
+        //noinspection ResultOfMethodCallIgnored
         bufferedInputStream.read(data);
         bufferedInputStream.close();
 
@@ -248,10 +249,10 @@ public class TerrainLoader {
     }
 
     private int[][] getCoordsRange(Vector<int[]> coords) {
-        int minLatitude = 1000;
-        int maxLatitude = -1000;
-        int minLongitude = 1000;
-        int maxLongitude = -1000;
+        int minLatitude = Integer.MAX_VALUE;
+        int maxLatitude = Integer.MIN_VALUE;
+        int minLongitude = Integer.MAX_VALUE;
+        int maxLongitude = Integer.MIN_VALUE;
 
         for (int[] coord : coords) {
             minLatitude = Math.min(minLatitude, coord[0]);
@@ -268,22 +269,22 @@ public class TerrainLoader {
     private double[][] calcWorldSize(int[][] coordsRange) {
         int[] latitudeRange = coordsRange[0];
         int[] longitudeRange = coordsRange[1];
-        double latitudeDistance = 0.0;
-        double longitudeDistance = 0.0;
+        double totalLatitudeDistance = 0.0;
+        double totalLongitudeDistance = 0.0;
 
         for (int i = 0; i < 2; ++i) {
-            latitudeDistance += CoordsManager.equirectangularApproximation(latitudeRange[0], longitudeRange[i],
+            totalLatitudeDistance += CoordsManager.equirectangularApproximation(latitudeRange[0], longitudeRange[i],
                     latitudeRange[1], longitudeRange[i]);
-            longitudeDistance += CoordsManager.equirectangularApproximation(latitudeRange[i], longitudeRange[0],
+            totalLongitudeDistance += CoordsManager.equirectangularApproximation(latitudeRange[i], longitudeRange[0],
                     latitudeRange[i], longitudeRange[1]);
         }
 
-        latitudeDistance /= 2.0;
-        longitudeDistance /= 2.0;
-        double latitudeGridSize = latitudeDistance / (double) Math.abs(latitudeRange[1] - latitudeRange[0]);
-        double longitudeGridSize = longitudeDistance / (double) Math.abs(longitudeRange[1] - longitudeRange[0]);
+        double meanLatitudeDistance = totalLatitudeDistance / 2.0;
+        double meanLongitudeDistance = totalLongitudeDistance / 2.0;
+        double latitudeGridSize = meanLatitudeDistance / (double) Math.abs(latitudeRange[1] - latitudeRange[0]);
+        double longitudeGridSize = meanLongitudeDistance / (double) Math.abs(longitudeRange[1] - longitudeRange[0]);
 
-        return new double[][]{{latitudeDistance, longitudeDistance}, {latitudeGridSize, longitudeGridSize}};
+        return new double[][]{{meanLatitudeDistance, meanLongitudeDistance}, {latitudeGridSize, longitudeGridSize}};
     }
 
     private String[][] prepareFilesNamesGrid(Vector<int[]> coords, int centralLatitude, int centralLongitude) {
@@ -324,5 +325,4 @@ public class TerrainLoader {
             this.scale = scale;
         }
     }
-
 }
