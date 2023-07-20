@@ -47,8 +47,7 @@ public class OffScreenRenderer {
         terrainModel = new TerrainModel(terrainData, shaderProgram);
         coordsManager = new CoordsManager(config.initObserverLocation, terrainData.getCoordsRange(), terrainData.getGridSize());
         camera = new Camera(config.FovVertical, (float) width / (float) height, (float) config.minDistance, (float) config.maxDistance, config.deviceOrientation);
-        screenManager = new ScreenManager();
-        screenManager.setViewportDimensions(width, height);
+        screenManager = new ScreenManager(width, height);
         peaks = new Peaks(context, coordsManager, terrainData, screenManager, shaderProgram);
 
         double[] cameraPositionLocal = coordsManager.convertGeoToLocalCoords(config.initObserverLocation[0], config.initObserverLocation[1], config.initObserverLocation[2]);

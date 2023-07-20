@@ -7,17 +7,8 @@ public class ScreenManager {
     private float[] viewMatrix;
     private float[] projectionMatrix;
 
-    public ScreenManager() {
-        viewport = new int[]{0, 0, 0, 0};
-    }
-
     public ScreenManager(int screenWidth, int screenHeight) {
         viewport = new int[]{0, 0, screenWidth, screenHeight};
-    }
-
-    public void setViewportDimensions(int screenWidth, int screenHeight) {
-        viewport[2] = screenWidth;
-        viewport[3] = screenHeight;
     }
 
     public void setMVPMatrices(float[] viewMatrix, float[] projectionMatrix) {
