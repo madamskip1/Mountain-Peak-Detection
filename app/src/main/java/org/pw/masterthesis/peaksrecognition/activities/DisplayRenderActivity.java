@@ -3,7 +3,6 @@ package org.pw.masterthesis.peaksrecognition.activities;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.os.Bundle;
-import android.util.Log;
 import android.widget.ImageView;
 
 import androidx.appcompat.app.AppCompatActivity;
@@ -19,7 +18,7 @@ import org.pw.masterthesis.peaksrecognition.mainopengl.OffScreenRenderer;
 
 import java.util.Vector;
 
-public class DisplayRender extends AppCompatActivity {
+public class DisplayRenderActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -43,8 +42,6 @@ public class DisplayRender extends AppCompatActivity {
         if (getIntent().getBooleanExtra("peaks", false)) {
             Peaks peaks = offScreenRenderer.getPeaks();
             Vector<Peaks.Peak> visiblePeaks = peaks.getVisiblePeaks();
-            Log.d("moje", "peaks " + visiblePeaks.size());
-            Log.d("moje", "peaks");
             bitmap = peaks.drawPeakNames(bitmap, visiblePeaks);
         }
 
@@ -58,7 +55,6 @@ public class DisplayRender extends AppCompatActivity {
         return cannyEdgeDetector.detect(image);
     }
 
-
     private Config prepareConfig() {
         Intent intent = getIntent();
 
@@ -70,7 +66,7 @@ public class DisplayRender extends AppCompatActivity {
         float roll = intent.getFloatExtra("roll", 0.0f);
         double minDistance = intent.getDoubleExtra("minDistance", 0.0);
         double maxDistance = intent.getDoubleExtra("maxDistance", 0.0);
-        Log.d("moje", "dupa " + latitude + " " + yaw + " " + minDistance);
+
         Config config = new Config();
         config.initObserverLocation = new double[]{latitude, longitude, altitude};
         config.initObserverRotation = new float[]{yaw, pitch, roll};
@@ -83,8 +79,6 @@ public class DisplayRender extends AppCompatActivity {
         config.width = 768;
         config.height = 1024;
 
-
         return config;
     }
-
 }
