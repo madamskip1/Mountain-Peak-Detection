@@ -1,6 +1,5 @@
 package org.pw.masterthesis.peaksrecognition.mainopengl;
 
-import org.pw.masterthesis.peaksrecognition.Config;
 import org.pw.masterthesis.peaksrecognition.DeviceOrientation;
 import org.pw.masterthesis.peaksrecognition.Utility;
 
@@ -9,13 +8,15 @@ public class Camera {
     private final float aspectRatio;
     private final float near;
     private final float far;
-    private final double[] position;
-    private final double[] targetVector;
+    private final double[] position = new double[]{0.0, 0.0, 0.0};
+    private final double[] targetVector = new double[]{0.0, 0.0, 0.0};
     private final DeviceOrientation deviceOrientation;
-    private double[] upVector;
-    private float[] angles;
-    private float lastRollAngle;
-    private double[] directionVector;
+
+    private double[] upVector = new double[]{0.0, 1.0, 0.0};
+    private double[] directionVector = new double[]{0.0, 0.0, 0.0};
+    private float[] angles = new float[]{0.0f, 0.0f, 0.0f};
+    private float lastRollAngle = 0.0f;
+
 
     public Camera(double fovVertical, float aspectRatio, float near, float far, DeviceOrientation deviceOrientation) {
         this.fovVertical = fovVertical;
@@ -23,13 +24,20 @@ public class Camera {
         this.near = near;
         this.far = far;
         this.deviceOrientation = deviceOrientation;
+    }
 
-        position = new double[]{0.0, 0.0, 0.0};
-        angles = new float[]{0.0f, 0.0f, 0.0f};
-        lastRollAngle = 0.0f;
-        upVector = new double[]{0.0, 1.0, 0.0};
-        targetVector = new double[]{0.0, 0.0, 0.0};
-        directionVector = new double[]{0.0, 0.0, 0.0};
+    private static float[] fixAngles(float yawDegree, float pitchDegree, float rollDegree) {
+        yawDegree = 180.0f - yawDegree;
+        if (yawDegree < 0.0f) {
+            yawDegree = 360.0f + yawDegree;
+        } else if (yawDegree >= 360.0f) {
+            yawDegree = yawDegree - 360.0f;
+        }
+
+        pitchDegree = (-1.0f) * pitchDegree;
+        rollDegree = (-1.0f) * rollDegree;
+
+        return new float[]{yawDegree, pitchDegree, rollDegree};
     }
 
     public void setPosition(double x, double y, double z) {
@@ -44,8 +52,8 @@ public class Camera {
         }
         angles = fixAngles(yawDegree, pitchDegree, rollDegree);
         float rollDegreeDiff = angles[2] - lastRollAngle;
-        lastRollAngle = angles[2];
         angles[2] = rollDegreeDiff;
+        lastRollAngle = angles[2];
 
         updateVectors();
     }
@@ -80,26 +88,14 @@ public class Camera {
         float yTranslation = (float) Utility.dotProduct(yMatrix, 3, negatedEye, 3);
         float zTranslation = (float) Utility.dotProduct(zMatrix, 3, negatedEye, 3);
 
+        // First row negated because of horizontal mirror
+        // Second row negated because of vertical mirror
         return new float[]{
                 -(float) xMatrix[0], -(float) yMatrix[0], (float) zMatrix[0], 0.0f,  // col 1
                 -(float) xMatrix[1], -(float) yMatrix[1], (float) zMatrix[1], 0.0f,  // col 2
                 -(float) xMatrix[2], -(float) yMatrix[2], (float) zMatrix[2], 0.0f,  // col 3
                 -xTranslation, -yTranslation, zTranslation, 1.0f,  // col 1
         };
-    }
-
-    private float[] fixAngles(float yawDegree, float pitchDegree, float rollDegree) {
-        yawDegree = 180.0f - yawDegree;
-        if (yawDegree < 0.0f) {
-            yawDegree = 360.0f + yawDegree;
-        } else if (yawDegree >= 360.0f) {
-            yawDegree = yawDegree - 360.0f;
-        }
-
-        pitchDegree = (-1.0f) * pitchDegree;
-        rollDegree = (-1.0f) * rollDegree;
-
-        return new float[]{yawDegree, pitchDegree, rollDegree};
     }
 
     private void updateVectors() {
