@@ -1,7 +1,5 @@
 package org.pw.masterthesis.peaksrecognition.terrain;
 
-import android.util.Log;
-
 import org.pw.masterthesis.peaksrecognition.Config;
 import org.pw.masterthesis.peaksrecognition.terrain.TerrainLoader.LoadedTerrain;
 
@@ -13,9 +11,9 @@ public class TerrainData {
     private int[] triangles;
     private int rows;
     private int cols;
-    private double[] origin;
     private int offsetX;
     private int offsetZ;
+    private double[] origin;
 
     public TerrainData(LoadedTerrain loadedTerrain, Config config) {
         scale = loadedTerrain.scale;
@@ -75,7 +73,6 @@ public class TerrainData {
 
         int range_x = (int) Math.ceil((max_distance + 1.0) / scale[0]);
         int range_z = (int) Math.ceil((max_distance + 1.0) / scale[2]);
-        Log.d("moje", "range " + range_x + " " + range_z);
 
         int x_start = observer_vertex_x - range_x;
         int x_end = observer_vertex_x + range_x;
@@ -87,23 +84,20 @@ public class TerrainData {
         x_end = Math.min(x_end, loadedHgtSize[0]);
         z_end = Math.min(z_end, loadedHgtSize[1]);
 
-        Log.d("moje", "x " + x_start + " " + x_end);
-        Log.d("moje", "z " + z_start + " " + z_end);
-
-        double origin_x = 0.0f + x_start * scale[0];
-        double origin_z = 0.0f + z_start * scale[2];
-
         short[][] newHeightMap = new short[x_end - x_start + 1][z_end - z_start + 1];
         for (int i = x_start; i <= x_end; i++) {
             if (z_end + 1 - z_start >= 0)
                 System.arraycopy(heightMap[i], z_start, newHeightMap[i - x_start], 0, z_end + 1 - z_start);
         }
 
-        origin = new double[]{origin_x, 0.0, origin_z};
         rows = newHeightMap.length;
         cols = newHeightMap[0].length;
         offsetX = x_start;
         offsetZ = z_start;
+
+        double origin_x = 0.0f + x_start * scale[0];
+        double origin_z = 0.0f + z_start * scale[2];
+        origin = new double[]{origin_x, 0.0, origin_z};
 
         return newHeightMap;
     }
@@ -124,6 +118,7 @@ public class TerrainData {
                 verticesIndex += 3;
             }
         }
+
         this.vertices = vertices;
     }
 
