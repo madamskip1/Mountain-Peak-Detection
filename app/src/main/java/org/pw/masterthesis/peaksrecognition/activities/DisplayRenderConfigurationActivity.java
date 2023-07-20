@@ -12,7 +12,7 @@ import org.pw.masterthesis.peaksrecognition.R;
 
 import java.text.DecimalFormatSymbols;
 
-public class DisplayRenderConfiguration extends AppCompatActivity {
+public class DisplayRenderConfigurationActivity extends AppCompatActivity {
 
     private EditText latitudeEditText;
     private EditText longitudeEditText;
@@ -58,7 +58,7 @@ public class DisplayRenderConfiguration extends AppCompatActivity {
         boolean edges = ((Switch) findViewById(R.id.displayRender_edgeSwitch)).isChecked();
         boolean peaks = ((Switch) findViewById(R.id.displayRender_peaksSwitch)).isChecked();
 
-        Intent intent = new Intent(this, DisplayRender.class);
+        Intent intent = new Intent(this, DisplayRenderActivity.class);
         intent.putExtra("latitude", latitude);
         intent.putExtra("longitude", longitude);
         intent.putExtra("altitude", altitude);
@@ -86,19 +86,19 @@ public class DisplayRenderConfiguration extends AppCompatActivity {
     }
 
     public void displayRender_fillButton_onClick(View view) {
-        final double[] observerLocation = new double[]{49.339045, 20.081936, 991.1};
-        final float[] observerRotation = new float[]{144.31152f, 2.3836904f, -2.0597333f};
-        final double[] distance = new double[]{0.00001, 30.0};
+        final double[] DEFAULT_OBSERVER_LOCATION = new double[]{49.339045, 20.081936, 991.1};
+        final float[] DEFAULT_OBSERVER_ROTATION = new float[]{144.31152f, 2.3836904f, -2.0597333f};
+        final double[] DEFAULT_DISTANCE = new double[]{0.00001, 30.0};
 
-        latitudeEditText.setText(String.valueOf(observerLocation[0]));
-        longitudeEditText.setText(String.valueOf(observerLocation[1]));
-        altitudeEditText.setText(String.valueOf(observerLocation[2]));
+        latitudeEditText.setText(String.valueOf(DEFAULT_OBSERVER_LOCATION[0]));
+        longitudeEditText.setText(String.valueOf(DEFAULT_OBSERVER_LOCATION[1]));
+        altitudeEditText.setText(String.valueOf(DEFAULT_OBSERVER_LOCATION[2]));
 
-        yawEditText.setText(String.valueOf(observerRotation[0]));
-        pitchEditText.setText(String.valueOf(observerRotation[1]));
-        rollEditText.setText(String.valueOf(observerRotation[2]));
+        yawEditText.setText(String.valueOf(DEFAULT_OBSERVER_ROTATION[0]));
+        pitchEditText.setText(String.valueOf(DEFAULT_OBSERVER_ROTATION[1]));
+        rollEditText.setText(String.valueOf(DEFAULT_OBSERVER_ROTATION[2]));
 
-        minDistanceEditText.setText(String.valueOf(distance[0]));
-        maxDistanceEditText.setText(String.valueOf(distance[1]));
+        minDistanceEditText.setText(String.valueOf(DEFAULT_DISTANCE[0]));
+        maxDistanceEditText.setText(String.valueOf(DEFAULT_DISTANCE[1]));
     }
 }
