@@ -56,15 +56,6 @@ public class OffScreenRenderer {
         camera.setAngles(config.initObserverRotation[0], config.initObserverRotation[1], config.initObserverRotation[2]);
     }
 
-    public Mat getRenderedMat() {
-        ByteBuffer buffer = getRenderBuffer();
-        Mat image = new Mat(height, width, CvType.CV_8UC4);
-        byte[] imageData = new byte[height * width * 4];
-        buffer.get(imageData);
-        image.put(0, 0, imageData);
-        return image;
-    }
-
     public void render() {
         GLES30.glViewport(0, 0, width, height);
         GLES30.glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
@@ -73,6 +64,15 @@ public class OffScreenRenderer {
         float[] projectionMatrix = camera.getProjectionMatrix();
         terrainModel.draw(viewMatrix, projectionMatrix);
         screenManager.setMVPMatrices(viewMatrix, projectionMatrix);
+    }
+
+    public Mat getRenderedMat() {
+        ByteBuffer buffer = getRenderBuffer();
+        Mat image = new Mat(height, width, CvType.CV_8UC4);
+        byte[] imageData = new byte[height * width * 4];
+        buffer.get(imageData);
+        image.put(0, 0, imageData);
+        return image;
     }
 
     public Peaks getPeaks() {
@@ -112,22 +112,22 @@ public class OffScreenRenderer {
         int[] numConfigs = new int[1];
         EGL14.eglChooseConfig(eglDisplay, attribList, 0, configs, 0, 1, numConfigs, 0);
 
-        int[] contextAttribs = {
+        int[] contextAttributes = {
                 EGL14.EGL_CONTEXT_CLIENT_VERSION, 3,
                 EGL14.EGL_NONE
         };
         eglConfig = configs[0];
-        eglContext = EGL14.eglCreateContext(eglDisplay, eglConfig, EGL14.EGL_NO_CONTEXT, contextAttribs, 0);
+        eglContext = EGL14.eglCreateContext(eglDisplay, eglConfig, EGL14.EGL_NO_CONTEXT, contextAttributes, 0);
     }
 
     private void createEGLSurface() {
-        int[] surfaceAttribs = {
+        int[] surfaceAttributes = {
                 EGL14.EGL_WIDTH, width,
                 EGL14.EGL_HEIGHT, height,
                 EGL14.EGL_NONE
         };
 
-        EGLSurface eglSurface = EGL14.eglCreatePbufferSurface(eglDisplay, eglConfig, surfaceAttribs, 0);
+        EGLSurface eglSurface = EGL14.eglCreatePbufferSurface(eglDisplay, eglConfig, surfaceAttributes, 0);
         EGL14.eglMakeCurrent(eglDisplay, eglSurface, eglSurface, eglContext);
     }
 }
