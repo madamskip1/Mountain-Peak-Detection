@@ -36,10 +36,10 @@
             android:name="org.pw.masterthesis.peaksrecognition.activities.LocationRotationTestActivity"
             android:exported="false" />
         <activity
-            android:name="org.pw.masterthesis.peaksrecognition.activities.DisplayRenderConfiguration"
+            android:name="org.pw.masterthesis.peaksrecognition.activities.DisplayRenderConfigurationActivity"
             android:exported="false" />
         <activity
-            android:name="org.pw.masterthesis.peaksrecognition.activities.DisplayRender"
+            android:name="org.pw.masterthesis.peaksrecognition.activities.DisplayRenderActivity"
             android:exported="false" />
         <activity
             android:name="org.pw.masterthesis.peaksrecognition.activities.MainActivity"

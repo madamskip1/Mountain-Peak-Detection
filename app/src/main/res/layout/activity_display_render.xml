@@ -3,7 +3,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="org.pw.masterthesis.peaksrecognition.activities.DisplayRender">
+    tools:context="org.pw.masterthesis.peaksrecognition.activities.DisplayRenderActivity">
 
     <ImageView
         android:id="@+id/displayRenderImageView"

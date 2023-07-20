@@ -17,7 +17,6 @@ public class LocationRotationTestActivity extends AppCompatActivity {
     TextView yawTextView;
     TextView rollTextView;
     TextView pitchTextView;
-
     LocationManager locationManager;
     RotationManager rotationManager;
 
@@ -48,7 +47,6 @@ public class LocationRotationTestActivity extends AppCompatActivity {
 
             @Override
             public void onLocationAvailabilityChange(boolean isAvailable) {
-
             }
         });
 

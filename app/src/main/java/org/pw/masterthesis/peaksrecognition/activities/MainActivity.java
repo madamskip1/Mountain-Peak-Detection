@@ -24,7 +24,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void DisplayRender_button_onClick(View view) {
-        Intent displayRenderIntent = new Intent(this, DisplayRenderConfiguration.class);
+        Intent displayRenderIntent = new Intent(this, DisplayRenderConfigurationActivity.class);
         startActivity(displayRenderIntent);
     }
 
