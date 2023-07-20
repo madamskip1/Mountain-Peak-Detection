@@ -106,7 +106,7 @@ public class BlendRenderAndLive extends FrameAnalyser {
 
     private void prepareRenderer() {
         FieldOfView fieldOfView = new FieldOfView(parentContext);
-        fieldOfView.setDeviceOrientation(FieldOfView.DeviceOrientation.LANDSCAPE);
+        fieldOfView.setDeviceOrientation(DeviceOrientation.LANDSCAPE);
 
         Config config = new Config();
         config.initObserverLocation = new double[]{curLocation.getLatitude(), curLocation.getLongitude(), curLocation.getAltitude()};
@@ -116,7 +116,7 @@ public class BlendRenderAndLive extends FrameAnalyser {
         config.FovVertical = (float) fieldOfView.getVerticalFOV();
         config.simplifyFactor = 3;
         config.initHgtSize = 3601;
-        config.deviceOrientation = Config.DeviceOrientation.LANDSCAPE;
+        config.deviceOrientation = DeviceOrientation.LANDSCAPE;
         config.width = width;
         config.height = height;
 

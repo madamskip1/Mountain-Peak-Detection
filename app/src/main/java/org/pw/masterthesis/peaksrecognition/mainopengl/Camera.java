@@ -1,6 +1,7 @@
 package org.pw.masterthesis.peaksrecognition.mainopengl;
 
 import org.pw.masterthesis.peaksrecognition.Config;
+import org.pw.masterthesis.peaksrecognition.DeviceOrientation;
 import org.pw.masterthesis.peaksrecognition.Utility;
 
 public class Camera {
@@ -10,13 +11,13 @@ public class Camera {
     private final float far;
     private final double[] position;
     private final double[] targetVector;
-    private final Config.DeviceOrientation deviceOrientation;
+    private final DeviceOrientation deviceOrientation;
     private double[] upVector;
     private float[] angles;
     private float lastRollAngle;
     private double[] directionVector;
 
-    public Camera(double fovVertical, float aspectRatio, float near, float far, Config.DeviceOrientation deviceOrientation) {
+    public Camera(double fovVertical, float aspectRatio, float near, float far, DeviceOrientation deviceOrientation) {
         this.fovVertical = fovVertical;
         this.aspectRatio = aspectRatio;
         this.near = near;
@@ -38,7 +39,7 @@ public class Camera {
     }
 
     public void setAngles(float yawDegree, float pitchDegree, float rollDegree) {
-        if (deviceOrientation == Config.DeviceOrientation.LANDSCAPE) {
+        if (deviceOrientation == DeviceOrientation.LANDSCAPE) {
             rollDegree += 90.0f;
         }
         angles = fixAngles(yawDegree, pitchDegree, rollDegree);

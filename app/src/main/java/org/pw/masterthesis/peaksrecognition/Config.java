@@ -11,9 +11,4 @@ public class Config {
     public DeviceOrientation deviceOrientation = DeviceOrientation.PORTRAIT;
     public int width;
     public int height;
-
-    public enum DeviceOrientation {
-        PORTRAIT,
-        LANDSCAPE
-    }
 }

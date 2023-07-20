@@ -11,6 +11,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import org.opencv.android.Utils;
 import org.opencv.core.Mat;
 import org.pw.masterthesis.peaksrecognition.Config;
+import org.pw.masterthesis.peaksrecognition.DeviceOrientation;
 import org.pw.masterthesis.peaksrecognition.Peaks;
 import org.pw.masterthesis.peaksrecognition.R;
 import org.pw.masterthesis.peaksrecognition.edgedetectors.CannyEdgeDetector;
@@ -78,7 +79,7 @@ public class DisplayRender extends AppCompatActivity {
         config.FovVertical = 66.0f;
         config.simplifyFactor = 3;
         config.initHgtSize = 3601;
-        config.deviceOrientation = Config.DeviceOrientation.PORTRAIT;
+        config.deviceOrientation = DeviceOrientation.PORTRAIT;
         config.width = 768;
         config.height = 1024;
 

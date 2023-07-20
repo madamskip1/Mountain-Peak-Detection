@@ -49,10 +49,4 @@ public class FieldOfView {
     private double getVerticalDeviceFOV() {
         return (2.0f * atan(sensorHeight / (focalLength * 2.0f)) * 180.0 / Math.PI);
     }
-
-    public enum DeviceOrientation {
-        PORTRAIT,
-        LANDSCAPE
-    }
-
 }
