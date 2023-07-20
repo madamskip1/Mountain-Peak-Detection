@@ -6,13 +6,13 @@ public class ShaderProgram {
     private final int shaderProgram;
 
     public ShaderProgram() {
-        String vertexShaderCode = "attribute vec4 vPosition;" +
+        final String vertexShaderCode = "attribute vec4 vPosition;" +
                 "uniform mat4 viewMatrix;" +
                 "uniform mat4 projectionMatrix;" +
                 "void main() {" +
                 "  gl_Position = projectionMatrix * viewMatrix * vPosition;" +
                 "}";
-        String fragmentShaderCode = "precision mediump float;" +
+        final String fragmentShaderCode = "precision mediump float;" +
                 "void main() {" +
                 "  gl_FragColor = vec4(1.0, 1.0, 1.0, 1.0);" +
                 "}";
