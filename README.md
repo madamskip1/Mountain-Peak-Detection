@@ -23,7 +23,12 @@
 
  ## Katalogi
 
--- TODO --
+- */projekt/*  - kod aplikacji  
+- */praca_dyplomowa/*  - praca dyplomowa w formacie LaTeX oraz skompilowana do postaci dokumentu pdf W szczególności:
+  - Wygenerowana praca dyplomowa w formacie PDF -- TODO --
+  - Kod źródłowy pracy dyplomowej w formacie LaTeX (TeX) -- TODO --
+- */materialy_prezentacyjne/*  - materiał prezentacyjne, w szczególności nagranie pokazujące działanie projektu w czasie rzeczywistym
+- */testy_wyniki/* - wyniki poszczególnych testów w formacie csv
 
 
 ## Instrukcja kompilacji
