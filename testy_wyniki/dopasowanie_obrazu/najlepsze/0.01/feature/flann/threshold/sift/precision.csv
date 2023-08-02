@@ -1,0 +1,3 @@
+offset,threshold,correct,max_matches,true_positive,true_negative,false_positive,false_negative,accuracy,precision,recall,f1_score,extra_info
+60,200,88,10,6,82,132,158,0.232804232804233,0.0434782608695652,0.0365853658536585,0.0397350993377483,"feature, flann, threshold - sift - dilated_dilated - 0.01"
+60,200,88,20,6,82,132,158,0.232804232804233,0.0434782608695652,0.0365853658536585,0.0397350993377483,"feature, flann, threshold - sift - dilated_dilated - 0.01"

@@ -1,0 +1,3 @@
+offset,threshold,correct,max_matches,true_positive,true_negative,false_positive,false_negative,accuracy,precision,recall,f1_score,extra_info
+80,0.6,10,176,7,169,12,190,0.465608465608466,0.368421052631579,0.0355329949238579,0.0648148148148148,"feature, flann, knn - orb - 1px_1px - 0.05"
+80,0.6,20,176,7,169,12,190,0.465608465608466,0.368421052631579,0.0355329949238579,0.0648148148148148,"feature, flann, knn - orb - 1px_1px - 0.05"

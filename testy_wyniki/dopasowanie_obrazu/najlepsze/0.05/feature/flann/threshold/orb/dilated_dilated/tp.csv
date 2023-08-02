@@ -1,0 +1,5 @@
+offset,threshold,correct,max_matches,true_positive,true_negative,false_positive,false_negative,accuracy,precision,recall,f1_score,extra_info
+100,30,100,10,100,0,278,0,0.264550264550265,0.264550264550265,1,0.418410041841004,"feature, flann, threshold - orb - dilated_dilated - 0.05"
+100,30,100,20,100,0,278,0,0.264550264550265,0.264550264550265,1,0.418410041841004,"feature, flann, threshold - orb - dilated_dilated - 0.05"
+100,40,100,10,100,0,278,0,0.264550264550265,0.264550264550265,1,0.418410041841004,"feature, flann, threshold - orb - dilated_dilated - 0.05"
+100,40,100,20,100,0,278,0,0.264550264550265,0.264550264550265,1,0.418410041841004,"feature, flann, threshold - orb - dilated_dilated - 0.05"

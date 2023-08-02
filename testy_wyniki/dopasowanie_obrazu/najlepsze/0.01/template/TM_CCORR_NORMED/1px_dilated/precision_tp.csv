@@ -1,0 +1,2 @@
+offset,threshold,correct,max_matches,true_positive,true_negative,false_positive,false_negative,accuracy,precision,recall,f1_score,extra_info
+60,0,280,0,115,165,30,68,0.740740740740741,0.793103448275862,0.628415300546448,0.701219512195122,template - TM_CCORR_NORMED - 1px_dilated - 0.01

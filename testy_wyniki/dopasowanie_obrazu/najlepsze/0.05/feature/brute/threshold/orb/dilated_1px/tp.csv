@@ -1,0 +1,3 @@
+offset,threshold,correct,max_matches,true_positive,true_negative,false_positive,false_negative,accuracy,precision,recall,f1_score,extra_info
+60,50,127,10,94,33,228,23,0.335978835978836,0.291925465838509,0.803418803418803,0.428246013667426,"feature, brute, threshold - orb - dilated_1px - 0.05"
+60,50,127,20,94,33,228,23,0.335978835978836,0.291925465838509,0.803418803418803,0.428246013667426,"feature, brute, threshold - orb - dilated_1px - 0.05"

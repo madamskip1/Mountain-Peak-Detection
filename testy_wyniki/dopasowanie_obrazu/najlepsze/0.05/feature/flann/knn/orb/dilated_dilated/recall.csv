@@ -1,0 +1,5 @@
+offset,threshold,correct,max_matches,true_positive,true_negative,false_positive,false_negative,accuracy,precision,recall,f1_score,extra_info
+100,0.9,10,89,88,1,289,0,0.235449735449735,0.23342175066313,1,0.378494623655914,"feature, flann, knn - orb - dilated_dilated - 0.05"
+100,0.9,20,89,88,1,289,0,0.235449735449735,0.23342175066313,1,0.378494623655914,"feature, flann, knn - orb - dilated_dilated - 0.05"
+150,0.9,10,74,74,0,304,0,0.195767195767196,0.195767195767196,1,0.327433628318584,"feature, flann, knn - orb - dilated_dilated - 0.05"
+150,0.9,20,74,74,0,304,0,0.195767195767196,0.195767195767196,1,0.327433628318584,"feature, flann, knn - orb - dilated_dilated - 0.05"

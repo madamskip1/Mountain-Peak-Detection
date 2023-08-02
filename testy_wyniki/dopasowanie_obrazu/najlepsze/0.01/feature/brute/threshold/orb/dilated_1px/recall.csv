@@ -1,0 +1,5 @@
+offset,threshold,correct,max_matches,true_positive,true_negative,false_positive,false_negative,accuracy,precision,recall,f1_score,extra_info
+100,35,23,10,17,6,355,0,0.0608465608465608,0.0456989247311828,1,0.0874035989717224,"feature, brute, threshold - orb - dilated_1px - 0.01"
+100,35,23,20,17,6,355,0,0.0608465608465608,0.0456989247311828,1,0.0874035989717224,"feature, brute, threshold - orb - dilated_1px - 0.01"
+150,30,13,10,11,2,365,0,0.0343915343915344,0.0292553191489362,1,0.0568475452196382,"feature, brute, threshold - orb - dilated_1px - 0.01"
+150,30,13,20,11,2,365,0,0.0343915343915344,0.0292553191489362,1,0.0568475452196382,"feature, brute, threshold - orb - dilated_1px - 0.01"

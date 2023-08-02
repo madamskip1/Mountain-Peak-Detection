@@ -1,0 +1,13 @@
+dilation,score,better_than,total
+pix_dilate,accuracy,84,7
+dilate_pix,accuracy,88,7
+dilate_dilate,accuracy,82,7
+pix_dilate,precision,82,7
+dilate_pix,precision,76,7
+dilate_dilate,precision,76,7
+pix_dilate,recall,78,7
+dilate_pix,recall,80,7
+dilate_dilate,recall,84,7
+pix_dilate,f1,76,7
+dilate_pix,f1,74,7
+dilate_dilate,f1,76,7
