@@ -1,7 +1,6 @@
 package org.pw.masterthesis.peaksrecognition.terrain;
 
 import org.pw.masterthesis.peaksrecognition.Config;
-import org.pw.masterthesis.peaksrecognition.terrain.TerrainLoader.LoadedTerrain;
 
 public class TerrainData {
     private final double[] scale;

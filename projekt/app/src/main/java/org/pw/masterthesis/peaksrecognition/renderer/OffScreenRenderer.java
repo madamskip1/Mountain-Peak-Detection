@@ -16,9 +16,10 @@ import org.pw.masterthesis.peaksrecognition.Peaks;
 import org.pw.masterthesis.peaksrecognition.ScreenManager;
 import org.pw.masterthesis.peaksrecognition.mainopengl.Camera;
 import org.pw.masterthesis.peaksrecognition.mainopengl.ShaderProgram;
+import org.pw.masterthesis.peaksrecognition.terrain.LoadedTerrain;
 import org.pw.masterthesis.peaksrecognition.terrain.TerrainData;
 import org.pw.masterthesis.peaksrecognition.terrain.TerrainLoader;
-import org.pw.masterthesis.peaksrecognition.terrain.TerrainLoader.LoadedTerrain;
+import org.pw.masterthesis.peaksrecognition.terrain.TerrainLoaderSRTM;
 import org.pw.masterthesis.peaksrecognition.terrain.TerrainModel;
 
 import java.nio.ByteBuffer;
@@ -43,7 +44,7 @@ public class OffScreenRenderer implements Renderer {
         createEGLSurface();
 
         ShaderProgram shaderProgram = new ShaderProgram();
-        TerrainLoader terrainLoader = new TerrainLoader(context, config);
+        TerrainLoader terrainLoader = new TerrainLoaderSRTM(context, config);
         LoadedTerrain loadedTerrain = terrainLoader.load();
         TerrainData terrainData = new TerrainData(loadedTerrain, config);
         terrainModel = new TerrainModel(terrainData, shaderProgram);
