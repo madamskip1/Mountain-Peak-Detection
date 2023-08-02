@@ -1,0 +1,13 @@
+<resources>
+
+    <style name="Widget.Theme.PeaksRecognition.ActionBar.Fullscreen" parent="Widget.AppCompat.ActionBar">
+        <item name="android:background">@color/black_overlay</item>
+    </style>
+
+    <style name="Widget.Theme.PeaksRecognition.ButtonBar.Fullscreen" parent="">
+        <item name="android:background">@color/black_overlay</item>
+        <item name="android:buttonBarStyle">?android:attr/buttonBarStyle</item>
+    </style>
+
+    <style name="NoTitleBar" parent="Theme.AppCompat.Light.NoActionBar" />
+</resources>
