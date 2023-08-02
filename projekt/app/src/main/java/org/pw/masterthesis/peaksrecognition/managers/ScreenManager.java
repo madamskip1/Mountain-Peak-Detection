@@ -1,4 +1,4 @@
-package org.pw.masterthesis.peaksrecognition;
+package org.pw.masterthesis.peaksrecognition.managers;
 
 import android.opengl.GLU;
 

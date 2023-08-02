@@ -16,6 +16,8 @@ import com.opencsv.CSVReaderBuilder;
 import com.opencsv.exceptions.CsvValidationException;
 
 import org.pw.masterthesis.peaksrecognition.mainopengl.ShaderProgram;
+import org.pw.masterthesis.peaksrecognition.managers.CoordsManager;
+import org.pw.masterthesis.peaksrecognition.managers.ScreenManager;
 import org.pw.masterthesis.peaksrecognition.terrain.TerrainData;
 
 import java.io.IOException;

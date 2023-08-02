@@ -1,4 +1,4 @@
-package org.pw.masterthesis.peaksrecognition;
+package org.pw.masterthesis.peaksrecognition.activities_frame_analysers;
 
 import android.content.Context;
 import android.graphics.Bitmap;
@@ -10,40 +10,59 @@ import androidx.camera.core.ImageProxy;
 
 import org.opencv.android.OpenCVLoader;
 import org.opencv.android.Utils;
-import org.opencv.core.Core;
 import org.opencv.core.Mat;
+import org.pw.masterthesis.peaksrecognition.Config;
+import org.pw.masterthesis.peaksrecognition.DeviceOrientation;
+import org.pw.masterthesis.peaksrecognition.FieldOfView;
+import org.pw.masterthesis.peaksrecognition.Peaks;
 import org.pw.masterthesis.peaksrecognition.devicecamera.FrameAnalyser;
 import org.pw.masterthesis.peaksrecognition.devicecamera.ImageProxyToMatConverter;
+import org.pw.masterthesis.peaksrecognition.edgedetectors.CannyEdgeDetector;
+import org.pw.masterthesis.peaksrecognition.edgedetectors.EdgeDetector;
 import org.pw.masterthesis.peaksrecognition.mainopengl.Camera;
-import org.pw.masterthesis.peaksrecognition.mainopengl.OffScreenRenderer;
+import org.pw.masterthesis.peaksrecognition.managers.CoordsManager;
+import org.pw.masterthesis.peaksrecognition.managers.LocationManager;
+import org.pw.masterthesis.peaksrecognition.managers.RotationManager;
+import org.pw.masterthesis.peaksrecognition.peaksmatching.PeaksMatching;
+import org.pw.masterthesis.peaksrecognition.peaksmatching.TemplateMatching;
+import org.pw.masterthesis.peaksrecognition.renderer.OffScreenRenderer;
+import org.pw.masterthesis.peaksrecognition.renderer.Renderer;
 
+import java.util.Vector;
 import java.util.concurrent.atomic.AtomicBoolean;
 
-public class BlendRenderAndLive extends FrameAnalyser {
+public class PeaksRecognizer extends FrameAnalyser {
     static {
         OpenCVLoader.initDebug();
     }
 
+    private final Context parentContext;
+    private final AppCompatActivity parentActivity;
+    private final EdgeDetector renderEdgeDetector;
+    private final EdgeDetector liveImgEdgeDetector;
     private final int width;
     private final int height;
-    private final AppCompatActivity parentActivity;
-    private final Context parentContext;
+    private final PeaksMatching peaksMatching;
     ImageView imageView;
     private Location curLocation;
     private float[] curRotation;
-    private OffScreenRenderer offScreenRenderer;
+    private Renderer renderer;
     private Camera camera;
+    private Peaks peaks;
     private CoordsManager coordsManager;
     private RotationManager rotationManager;
     private LocationManager locationManager;
 
-    public BlendRenderAndLive(AppCompatActivity activity, Context context, ImageView imageView) {
-        super(activity, 640, 480);
-        width = 640;
-        height = 480;
-        parentActivity = activity;
+    public PeaksRecognizer(AppCompatActivity activity, Context context, ImageView imageView, int width, int height) {
+        super(activity, width, height);
         parentContext = context;
+        parentActivity = activity;
         this.imageView = imageView;
+        this.width = width;
+        this.height = height;
+        renderEdgeDetector = new CannyEdgeDetector(50, 100);
+        liveImgEdgeDetector = new CannyEdgeDetector(50, 130);
+        peaksMatching = new TemplateMatching();
     }
 
     public void prepareAndStart() {
@@ -52,16 +71,25 @@ public class BlendRenderAndLive extends FrameAnalyser {
 
     @Override
     protected void analyse(ImageProxy image) {
-        Mat rgbaMat = ImageProxyToMatConverter.rgba(image);
         double[] cameraCoords = coordsManager.convertGeoToLocalCoords(curLocation.getLatitude(), curLocation.getLongitude(), curLocation.getAltitude());
         camera.setPosition(cameraCoords[0], cameraCoords[1], cameraCoords[2]);
         camera.setAngles(curRotation[0], curRotation[1], curRotation[2]);
-        offScreenRenderer.render();
-        Mat renderMat = offScreenRenderer.getRenderedMat();
+        renderer.render();
 
-        Core.addWeighted(rgbaMat, 0.5, renderMat, 0.5, 0.0, rgbaMat);
-        Bitmap bitmap = Bitmap.createBitmap(rgbaMat.cols(), rgbaMat.rows(), Bitmap.Config.ARGB_8888);
-        Utils.matToBitmap(rgbaMat, bitmap);
+        Mat liveImg = ImageProxyToMatConverter.rgba(image);
+        Mat liveEdges = liveImgEdgeDetector.detect(liveImg);
+        Mat liveSkyline = liveImgEdgeDetector.detectSkyline(liveEdges);
+
+        Mat renderedScene = renderer.getRenderedMat();
+        Mat renderedEdges = renderEdgeDetector.detect(renderedScene);
+        Mat renderedSkyline = renderEdgeDetector.detectSkyline(renderedEdges);
+
+        Vector<Peaks.Peak> visiblePeaks = peaks.getVisiblePeaks();
+        Vector<Peaks.Peak> visiblePeaksAfterMatching = peaksMatching.matchAll(visiblePeaks, renderedSkyline, liveSkyline);
+
+        Bitmap bitmap = Bitmap.createBitmap(liveImg.cols(), liveImg.rows(), Bitmap.Config.ARGB_8888);
+        Utils.matToBitmap(liveImg, bitmap);
+        bitmap = peaks.drawPeakNames(bitmap, visiblePeaksAfterMatching);
         imageView.setImageBitmap(bitmap);
     }
 
@@ -107,7 +135,6 @@ public class BlendRenderAndLive extends FrameAnalyser {
     private void prepareRenderer() {
         FieldOfView fieldOfView = new FieldOfView(parentContext);
         fieldOfView.setDeviceOrientation(DeviceOrientation.LANDSCAPE);
-
         Config config = new Config();
         config.initObserverLocation = new double[]{curLocation.getLatitude(), curLocation.getLongitude(), curLocation.getAltitude()};
         config.initObserverRotation = curRotation;
@@ -119,10 +146,10 @@ public class BlendRenderAndLive extends FrameAnalyser {
         config.deviceOrientation = DeviceOrientation.LANDSCAPE;
         config.width = width;
         config.height = height;
-
-        offScreenRenderer = new OffScreenRenderer(parentContext, config);
-        coordsManager = offScreenRenderer.getCoordsManager();
-        camera = offScreenRenderer.getCamera();
+        renderer = new OffScreenRenderer(parentContext, config);
+        coordsManager = renderer.getCoordsManager();
+        camera = renderer.getCamera();
+        peaks = renderer.getPeaks();
         start();
     }
 

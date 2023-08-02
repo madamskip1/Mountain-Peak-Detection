@@ -12,13 +12,14 @@ import androidx.appcompat.app.AppCompatActivity;
 import org.opencv.android.Utils;
 import org.opencv.core.Mat;
 import org.pw.masterthesis.peaksrecognition.Config;
-import org.pw.masterthesis.peaksrecognition.CoordsManager;
-import org.pw.masterthesis.peaksrecognition.LocationManager;
 import org.pw.masterthesis.peaksrecognition.Peaks;
 import org.pw.masterthesis.peaksrecognition.R;
-import org.pw.masterthesis.peaksrecognition.RotationManager;
 import org.pw.masterthesis.peaksrecognition.mainopengl.Camera;
-import org.pw.masterthesis.peaksrecognition.mainopengl.OffScreenRenderer;
+import org.pw.masterthesis.peaksrecognition.managers.CoordsManager;
+import org.pw.masterthesis.peaksrecognition.managers.LocationManager;
+import org.pw.masterthesis.peaksrecognition.managers.RotationManager;
+import org.pw.masterthesis.peaksrecognition.renderer.OffScreenRenderer;
+import org.pw.masterthesis.peaksrecognition.renderer.Renderer;
 
 import java.util.Vector;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -26,7 +27,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 public class DisplayRenderLiveActivity extends AppCompatActivity {
     private Location curLocation;
     private float[] curRotation;
-    private OffScreenRenderer offScreenRenderer;
+    private Renderer renderer;
     private Camera camera;
     private CoordsManager coordsManager;
     private ImageView imageView;
@@ -55,9 +56,9 @@ public class DisplayRenderLiveActivity extends AppCompatActivity {
                 double[] cameraCoords = coordsManager.convertGeoToLocalCoords(curLocation.getLatitude(), curLocation.getLongitude(), curLocation.getAltitude());
                 camera.setPosition(cameraCoords[0], cameraCoords[1], cameraCoords[2]);
                 camera.setAngles(curRotation[0], curRotation[1], curRotation[2]);
-                offScreenRenderer.render();
-                Vector<Peaks.Peak> visiblePeaks = offScreenRenderer.getPeaks().getVisiblePeaks();
-                Mat renderedImage = offScreenRenderer.getRenderedMat();
+                renderer.render();
+                Vector<Peaks.Peak> visiblePeaks = renderer.getPeaks().getVisiblePeaks();
+                Mat renderedImage = renderer.getRenderedMat();
 
                 Bitmap bitmap = Bitmap.createBitmap(renderedImage.cols(), renderedImage.rows(), Bitmap.Config.ARGB_8888);
                 Utils.matToBitmap(renderedImage, bitmap);
@@ -100,7 +101,7 @@ public class DisplayRenderLiveActivity extends AppCompatActivity {
 
     private void afterRotationLoaded() {
         prepareOffScreenRendered();
-        camera = offScreenRenderer.getCamera();
+        camera = renderer.getCamera();
         go();
     }
 
@@ -132,8 +133,8 @@ public class DisplayRenderLiveActivity extends AppCompatActivity {
         config.simplifyFactor = 3;
         config.initHgtSize = 3601;
 
-        offScreenRenderer = new OffScreenRenderer(this, config);
-        coordsManager = offScreenRenderer.getCoordsManager();
+        renderer = new OffScreenRenderer(this, config);
+        coordsManager = renderer.getCoordsManager();
     }
 
     @Override

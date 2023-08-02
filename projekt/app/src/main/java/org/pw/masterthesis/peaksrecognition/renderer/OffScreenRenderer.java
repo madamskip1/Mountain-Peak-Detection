@@ -1,4 +1,4 @@
-package org.pw.masterthesis.peaksrecognition.mainopengl;
+package org.pw.masterthesis.peaksrecognition.renderer;
 
 import android.content.Context;
 import android.opengl.EGL14;
@@ -11,18 +11,21 @@ import android.opengl.GLES30;
 import org.opencv.core.CvType;
 import org.opencv.core.Mat;
 import org.pw.masterthesis.peaksrecognition.Config;
-import org.pw.masterthesis.peaksrecognition.CoordsManager;
 import org.pw.masterthesis.peaksrecognition.Peaks;
-import org.pw.masterthesis.peaksrecognition.ScreenManager;
+import org.pw.masterthesis.peaksrecognition.mainopengl.Camera;
+import org.pw.masterthesis.peaksrecognition.mainopengl.ShaderProgram;
+import org.pw.masterthesis.peaksrecognition.managers.CoordsManager;
+import org.pw.masterthesis.peaksrecognition.managers.ScreenManager;
+import org.pw.masterthesis.peaksrecognition.terrain.LoadedTerrain;
 import org.pw.masterthesis.peaksrecognition.terrain.TerrainData;
 import org.pw.masterthesis.peaksrecognition.terrain.TerrainLoader;
-import org.pw.masterthesis.peaksrecognition.terrain.TerrainLoader.LoadedTerrain;
+import org.pw.masterthesis.peaksrecognition.terrain.TerrainLoaderSRTM;
 import org.pw.masterthesis.peaksrecognition.terrain.TerrainModel;
 
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 
-public class OffScreenRenderer {
+public class OffScreenRenderer implements Renderer {
     private final int width;
     private final int height;
     private final TerrainModel terrainModel;
@@ -41,7 +44,7 @@ public class OffScreenRenderer {
         createEGLSurface();
 
         ShaderProgram shaderProgram = new ShaderProgram();
-        TerrainLoader terrainLoader = new TerrainLoader(context, config);
+        TerrainLoader terrainLoader = new TerrainLoaderSRTM(context, config);
         LoadedTerrain loadedTerrain = terrainLoader.load();
         TerrainData terrainData = new TerrainData(loadedTerrain, config);
         terrainModel = new TerrainModel(terrainData, shaderProgram);

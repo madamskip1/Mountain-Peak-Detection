@@ -1,4 +1,4 @@
-package org.pw.masterthesis.peaksrecognition;
+package org.pw.masterthesis.peaksrecognition.managers;
 
 public class CoordsManager {
     private static final double EARTH_RADIUS = 6371.0;

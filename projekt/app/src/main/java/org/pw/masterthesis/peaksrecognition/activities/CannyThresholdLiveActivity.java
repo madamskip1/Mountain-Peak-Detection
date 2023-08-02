@@ -13,8 +13,8 @@ import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 
 import org.opencv.android.OpenCVLoader;
-import org.pw.masterthesis.peaksrecognition.CannyThresholdLive;
 import org.pw.masterthesis.peaksrecognition.R;
+import org.pw.masterthesis.peaksrecognition.activities_frame_analysers.CannyThresholdLive;
 
 public class CannyThresholdLiveActivity extends AppCompatActivity {
     private static final int MY_CAMERA_REQUEST_CODE = 100;
