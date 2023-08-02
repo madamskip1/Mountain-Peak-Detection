@@ -14,6 +14,7 @@ import org.pw.masterthesis.peaksrecognition.DeviceOrientation;
 import org.pw.masterthesis.peaksrecognition.Peaks;
 import org.pw.masterthesis.peaksrecognition.R;
 import org.pw.masterthesis.peaksrecognition.edgedetectors.CannyEdgeDetector;
+import org.pw.masterthesis.peaksrecognition.edgedetectors.EdgeDetector;
 import org.pw.masterthesis.peaksrecognition.renderer.OffScreenRenderer;
 import org.pw.masterthesis.peaksrecognition.renderer.Renderer;
 
@@ -52,8 +53,8 @@ public class DisplayRenderActivity extends AppCompatActivity {
     }
 
     private Mat detectEdges(Mat image) {
-        CannyEdgeDetector cannyEdgeDetector = new CannyEdgeDetector(20, 100);
-        return cannyEdgeDetector.detect(image);
+        EdgeDetector edgeDetector = new CannyEdgeDetector(20, 100);
+        return edgeDetector.detect(image);
     }
 
     private Config prepareConfig() {
