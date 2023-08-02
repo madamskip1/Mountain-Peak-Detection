@@ -15,8 +15,9 @@ import org.pw.masterthesis.peaksrecognition.devicecamera.FrameAnalyser;
 import org.pw.masterthesis.peaksrecognition.devicecamera.ImageProxyToMatConverter;
 import org.pw.masterthesis.peaksrecognition.edgedetectors.CannyEdgeDetector;
 import org.pw.masterthesis.peaksrecognition.mainopengl.Camera;
-import org.pw.masterthesis.peaksrecognition.mainopengl.OffScreenRenderer;
 import org.pw.masterthesis.peaksrecognition.peaksmatching.TemplateMatching;
+import org.pw.masterthesis.peaksrecognition.renderer.OffScreenRenderer;
+import org.pw.masterthesis.peaksrecognition.renderer.Renderer;
 
 import java.util.Vector;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -36,7 +37,7 @@ public class PeaksRecognizer extends FrameAnalyser {
     ImageView imageView;
     private Location curLocation;
     private float[] curRotation;
-    private OffScreenRenderer offScreenRenderer;
+    private Renderer renderer;
     private Camera camera;
     private Peaks peaks;
     private CoordsManager coordsManager;
@@ -64,13 +65,13 @@ public class PeaksRecognizer extends FrameAnalyser {
         double[] cameraCoords = coordsManager.convertGeoToLocalCoords(curLocation.getLatitude(), curLocation.getLongitude(), curLocation.getAltitude());
         camera.setPosition(cameraCoords[0], cameraCoords[1], cameraCoords[2]);
         camera.setAngles(curRotation[0], curRotation[1], curRotation[2]);
-        offScreenRenderer.render();
+        renderer.render();
 
         Mat rgba = ImageProxyToMatConverter.rgba(image);
         Mat liveEdges = cannyLive.detect(rgba);
         Mat liveSkyline = cannyLive.detectSkyline(liveEdges);
 
-        Mat renderedScene = offScreenRenderer.getRenderedMat();
+        Mat renderedScene = renderer.getRenderedMat();
         Mat renderedEdges = cannyRender.detect(renderedScene);
         Mat renderedSkyline = cannyRender.detectSkyline(renderedEdges);
 
@@ -136,10 +137,10 @@ public class PeaksRecognizer extends FrameAnalyser {
         config.deviceOrientation = DeviceOrientation.LANDSCAPE;
         config.width = width;
         config.height = height;
-        offScreenRenderer = new OffScreenRenderer(parentContext, config);
-        coordsManager = offScreenRenderer.getCoordsManager();
-        camera = offScreenRenderer.getCamera();
-        peaks = offScreenRenderer.getPeaks();
+        renderer = new OffScreenRenderer(parentContext, config);
+        coordsManager = renderer.getCoordsManager();
+        camera = renderer.getCamera();
+        peaks = renderer.getPeaks();
         start();
     }
 

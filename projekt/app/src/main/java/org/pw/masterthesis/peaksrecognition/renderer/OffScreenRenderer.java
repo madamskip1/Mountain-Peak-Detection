@@ -1,4 +1,4 @@
-package org.pw.masterthesis.peaksrecognition.mainopengl;
+package org.pw.masterthesis.peaksrecognition.renderer;
 
 import android.content.Context;
 import android.opengl.EGL14;
@@ -14,6 +14,8 @@ import org.pw.masterthesis.peaksrecognition.Config;
 import org.pw.masterthesis.peaksrecognition.CoordsManager;
 import org.pw.masterthesis.peaksrecognition.Peaks;
 import org.pw.masterthesis.peaksrecognition.ScreenManager;
+import org.pw.masterthesis.peaksrecognition.mainopengl.Camera;
+import org.pw.masterthesis.peaksrecognition.mainopengl.ShaderProgram;
 import org.pw.masterthesis.peaksrecognition.terrain.TerrainData;
 import org.pw.masterthesis.peaksrecognition.terrain.TerrainLoader;
 import org.pw.masterthesis.peaksrecognition.terrain.TerrainLoader.LoadedTerrain;
@@ -22,7 +24,7 @@ import org.pw.masterthesis.peaksrecognition.terrain.TerrainModel;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 
-public class OffScreenRenderer {
+public class OffScreenRenderer implements Renderer {
     private final int width;
     private final int height;
     private final TerrainModel terrainModel;

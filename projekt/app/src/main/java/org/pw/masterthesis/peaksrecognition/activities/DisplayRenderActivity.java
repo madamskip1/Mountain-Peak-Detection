@@ -14,7 +14,8 @@ import org.pw.masterthesis.peaksrecognition.DeviceOrientation;
 import org.pw.masterthesis.peaksrecognition.Peaks;
 import org.pw.masterthesis.peaksrecognition.R;
 import org.pw.masterthesis.peaksrecognition.edgedetectors.CannyEdgeDetector;
-import org.pw.masterthesis.peaksrecognition.mainopengl.OffScreenRenderer;
+import org.pw.masterthesis.peaksrecognition.renderer.OffScreenRenderer;
+import org.pw.masterthesis.peaksrecognition.renderer.Renderer;
 
 import java.util.Vector;
 
@@ -29,9 +30,9 @@ public class DisplayRenderActivity extends AppCompatActivity {
 
     private void renderToLayout() {
         Config config = prepareConfig();
-        OffScreenRenderer offScreenRenderer = new OffScreenRenderer(this, config);
-        offScreenRenderer.render();
-        Mat renderedImage = offScreenRenderer.getRenderedMat();
+        Renderer renderer = new OffScreenRenderer(this, config);
+        renderer.render();
+        Mat renderedImage = renderer.getRenderedMat();
 
         if (getIntent().getBooleanExtra("edges", false)) {
             renderedImage = detectEdges(renderedImage);
@@ -40,7 +41,7 @@ public class DisplayRenderActivity extends AppCompatActivity {
         Bitmap bitmap = Bitmap.createBitmap(renderedImage.cols(), renderedImage.rows(), Bitmap.Config.ARGB_8888);
 
         if (getIntent().getBooleanExtra("peaks", false)) {
-            Peaks peaks = offScreenRenderer.getPeaks();
+            Peaks peaks = renderer.getPeaks();
             Vector<Peaks.Peak> visiblePeaks = peaks.getVisiblePeaks();
             bitmap = peaks.drawPeakNames(bitmap, visiblePeaks);
         }

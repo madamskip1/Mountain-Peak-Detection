@@ -12,10 +12,12 @@ import org.opencv.android.OpenCVLoader;
 import org.opencv.android.Utils;
 import org.opencv.core.Core;
 import org.opencv.core.Mat;
+import org.opencv.core.Rect;
 import org.pw.masterthesis.peaksrecognition.devicecamera.FrameAnalyser;
 import org.pw.masterthesis.peaksrecognition.devicecamera.ImageProxyToMatConverter;
 import org.pw.masterthesis.peaksrecognition.mainopengl.Camera;
-import org.pw.masterthesis.peaksrecognition.mainopengl.OffScreenRenderer;
+import org.pw.masterthesis.peaksrecognition.renderer.OffScreenRenderer;
+import org.pw.masterthesis.peaksrecognition.renderer.Renderer;
 
 import java.util.concurrent.atomic.AtomicBoolean;
 
@@ -31,7 +33,7 @@ public class BlendRenderAndLive extends FrameAnalyser {
     ImageView imageView;
     private Location curLocation;
     private float[] curRotation;
-    private OffScreenRenderer offScreenRenderer;
+    private Renderer renderer;
     private Camera camera;
     private CoordsManager coordsManager;
     private RotationManager rotationManager;
@@ -56,8 +58,8 @@ public class BlendRenderAndLive extends FrameAnalyser {
         double[] cameraCoords = coordsManager.convertGeoToLocalCoords(curLocation.getLatitude(), curLocation.getLongitude(), curLocation.getAltitude());
         camera.setPosition(cameraCoords[0], cameraCoords[1], cameraCoords[2]);
         camera.setAngles(curRotation[0], curRotation[1], curRotation[2]);
-        offScreenRenderer.render();
-        Mat renderMat = offScreenRenderer.getRenderedMat();
+        renderer.render();
+        Mat renderMat = renderer.getRenderedMat();
 
         Core.addWeighted(rgbaMat, 0.5, renderMat, 0.5, 0.0, rgbaMat);
         Bitmap bitmap = Bitmap.createBitmap(rgbaMat.cols(), rgbaMat.rows(), Bitmap.Config.ARGB_8888);
@@ -120,9 +122,9 @@ public class BlendRenderAndLive extends FrameAnalyser {
         config.width = width;
         config.height = height;
 
-        offScreenRenderer = new OffScreenRenderer(parentContext, config);
-        coordsManager = offScreenRenderer.getCoordsManager();
-        camera = offScreenRenderer.getCamera();
+        renderer = new OffScreenRenderer(parentContext, config);
+        coordsManager = renderer.getCoordsManager();
+        camera = renderer.getCamera();
         start();
     }
 
