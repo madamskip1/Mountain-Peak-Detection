@@ -18,10 +18,12 @@ import org.pw.masterthesis.peaksrecognition.Peaks;
 import org.pw.masterthesis.peaksrecognition.devicecamera.FrameAnalyser;
 import org.pw.masterthesis.peaksrecognition.devicecamera.ImageProxyToMatConverter;
 import org.pw.masterthesis.peaksrecognition.edgedetectors.CannyEdgeDetector;
+import org.pw.masterthesis.peaksrecognition.edgedetectors.EdgeDetector;
 import org.pw.masterthesis.peaksrecognition.mainopengl.Camera;
 import org.pw.masterthesis.peaksrecognition.managers.CoordsManager;
 import org.pw.masterthesis.peaksrecognition.managers.LocationManager;
 import org.pw.masterthesis.peaksrecognition.managers.RotationManager;
+import org.pw.masterthesis.peaksrecognition.peaksmatching.PeaksMatching;
 import org.pw.masterthesis.peaksrecognition.peaksmatching.TemplateMatching;
 import org.pw.masterthesis.peaksrecognition.renderer.OffScreenRenderer;
 import org.pw.masterthesis.peaksrecognition.renderer.Renderer;
@@ -36,11 +38,11 @@ public class PeaksRecognizer extends FrameAnalyser {
 
     private final Context parentContext;
     private final AppCompatActivity parentActivity;
-    private final CannyEdgeDetector cannyRender;
-    private final CannyEdgeDetector cannyLive;
+    private final EdgeDetector renderEdgeDetector;
+    private final EdgeDetector liveImgEdgeDetector;
     private final int width;
     private final int height;
-    private final TemplateMatching templateMatching;
+    private final PeaksMatching peaksMatching;
     ImageView imageView;
     private Location curLocation;
     private float[] curRotation;
@@ -58,9 +60,9 @@ public class PeaksRecognizer extends FrameAnalyser {
         this.imageView = imageView;
         this.width = width;
         this.height = height;
-        cannyRender = new CannyEdgeDetector(50, 100);
-        cannyLive = new CannyEdgeDetector(50, 130);
-        templateMatching = new TemplateMatching();
+        renderEdgeDetector = new CannyEdgeDetector(50, 100);
+        liveImgEdgeDetector = new CannyEdgeDetector(50, 130);
+        peaksMatching = new TemplateMatching();
     }
 
     public void prepareAndStart() {
@@ -74,19 +76,19 @@ public class PeaksRecognizer extends FrameAnalyser {
         camera.setAngles(curRotation[0], curRotation[1], curRotation[2]);
         renderer.render();
 
-        Mat rgba = ImageProxyToMatConverter.rgba(image);
-        Mat liveEdges = cannyLive.detect(rgba);
-        Mat liveSkyline = cannyLive.detectSkyline(liveEdges);
+        Mat liveImg = ImageProxyToMatConverter.rgba(image);
+        Mat liveEdges = liveImgEdgeDetector.detect(liveImg);
+        Mat liveSkyline = liveImgEdgeDetector.detectSkyline(liveEdges);
 
         Mat renderedScene = renderer.getRenderedMat();
-        Mat renderedEdges = cannyRender.detect(renderedScene);
-        Mat renderedSkyline = cannyRender.detectSkyline(renderedEdges);
+        Mat renderedEdges = renderEdgeDetector.detect(renderedScene);
+        Mat renderedSkyline = renderEdgeDetector.detectSkyline(renderedEdges);
 
         Vector<Peaks.Peak> visiblePeaks = peaks.getVisiblePeaks();
-        Vector<Peaks.Peak> visiblePeaksAfterMatching = templateMatching.matchAll(visiblePeaks, renderedSkyline, liveSkyline);
+        Vector<Peaks.Peak> visiblePeaksAfterMatching = peaksMatching.matchAll(visiblePeaks, renderedSkyline, liveSkyline);
 
-        Bitmap bitmap = Bitmap.createBitmap(rgba.cols(), rgba.rows(), Bitmap.Config.ARGB_8888);
-        Utils.matToBitmap(rgba, bitmap);
+        Bitmap bitmap = Bitmap.createBitmap(liveImg.cols(), liveImg.rows(), Bitmap.Config.ARGB_8888);
+        Utils.matToBitmap(liveImg, bitmap);
         bitmap = peaks.drawPeakNames(bitmap, visiblePeaksAfterMatching);
         imageView.setImageBitmap(bitmap);
     }
