@@ -5,7 +5,7 @@ import android.view.Window;
 
 import androidx.appcompat.app.AppCompatActivity;
 
-import org.pw.masterthesis.peaksrecognition.BlendRenderAndLive;
+import org.pw.masterthesis.peaksrecognition.activities_frame_analysers.BlendRenderAndLive;
 import org.pw.masterthesis.peaksrecognition.R;
 
 public class BlendRenderAndLiveActivity extends AppCompatActivity {

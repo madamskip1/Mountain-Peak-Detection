@@ -10,7 +10,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 
-import org.pw.masterthesis.peaksrecognition.PeaksRecognizer;
+import org.pw.masterthesis.peaksrecognition.activities_frame_analysers.PeaksRecognizer;
 import org.pw.masterthesis.peaksrecognition.R;
 
 public class PeaksRecognitionActivity extends AppCompatActivity {

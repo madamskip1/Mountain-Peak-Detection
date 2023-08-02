@@ -13,7 +13,7 @@ import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 
 import org.opencv.android.OpenCVLoader;
-import org.pw.masterthesis.peaksrecognition.CannyThresholdLive;
+import org.pw.masterthesis.peaksrecognition.activities_frame_analysers.CannyThresholdLive;
 import org.pw.masterthesis.peaksrecognition.R;
 
 public class CannyThresholdLiveActivity extends AppCompatActivity {

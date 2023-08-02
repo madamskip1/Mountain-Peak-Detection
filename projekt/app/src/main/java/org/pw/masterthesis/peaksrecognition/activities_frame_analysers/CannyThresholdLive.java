@@ -1,4 +1,4 @@
-package org.pw.masterthesis.peaksrecognition;
+package org.pw.masterthesis.peaksrecognition.activities_frame_analysers;
 
 import android.graphics.Bitmap;
 import android.widget.ImageView;
