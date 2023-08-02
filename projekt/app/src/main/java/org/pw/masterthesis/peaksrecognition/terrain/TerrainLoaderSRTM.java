@@ -4,7 +4,7 @@ import android.content.Context;
 import android.content.res.AssetManager;
 
 import org.pw.masterthesis.peaksrecognition.Config;
-import org.pw.masterthesis.peaksrecognition.CoordsManager;
+import org.pw.masterthesis.peaksrecognition.managers.CoordsManager;
 
 import java.io.BufferedInputStream;
 import java.io.IOException;

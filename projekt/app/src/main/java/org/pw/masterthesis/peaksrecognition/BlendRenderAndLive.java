@@ -12,10 +12,12 @@ import org.opencv.android.OpenCVLoader;
 import org.opencv.android.Utils;
 import org.opencv.core.Core;
 import org.opencv.core.Mat;
-import org.opencv.core.Rect;
 import org.pw.masterthesis.peaksrecognition.devicecamera.FrameAnalyser;
 import org.pw.masterthesis.peaksrecognition.devicecamera.ImageProxyToMatConverter;
 import org.pw.masterthesis.peaksrecognition.mainopengl.Camera;
+import org.pw.masterthesis.peaksrecognition.managers.CoordsManager;
+import org.pw.masterthesis.peaksrecognition.managers.LocationManager;
+import org.pw.masterthesis.peaksrecognition.managers.RotationManager;
 import org.pw.masterthesis.peaksrecognition.renderer.OffScreenRenderer;
 import org.pw.masterthesis.peaksrecognition.renderer.Renderer;
 

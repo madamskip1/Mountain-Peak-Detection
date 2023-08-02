@@ -6,9 +6,9 @@ import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatActivity;
 
-import org.pw.masterthesis.peaksrecognition.LocationManager;
+import org.pw.masterthesis.peaksrecognition.managers.LocationManager;
 import org.pw.masterthesis.peaksrecognition.R;
-import org.pw.masterthesis.peaksrecognition.RotationManager;
+import org.pw.masterthesis.peaksrecognition.managers.RotationManager;
 
 public class LocationRotationTestActivity extends AppCompatActivity {
     TextView latitudeTextView;
