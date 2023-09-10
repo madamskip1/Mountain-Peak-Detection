@@ -4,7 +4,8 @@ import android.content.Context;
 import android.content.res.AssetManager;
 
 import org.pw.masterthesis.peaksrecognition.Config;
-import org.pw.masterthesis.peaksrecognition.managers.CoordsManager;
+import org.pw.masterthesis.peaksrecognition.geodistance.EquirectangularApproximation;
+import org.pw.masterthesis.peaksrecognition.geodistance.GeoDistance;
 
 import java.io.BufferedInputStream;
 import java.io.IOException;
@@ -16,10 +17,12 @@ import java.util.Vector;
 public class TerrainLoaderSRTM implements TerrainLoader {
     private final Context context;
     private final Config config;
+    private final GeoDistance geoDistanceCalculator;
 
     public TerrainLoaderSRTM(Context context, Config config) {
         this.context = context;
         this.config = config;
+        this.geoDistanceCalculator = new EquirectangularApproximation();
     }
 
     public LoadedTerrain load() {
@@ -238,7 +241,7 @@ public class TerrainLoaderSRTM implements TerrainLoader {
         }
 
         for (double[] coordsData : coordsToCheck) {
-            double distance = CoordsManager.equirectangularApproximation(coordsData[0], coordsData[1],
+            double distance = geoDistanceCalculator.calcDistance(coordsData[0], coordsData[1],
                     observerLatitude, observerLongitude);
             if (distance <= maxDistance) {
                 coordsForFilesNames.add(new int[]{(int) coordsData[2], (int) coordsData[3]});
@@ -273,9 +276,9 @@ public class TerrainLoaderSRTM implements TerrainLoader {
         double totalLongitudeDistance = 0.0;
 
         for (int i = 0; i < 2; ++i) {
-            totalLatitudeDistance += CoordsManager.equirectangularApproximation(latitudeRange[0], longitudeRange[i],
+            totalLatitudeDistance += geoDistanceCalculator.calcDistance(latitudeRange[0], longitudeRange[i],
                     latitudeRange[1], longitudeRange[i]);
-            totalLongitudeDistance += CoordsManager.equirectangularApproximation(latitudeRange[i], longitudeRange[0],
+            totalLongitudeDistance += geoDistanceCalculator.calcDistance(latitudeRange[i], longitudeRange[0],
                     latitudeRange[i], longitudeRange[1]);
         }
 
