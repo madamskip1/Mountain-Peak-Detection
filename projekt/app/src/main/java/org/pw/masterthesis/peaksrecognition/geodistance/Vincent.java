@@ -1,10 +1,14 @@
 package org.pw.masterthesis.peaksrecognition.geodistance;
 
 public class Vincent implements GeoDistance {
+    private final double ITERATION_LIMIT;
+
+    public Vincent(double iteration_limit) {
+        ITERATION_LIMIT = iteration_limit;
+    }
+
     @Override
     public double calcDistance(double latitude1, double longitude1, double latitude2, double longitude2) {
-        final double ITERATION_LIMIT = 1000;
-
         double a = 6378137.0; // length of semi-major axis of the ellipsoid (radius at equator), in meters
         double f = 1.0 / 298.257223563; // 	flattening of the ellipsoid;
         double b = 6356752.314245; // 	length of semi-minor axis of the ellipsoid (radius at the poles), in meters
