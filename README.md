@@ -1,11 +1,11 @@
 
 
-# Praca dyplomowa magisterska "*Rozpoznawanie szczytów górskich na obrazie w czasie rzeczywistym*"
+# Praca dyplomowa magisterska "*Zastosowanie algorytmów cyfrowego przetwarzania obrazów do identyfikacji szczytów górskich w czasie rzeczywistym*"
 
 **Autor:** Adamski Maciej<br/>
 **Promotor:** prof. dr hab. inż. Przemysław Rokita<br/>
 **Uczelnia/wydział/instytut**: Instytut Informatyki na Wydziale Elektroniki i Nauk Informacyjnych, Politechniki Warszawskiej<br />
-**Tytuł**: Rozpoznawanie szczytów górskich na obrazie w czasie rzeczywistym<br />
+**Tytuł**: Zastosowanie algorytmów cyfrowego przetwarzania obrazów do identyfikacji szczytów górskich w czasie rzeczywistym<br />
 **Tytuł angielski**: Real-time recognition of mountain peaks in the image.
 
  
