@@ -1,0 +1,323 @@
+\newpage
+
+\section{Porównanie wybranych algorytmów i próby optymalizacji} \label{sec:testing}
+
+W ramach pracy dyplomowej podjęte zostały próby usprawnienia i optymalizacji różnych aspektów projektu. Testowany był wpływ rozdzielczości danych SRTM terenu na dokładność odwzorowania modelu oraz czas ich przetwarzania. Podjęta została próba optymalizacji procesu poprzez odrzucenie niepotrzebnych w danym momencie próbek terenu, zmniejszając przetwarzaną ich liczbę. Z powodu mnogości dostępnych metod obliczania odległości między punktami geograficznym, zostały one przebadane ze względu na dokładność, a także na czas wykonania potrzebnych obliczeń. Skuteczność dopasowania obrazów binarnych zawierających kontury gór na modelu terenu oraz na zdjęciu rzeczywistym wydaje się kluczowym czynnikiem wpływającym na jakość rozwiązania. Mając to na uwadze zostały przetestowane i porównane metody dopasowania na podstawie szablonu oraz na podstawie cech. Przeprowadzono również próbę optymalizacji tych klasyfikatorów pod względem jakościowym poprzez zastosowanie operacji morfologicznej dylacji oraz zbadano jej wpływ na ten aspekt. Na koniec przeprowadzono profilowanie procesu rozpoznawania szczytów wykonywanego na platformie testowej, które pozwoliło wyłapać ewentualne błędy implementacyjne oraz tzw. wąskie gardła zaproponowanego procesu. Dzięki temu wykryta została możliwość usprawnienia systemu poprzez lepsze wykorzystanie pamięci podręcznej procesora. 
+
+W przypadku testów i porównań złożoności czasowej rozwiązań badania były przeprowadzane przy pomocy trzech różnych urządzeń z system Android. Były one zróżnicowane pod względem wydajnościowym, jak i lat produkcji. Wykorzystane były urządzenia marki Huaweii: Mate 20 Lite, P30 Pro oraz Mate 50 Pro. Przedstawione zostały w kolejności od najmniejszej mocy obliczeniowej do największej. 
+
+
+\subsection{Wpływ rozdzielczości danych SRTM na dokładność odwzorowania terenu} \label{sec:rozdzielczosc_srtm}
+
+Opisane wcześniej dane SRTM w wersji podstawowej $1^{\prime\prime}$ zawierają $12 \; 967 \; 201$ wartości na jedną kratkę ($3601 \textrm{x} 3601$) siatki geograficznej. Natomiast, w przypadku rozdzielczości~$3^{\prime\prime}$ próbek jest już tylko $1 \; 442 \; 401$ ($1201 \textrm{x} 1201$). Jest to prawie $90\%$ mniej wpisów.
+
+Mimo, że rzadsze próbkowanie zawiera dziewięciokrotnie mniej danych, to jednak dla problemu detekcji szczytów górskich, dokładne odwzorowanie terenu nie zawsze musi być aż tak znaczące. Na rzeczywistych zdjęciach pasma górskie mogą być oddalone nawet o kilkanaście czy kilkadziesiąt kilometrów, więc ich szczegółowość nie będzie duża. Tak samo, trójwymiarowy model terenu w zależności od rozdzielczości danych, będzie różnić się tylko detalami. Odwzorowanie pasm górskich zostanie mimo to zachowane. 
+
+
+
+Ze względu na dużą różnice w liczbie danych, porównane zostały modele generowane z~wykorzystaniem obu rozdzielczości. Badanie polegało na subiektywnej ocenie dokładności krawędzi pasm renderowanego terenu w wybranych lokalizacjach geograficznych.
+
+Przykładowe porównanie modeli pokazane zostało na rysunku \ref{fig:render-resolution-comp}. Przedstawia on wycinki wyrenderowanych gór oddalonych w rzeczywistości o $10-20$ km. 
+
+\begin{figure}[!h]
+    \centering \includegraphics[width=0.65\linewidth]{img/new_compare.png}
+    \caption{Porównanie generowanego terenu w zależności od rozdzielczości danych. Górny wyrenderowany model prezentuje dokładność $30$ m, dolny natomiast $90$ m.}
+    \label{fig:render-resolution-comp}
+\end{figure}
+
+Na podstawie pokazanego porównania można stwierdzić, że główne kontury pasm górskich są widoczne w podobnym i dostatecznym stopniu na obu wizualizacjach. Bardziej dokładny model posiada więcej szczegółów związanych z nierównościami terenu, drobnymi pagórkami czy gwałtownymi zmianami wysokości. Na potrzeby detekcji krawędzi gór obie wizualizacje są wystarczające, ze względu na to, że pasma horyzontalne są wyraźnie widoczne. Dodatkowo, bardziej dokładne dane mogę mieć negatywny wpływ na rozpoznawanie tych elementów poprzez zwiększenie zaszumienia wizualizacji mało istotnymi konturami i zmianami odcieni terenu. 
+
+Przeprowadzone zostało badanie wpływu rozdzielczości zbioru danych na czas generowanie trójkątów i wierzchołków modelu. Wyniki tego testu zostały przedstawione w~tabeli~\ref{tab:render-res-time-comp}. Długość trwania tych operacji w przypadku mniej dokładnego zestawu danych wyniosła około $10-12\%$ czasu potrzebnego na te same czynności wykonane przy wykorzystaniu danych o większej rozdzielczości. Dane te potwierdzają opisane rozważania teoretyczne. Każdy przypadek testowy przeprowadzony był dziesięciokrotnie, a wynik uśredniony. Rezultaty jednoznacznie pokazują znaczne zmniejszenie okresu potrzebnego na przetworzenie wejściowych danych dotyczących terenu, co może mieć istotne znaczenie przy komforcie użytkowania takiego projektu. Dane wczytywane i~przygotowywane są w czasie ładowania aplikacji, a nie jej działania, dlatego wpływ może mieć głównie na subiektywne odczucia podczas jej używania, a nie na wydajności w~kontekście pracy w~czasie rzeczywistym. 
+
+\input{tex/tables/render_time_simplify}
+
+Więcej danych oznacza również zwiększenie zapotrzebowania na zasoby pamięci celem przechowania znacznie większej liczby wierzchołków i trójkątów. Potrzebny rozmiar pamięci przedstawiono w tabeli \ref{tab:render-res-memory-comp}. W projekcie wczytanych kratek danych może być nawet 4 w zależności od położenia geograficznego i maksymalnej renderowanej odległości. Wtedy różnice czasowe są jeszcze bardziej znaczące. W przypadku mniejszej rozdzielczości zostaje zaoszczędzone wtedy aż $1659$ MB pamięci operacyjnej urządzenia. 
+
+\input{tex/tables/render_res_comp_memory}
+
+Porównanie graficzne wygenerowanych modeli pokazało małą stratę jakości w kontekście odwzorowania istotnych elementów terenu. Natomiast, różnica czasu tworzenia wierzchołków i trójkątów oraz zajmowanej pamięci przy mniejszej rozdzielczości jest znaczna. Wydaje się zatem, że wykorzystanie dokładniejszych danych jest niepotrzebne. Z~tego powodu na platformie testowej używane były dane SRTM o rozdzielczości $3^{\prime\prime}$.
+
+
+
+
+\subsection{Odrzucenie niepotrzebnych danych SRTM} \label{sec:niepotrzebne_srtm}
+
+Nie wszystkie wczytane dane SRTM są potrzebne ze względu na parametryzowaną odległość na jaką renderowany jest dany teren i na jakiej rozpoznawane są szczyty górskie. Z tego powodu można usunąć niepotrzebne wpisy.
+
+W zależności od położenia i ustawionej odległości widzenia wczytywane są od jednego do czterech plików SRTM, które następnie łączone są w jedną tablicę dwuwymiarową. W~przypadku czterech kratek, mogę one obejmować prawie $50$ tysięcy kilometrów kwadratowych. Natomiast, jeśli założymy, że maksymalny widoczny dystans wynosi $30$ km, to koło o takim promieniu zajmuje powierzchnie raptem $\sim3$ tysiące kilometrów kwadratowych. W tym wypadku, efektywne wykorzystanie przechowywanych danych wynosi około $6\%$.
+
+Dlatego, zdecydowano się odrzucać część wczytanych danych, które reprezentują punkty geograficzne znajdujące się poza określonym polem widzenia. Biorąc pod uwagę, że użytkownik urządzenia mobilnego może się z nim przemieszczać, promień takiego pola jest powiększony o jeden kilometr względem ustawionego parametru maksymalnej odległości renderingu. Przechowywanie danych dla pola o kształcie koła wiązałoby się z~dodatkowymi obliczeniami, np. wyliczanie przesunięcia, a także z bardziej skomplikowanym procesem odrzucenia niepotrzebnych próbek. Z tego powodu, brane pod uwagę są wszystkie wpisy zawierające się w kwadracie opisanym na takim kole. Mimo, że punkty znajdujące się w rogach tego czworokąta są nadmiarowe to pozwalają na uproszczenie przeprowadzanych obliczeń oraz przechowywanie danych w formie wypełnionej tablicy dwuwymiarowej. Wizualizacja odrzucenia niepotrzebnych danych pokazana jest na rysunku \ref{fig:drop-unused-data}. Widoczny na nim zacieniony, czerwony obszar zostaje usunięty.
+
+\begin{figure}[!h]
+    \centering \includegraphics[width=0.5\linewidth]{img/odrzucenie_srtm.png}
+    \caption{Wizualizacja usuwania niepotrzebnych danych SRTM.}
+    \label{fig:drop-unused-data}
+\end{figure}
+
+Dzięki takiemu założeniu, ilość przetwarzanych danych została ograniczona nawet o $92,7\%$, jeśli maksymalna widoczność wynosi $30$km oraz brane są pod uwagę cztery sąsiadujące kratki. W przypadku gdy obserwator znajduje się w okolicach Tatr, to ze względu na zmniejszenie odległości między kolejnymi punktami długości geograficznej, różnica ta wynosi około $88,9\%$. Natomiast, jeśli maksymalny dystans jest ustawiony na $50$km, wartości te wynoszą odpowiednio $89,7\%$ i $79,2\%$.
+
+Dane teoretyczne oraz wyniki pokazane w tabeli \ref{tab:render-drop-time-comp}, jednoznacznie potwierdzają zasadność takiego uproszczenia. Sumaryczny czas potrzebny na wygenerowanie modelu przy odrzuceniu części danych jest mniejszy o około $80-85\%$ w porównaniu do cyklu bez takiej optymalizacji.
+
+\input{tex/tables/render_drop_time}
+
+
+
+\subsection{Porównanie algorytmów obliczających odległość między dwoma punktami geograficznymi}
+
+Ze względu na różne rozwiązania umożliwiające obliczenie odległości między dwoma punktami, zostały one przetestowane pod kątem dokładności wykonywanych obliczeń oraz szybkości działania.
+
+Jako referencja wyników odległości wykorzystany został algorytm Vincenta, uznawany za najbardziej dokładny wśród prezentowanych. Ustawiony został dla niego limit iteracji na poziomie $1000$ (w nagłówkach tabel, liczba w nawiasie przy metodzie Vincenta oznacza maksymalną liczbę iteracji) i względem niego obliczane były różnice i błędy pozostałych metod.
+
+
+Niezależnie od odległości wszystkie algorytmy uzyskały akceptowalną niedokładność wyników. Przedstawione zostały one w tabeli \ref{tab:geo-distance-accuracy}. Największa różnica wyniosła około $0,32\%$ dla przypadku Londyn - Warszawa, którego rzeczywista odległość wynosi $\sim1452$~km. Wartość ta odpowiada w przybliżeniu błędowi $200$ m. Na potrzeby obliczeń wykonywanych w ramach projektu dyplomowego, błąd przy tak odległych punktach jest całkowicie pomijalny i nie wpływa w istotny sposób na działanie programu i dokładność rezultatów całego procesu. Dodatkowo, obliczenia na tak dużych odległościach w projekcie są mało prawdopodobne, ponieważ widoczność tak oddalonych szczytów jest niemożliwa i w rzeczywistości nie występuje. Największe dystanse w aplikacji testowej obliczane są między dwoma bokami siatki geograficznej, ale nawet wtedy ich maksymalny wynik nie przekracza $220$ km. Jest to mniej niż badana wartość dla przypadku Warszawa - Kraków, dla którego błąd wynosi około $0,07\%$. 
+
+\input{tex/tables/geo_distance_accuracy_table}
+
+
+W przypadku obliczania odległości między dwoma równoleżnikami błąd porównywanych algorytmów wynosił około $0,022\%$. Natomiast niedokładność wyników między południkami był na poziomie $0,30\%$. Te dwa testy ze względu na swoje znaczenie przy wyznaczaniu skali generowanego modelu trójwymiarowego, która ma realny wpływ na dokładność rozpoznawania szczytów, były bardzo istotne. Pomijając algorytm Vincenta, pozostałe metody dały porównywalne wyniki. Z tego powodu ich wpływ na wybór ostatecznej metody był zerowy. Tym bardziej, że przekłamanie w obliczonym dystansie wynosiło odpowiednio tylko $20$ m i $200$ m.
+
+\par
+
+Algorytm Vincenta, niezależnie od wartości parametru maksymalnej liczby iteracji daje praktycznie takie same rezultaty. Może to wynikać z charakterystyki tej metody oraz wykorzystanych danych wejściowych w trakcie testu. Prawdopodobnie w badanych przypadkach algorytm przestawał obliczać kolejne przybliżenia wartości przed osiągnięciem zadanej, maksymalnej liczby iteracji. Mogło to wynikać z faktu osiągnięcia błędu mniejszego niż $\varepsilon=1\mathrm{e}{-12}$.
+
+\par
+
+Niedokładność podczas obliczania odległości między Krakowem, a Zakopanem wyniosła w przybliżeniu $20$ m. Jest to wartość mniejsza niż odległość między kolejnymi punktami danych \textit{SRTM1}, których rozdzielczość wynosi około $30$ m. Błąd na tym poziomie uzyskały wszystkie testowane metody. Z tego powodu ostateczny wybór algorytmu jako optymalny z zaprezentowanych odbywał się z uwzględnieniem przede wszystkim złożoności czasowej poszczególnych rozwiązań.
+
+Takie porównanie czasu trwania obliczeń dla poszczególnych rozwiązań przedstawiono w tabeli \ref{tab:geo-distance-time}. Zgodnie z założeniami, w porównaniu do metody Vincenta trzy pozostałe algorytmy okazały się dużo szybsze.
+
+\input{tex/tables/geo_distance_time_table}
+
+
+Przy badaniu złożoności obliczeniowej algorytmu Vincenta dla obu wartości parametrów czas wykonania funkcji i testu był podobny. Wynik ten wydaje się potwierdzać tezę, że maksymalna liczba iteracji nie jest osiągana, a proces kończy działanie wcześniej. 
+
+\par
+
+Metody Haverisan oraz Sferyczne Prawo Consinusów opierają się na bardzo podobnej metodzie i obliczeniach, dlatego czas ich wykonania jest bardzo zbliżony. Obliczenie jednego wywołania tych dwóch funkcji zajmuje jedynie około $20\%$ czasu potrzebnego na wykonanie algorytmu Vincenta. W przypadku najsłabszego z wykorzystanych urządzeń jest to różnica prawie tysiąc nanosekund przy każdej obliczanej odległości.
+
+\par
+
+Najszybszym z testowanych sposobów obliczenia odległości między dwoma punktami geograficznymi jest przybliżenie Equirectangular. Nawet względem najbardziej popularnej formuły Haversiana wykonywany jest $3-4$ razy szybciej. Jest to zgodne z przedstawionym teoretycznym opisem teoretycznym tej metody, gdzie stwierdzono jej popularność przy projektach o ograniczonych zasobach sprzętowych ze względu na jej małą złożoność obliczeniową.
+
+
+
+Na podstawie przyprowadzonych testów dokładności i szybkości działania na urządzeniach testowych wybrany jako najbardziej optymalny został algorytm Equirectangular Approximation. Uzyskał on podobny błąd odległości jak pozostałe metody, ale jego złożoność czasowa była znacznie mniejsza. Szybkość działania była czynnikiem decydującym ze względu na złożoność czasową, co w przypadku urządzeń mobilnych, których zasoby są ograniczone może mieć bardzo istotne znaczenie. 
+
+
+
+\subsection{Testowanie i optymalizacja algorytmów dopasowania obrazów} \label{sec:test_matching}
+
+Dopasowanie obrazów celem stwierdzenia widoczności wybranych gór oraz określenia ich położenia na zdjęciu wydaje się zagadnieniem kluczowym w kontekście prawidłowego rozpoznawania szczytów. Z tego powodu przeprowadzone zostały testy porównujące algorytmy oparte na szablonach oraz na cechach. Przebadano została także ich skuteczność w~zależności od ustawień wybranych parametrów. Odbywało się to poprzez przeszukanie przestrzeni możliwych ich wartości celem znalezienia najbardziej optymalnych zestawień. Przeprowadzono również badanie sprawdzające jaki wpływ ma operacja morfologiczna dylacji na jakość klasyfikatorów przy zastosowaniu jej na obrazach binarnych. Wykonane badania pozwoliły na wybranie lepszej metody, dobranie parametrów optymalnych oraz stwierdzenie czy wykorzystanie dylacji jest uzasadnione.
+
+Opisane w poniższych podrozdziałach testy zostały przeprowadzone z wykorzystaniem dwóch zdjęć ze zbioru przygotowanego do statycznej analizy podczas jednego z etapów pracy dyplomowej. Na obu z nich widoczne są inne szczyty, jednak wszystkie należą do pasma górskiego Tatr. Na potrzeby testów, badane zdjęcia zostały kilkukrotnie powielone i~zmodyfikowane poprzez dodanie na kolejnych kopiach różnego typu artefaktów. Zmiany te miały symulować niewidoczność szczytów górskich, które mogą wystąpić z różnych względów w rzeczywistości. Takimi powodami mogą być na przykład przesłanianie innymi obiektami, drzewami czy budynkami. Dwie z takich takich modyfikacji pokazane zostały na rysunku \ref{fig:not_visible_peaks}. Każde zdjęcie występuje w sumie w sześciu wariantach, na których zasłaniane są pojedyncze szczyty, kilka na raz lub całe pasma, większymi lub mniejszymi elementami. 
+
+\begin{figure}[!h]
+    \centering \includegraphics[width=.9\linewidth]{img/zaslanianie_przyklad.png}
+    \caption{Przykłady nałożenia artefaktów zasłaniających część szczytów w wybranych przypadkach testowych.}
+    \label{fig:not_visible_peaks}
+\end{figure}
+
+Sumarycznie daje to $378$ badanych szczytów w pojedynczym teście (każda kopia jednego zdjęcia - $32$ szczyty, natomiast drugiego - $31$), w tym $199$ widocznych oraz $179$ zasłoniętych. Daje to rozkład klas na poziomie $53\%/47\%$.
+
+Badania były przeprowadzane przy dwóch rozdzielczościach: $768\textrm{x}1024$ i $3840\textrm{x}5120$. Większa z nich związana jest z wielkością zebranych wcześniej statycznych zdjęć. Model trójwymiarowy terenu był domyślnie generowany w rozmiarach $768\textrm{x}1024$, dlatego w przypadku drugiej rozdzielczości zdjęć, uzyskany render interpolowany był w górę. Operacja ta była przeprowadzana dopiero na wynikowym obrazie binarnym procesu detekcji krawędzi.
+
+W poniższych zestawieniach i porównaniach przedstawione zostały wyniki jedynie dla mniejszego rozmiaru zdjęć, ponieważ w procesie rozpoznawania szczytów w czasie rzeczywistym wykorzystywane są obrazy o mniejszych rozdzielczościach ze względu na złożoność czasową obliczeń. Dlatego rozmiar $768\textrm{x}1024$ jest bliższy rzeczywistemu. Dodatkowo, przestrzeń w pracy dyplomowej zajmowana przez tak dużą ilość danych rozrosłaby się niepotrzebnie. Porównanie dwóch rozdzielczości pozwoliło jednak stwierdzić brak znaczących różnic w wynikach między nimi. Z tego względu można założyć, że wpływ rozdzielczości zdjęć na skuteczność dopasowania obrazów do siebie nie jest tak znaczny. Wszelkie dane zebrane dla obu rozdzielczości zostały umieszczone w repozytorium opisanym w załączniku nr 1. 
+
+
+W zależności od rozmiaru zdjęcia badane były różne rozmiary wycinka obrazów. W~przypadku rozdzielczości $768\textrm{x}1024$ były to fragmenty o wymiarach: $20\textrm{x}20$, $40\textrm{x}40$, $60\textrm{x}60$, $80\textrm{x}80$, $120\textrm{x}120$, $160\textrm{x}160$, $200\textrm{x}200$, $300\textrm{x}300$. Natomiast, dla $3840\textrm{x}5120$: $100\textrm{x}100$, $200\textrm{x}200$, $300\textrm{x}300$, $400\textrm{x}400$, $600\textrm{x}600$, $800\textrm{x}800$, $1000\textrm{x}1000$. Wycinany segment zdjęcia rzeczywistego był powiększony o $15\%$ rozmiaru zdjęcia. Związane jest to z założoną niedokładnością czujników dotyczących obrotu urządzenia. Założona tolerancja odpowiada około $+/-5^\circ$ odchylenia w każdym kierunku. Sprawia to, że wycinki zdjęć mają rozmiary odpowiednio $\{250\textrm{x}328$, $270\textrm{x}348$, $190\textrm{x}368$, $310\textrm{x}388$, $350\textrm{x}428$, $390\textrm{x}68$, $430\textrm{x}508$, $530\textrm{x}608\}$ (powiększenie o $230\textrm{x}308$) i $\{1252\textrm{x}1636$, $1352\textrm{x}1736$, $1452\textrm{x}1836$, $1552\textrm{x}1936$, $1752\textrm{x}2136$, $1952\textrm{x}2336$, $2152\textrm{x}2536\}$ (powiększenie $576\textrm{x}768$).
+
+W przypadku dopasowania opartego na szablonach, badano wszystkie rozmiary wycinków, zarówno dla korelacji krzyżowej, jaki i współczynnika korelacji krzyżowej. Dla każdego wyniku klasyfikatora wybierana była jedynie najwyższa wartość prawdopodobieństwa uznawana za hipotetyczne położenie szczytu. Pozostałe rezultaty były odrzucane. Najpierw jednak, dla każdego ustawienia algorytmu ustalana była wartość progu. Odbywało się to poprzez wyliczenie dla każdej kombinacji współczynników wszystkich przypadków testowych. Na ich podstawie dobierana była taka wartość, przy której liczba poprawnych wskazań była największa. Przykład wartości wykorzystanych do wyznaczenia progu pokazano na rysunku \ref{fig:template_threshold}. Wykres ten przedstawia uzyskane wartości prawdopodobieństwa dopasowania podzielone na trzy grupy: prawidłowo określone położenie, błędnie określone położenie oraz szczyt niewidoczny na zdjęciu rzeczywistym. Na rysunku została zaznaczona również wartość progu wybrana dla tego ustawienia algorytmu. Przy tak wyliczonych limitach przeprowadzano dalsze testy dla tej metody. 
+
+\begin{figure}[!h]
+    \centering \includegraphics[width=1\linewidth]{img/przyklad_threshold.png}
+    \caption{Przykład obliczonego podobieństwa dla poszczególnych przypadków przy użyciu algorytmu dopasowania szablonu. Na ich podstawie ustalany był próg wartości dla danych ustawień parametrów.}
+    \label{fig:template_threshold}
+\end{figure}
+
+Feature matching zostało podzielone na cztery kategorie testów, po dwie dla każdego rodzaju dopasowania. Zarówno dla metody opartej na metodzie siłowej, jak i FLANN, były to progowanie punktów kluczowych i przeprowadzenie testu współczynników dla k-najbliższych sąsiadów. Każda z nich była badana dla  deskryptorów i cech charakterystycznych uzyskanych przy pomocy algorytmów SIFT i ORB. W przypadku filtracji więcej niż jednej pary przy pomocą testu ratio, badane były następujące wartości tego parametru: $\{0,9$, $0,75$, $0,6$, $0,5\}$. Natomiast, gdy wykorzystywane było progowanie najpierw ustalone zostały wartości graniczne dla poszczególnych przypadków testowych. Odbywało się to na podobnej zasadzie co w przypadku dopasowania na podstawie szablonu. Ze względu jednak, że dla metody opartej na cechach, liczba wartości obliczana na jeden szczyt jest większa niż w przypadku template matching, to określone zostały trzy wartości progów dla każdego ustawienia. Oznaczały one branie pod uwagę różnej liczby najlepszych trafień.  W obu filtracjach i dla każdego algorytmu wykrywania cech, badano również maksymalną liczbę dopasowań braną pod uwagę przy procesie projekcji homograficznej: bez ograniczeń, $10$ lub $20$. 
+
+W poszczególnych przypadkach testowych, dla każdego szczytu przypisywany jest jeden z czterech możliwych wyników:
+
+\begin{itemize}
+    \item \textbf{TP} (ang. True Positive) - prawdziwie pozytywne. Przypadki, które zostały poprawnie sklasyfikowane jako pozytywne - szczyt został poprawnie uznany za widoczny na zdjęciu, a jego położenie mieści się w granicach przyjętego błędu.
+    \item \textbf{TN} (ang. True Negative) - prawdziwie negatywne. Przypadki, które zostały poprawnie sklasyfikowane jako negatywne - szczyt został poprawnie uznany za niewidoczny na zdjęciu.
+    \item \textbf{FP} (ang. False Positive) - fałszywie pozytywne. Przypadki, które zostały błędnie sklasyfikowane jako pozytywne - szczyt został niepoprawnie uznany za widoczny lub jego estymowane położenie jest zbyt odległe od prawidłowego. 
+    \item \textbf{FN} (ang. False Negative) - fałszywie negatywne. Przypadki, które zostały błędnie sklasyfikowane jako negatywne - szczyt został błędnie uznany jako niewidoczny.
+\end{itemize}
+
+Na ich podstawie obliczane były cztery wskaźniki skuteczności klasyfikatora: dokładność, precyzja, czułość i miara F1 \cite{metrics}. W ogólności dla każdego z nich im większa wartość tym lepiej. Jednak dla lepszej interpretacji wyników wymagana jest analiza wszystkich wskaźników oraz liczby przypadków sklasyfikowanych jako TP, TN, FP i FN.
+
+\paragraph{Dokładność.} Stosunek poprawnie sklasyfikowanych przypadków do sumy wszystkich testów. Określa ogólną skuteczność klasyfikatora.
+\begin{align*}
+\textrm{Dokładność} =  \frac{TP + TN}{TP+TN+FP+FN}
+\end{align*} 
+
+
+\paragraph{Precyzja.} Liczba poprawnie pozytywnych przypadków do sumy prawdziwie i fałszywie pozytywnych wyników. Opisuje ile pozytywnych przypadków jest faktycznie prawdziwych. 
+\begin{align*}
+\textrm{Precyzja} = \frac{TP}{TP+FP}
+\end{align*} 
+
+
+\paragraph{Czułość.} Proporcja prawdziwie pozytywnych rezultatów do sumy poprawnych pozytywów i fałszywych negatywów. Wyraża zdolność do wykrywania pozytywnych przypadków.
+\begin{align*}
+\textrm{Czułość} =  \frac{TP}{TP+FN}
+\end{align*} 
+
+\paragraph{Miara F1.} Jest to średnia harmoniczna precyzji i czułości. Pozwala określić jednym wskaźnikiem skuteczność klasyfikatora biorąc pod uwagę te dwie składowe. 
+\begin{align*}
+\textrm{F1} =  \frac{2*\textrm{Precyzja}*\textrm{Czułość}}{\textrm{Precyzja}+\textrm{Czułość}}
+\end{align*} 
+
+
+Estymowane położenie szczytu na obrazie było uznawane za poprawne, jeśli spełniało nierówność związaną z odległością od oczekiwanego rezultatu:
+
+\begin{align*}
+    \lVert \text{P} - \text{E} \rVert \le K*\sqrt{w^2 + h^2}
+\end{align*}
+
+gdzie: 
+ 
+\begin{itemize}
+    \item \textbf{P} (ang. Predicted) - obliczone położenie szczytu na obrazie.
+    \item \textbf{E} (ang. Expected) - oczekiwane (prawidłowe) położenie szczytu na obrazie.
+    \item \textbf{K} - współczynnik skalujący, określający dopuszczalną wielkość błędu.
+    \item \textbf{w, h} - wymiary obrazu.
+\end{itemize}
+
+
+Współczynnik $K$ pozwala określić wielkość dopuszczalnego błędu zwróconego położenia względem oczekiwanego. Oznacza on to jak dokładna predykcja położenia szczytu na obrazie jest uznawana za wystarczającą. W trakcie testów wykorzystywane były wartości tego współczynnika równe $0,05$ i $0,01$. Dla rozmiaru zdjęcia $768\textrm{x}1024$ oznaczało to dopuszczalną odległość o wielkościach odpowiednio $64$ i $12,8$ pikseli. Interpretacja graficzna opisanych wartości współczynnika została pokazana na rysunku \ref{fig:wspolczynnik_K}. Przedstawia on przestrzeń, w której musi znajdować się wyliczone położenie szczytu by wynik został uznany za prawidłowy. Zewnętrzny obszar przedstawia wartość $K=0,05$, natomiast wewnętrzny $K=0,01$. Punkt oznaczony kropką oznacza idealne dopasowanie. Wybrany do tej prezentacji szczyt oddalony jest od obserwatora o około $13$ km. W tym przypadku wskazania na obwodzie szerszego okręgu wydają się zbyt odstające od rzeczywistego położenia by można uznać je za dokładne. Przy bliższych szczytach niedokładność nie byłaby tak wyraźna. Jednak z powodu, że w hipotetycznych warunkach rzeczywistych bardziej wartościowe wydają się wskazania dla gór będących w pewnej odległości od obserwatora, przy ostatecznym wyborze algorytmu większą uwagę zwracano na wyniki dla $K=0,01$.
+
+\begin{figure}[!h]
+    \centering \includegraphics[width=0.4\linewidth]{tex/sections/wspolczynnik_K.png}
+    \caption{Dopuszczalny błąd dopasowania w zależności od wartości współczynnika tolerancji~$K$ dla wybranego szczytu.}
+    \label{fig:wspolczynnik_K}
+\end{figure}
+
+
+\subsubsection{Wpływ dylacji na skuteczność dopasowania obrazów} \label{sec:test_dilation}
+
+Dylacja \cite{dilation} - jedna z operacji morfologicznych stosowanych w przetwarzaniu cyfrowym obrazu. Służy do zwiększania oraz łączenia obiektów, wypełniania dziur czy pogrubienia konturów i linii. Polega na modyfikacji każdego piksela w zależności od jego sąsiedztwa określonego rozmiarem elementu strukturalnego (najczęściej macierzy kwadratowej) będącej parametrem dylacji. Jeśli badany punkt ma w okolicy przynajmniej jeden piksel o wartości $255$ (lub $1,0$ w zależności od sposobu reprezentacji koloru białego) to przyjmuje on również tę wartość. 
+
+Operacja dylacji może być również przeprowadzona z wykorzystaniem funkcji zwracającej wartość maksymalną z danego zbioru. W tym wypadku ze wszystkich wartości pikseli będących w danym sąsiedztwie. Wtedy wzór na tę operację morfologiczną można zapisać jako:
+
+\begin{align*}
+     (I \oplus B)(x, y) = \max \left\{ I(x + b, y + c) : (b, c) \in B \right\}
+\end{align*}
+
+gdzie $\textbf{I(x,y)}$ oznacza wartość danego piksela (luminancję), natomiast $\textbf{B}$ element strukturalny.
+
+Podczas generowania grafik związanych z dopasowaniem obrazów na potrzeby pracy magisterskiej, został wykorzystany mechanizm dylacji celem poprawy ich czytelności. W~trakcie tego procesu, dla wybranego szczytu zaobserwowana została poprawa wskazania jego lokalizacji oraz zwiększenie wartości prawdopodobieństwa prawidłowego dopasowania. Mając to na uwadze, przeprowadzono wstępne testy wpływu dylacji na działanie algorytmów porównujących podobieństwo zdjęć przy losowych ustawieniach algorytmów. 
+
+Przedstawione na rysunku \ref{fig:dilation_graph} wykresy punktowe prezentują wartości dopasowania szablonów poszczególnych szczytów dla jednakowych ustawień algorytmu, przy niemodyfikowanym zdjęciu oraz przy użytej dylacji. 
+
+\begin{figure}[!h]
+    \centering \includegraphics[width=0.93\linewidth]{img/dilation_graph.png}
+    \caption{Przykład wpływu dylacji na wyniki algorytmu dopasowania obrazów na podstawie szablonów przy przykładowych ustawieniach parametrów. Górny wykres przedstawia wyniki bez wykorzystania dylacji, dolny natomiast z wykorzystaniem dylacji.}
+    \label{fig:dilation_graph}
+\end{figure}
+
+Wskazania dla szczytów poprawnie oraz błędnie sklasyfikowanych, a także przesłoniętych przyjmują podobny zakres wartości w przypadku obrazów niemodyfikowanych. Widoczne to jest na górnym wykresie. Ciężko jest na nim wskazać jakikolwiek trend zachowania algorytmu i dobrać sensowną wartość progowania. Najlepszą wartość dokładności klasyfikatora metoda uzyskuje przy progu, dla którego wszystkie testy oznaczone zostają jako negatywne. Takie ewentualne działanie klasyfikatora nie jest w żaden sposób porządne i sensowne. Natomiast na wykresie dolnym, który pokazuje wyniki gdy obrazy zostały poddane operacji dylacji, można zaobserwować zwiększenie liczby poprawnych detekcji. Przede wszystkim jednak widoczny jest na nim pewien trend związany z wartościami w zależności od widoczności szczytu. Dla gór, które na zdjęciu rzeczywistym są niewidoczne, algorytm zwraca wartości zauważalnie niższe niż w przypadku, gdy szczyt znajduje się na zdjęciu. Dzięki temu, możliwe jest dobranie wartości progowania w sposób bardziej racjonalny. W~tym przypadku, przekłada się to na zdecydowane zwiększenie dokładności klasyfikatora. 
+
+
+W tabeli \ref{tab:dilation} pokazano porównanie przykładowych wyników dopasowania obrazów z wykorzystaniem dylacji i bez. Są to rezultaty dla algorytmów wykorzystujących porównanie wzorca oraz cech przy losowo wybranych ustawieniach ich parametrów. W obu przypadkach użycie operacji morfologicznej pozwoliło zwiększyć wartości wszystkich metryk. Dla feature matching w przypadku czułości i miary F1 wskazania poprawione zostały o około $20$ punktów procentowych. Udało mu się też sklasyfikować prawie czterokrotnie więcej przypadków jako prawdziwie pozytywne. Badane ustawienie template matching dużo bardziej widocznie poprawiło się po zastosowaniu operacji dylacji. Sprawiła ona, że klasyfikator nie wskazywał już wszystkich przypadków jako negatywne. Pozwoliło to określić aż 151 szczytów jako prawdziwie pozytywne, zwiększając dokładność o $30$~punktów procentowych. Ze względu na pierwotne wskazanie wszystkich przypadków jako negatywne, gdy algorytm nie wykorzystywał dylacji, pozostałe wskaźniki były wtedy równe $0\%$. Użycie operacji morfologicznej oznaczało skok wartości tych metryk do poziomu~$\sim80\%$. Jest to niebagatelna i znacząca poprawa jakości tego klasyfikatora.
+
+\input{tex/tables/dilation}
+
+Wyżej wymienione przykłady poprawy jakości klasyfikatora dzięki użyciu operacji dylacji sugerują zasadność wykorzystania tej techniki dla procesu porównania obrazów binarnych zawierających krawędzie gór. Z tego powodu, przeprowadzone zostały dalsze testy porównujące wyniki algorytmów dopasowania zdjęć przy pomocy szablonów oraz cech charakterystycznych, w zależności od wykorzystania tej techniki. Badane były kombinacje zastosowania dylacji na obrazach binarnych wyrenderowanego modelu oraz rzeczywistego zdjęcia:
+
+\begin{itemize}
+    \item Brak dylacji na obu obrazach.
+    \item Dylacja tylko na wyrenderowanym obrazie.
+    \item Dylacja tylko na rzeczywistym zdjęciu.
+    \item Dylacja na obu obrazach.
+\end{itemize}
+
+Trzy ostatnie przypadki były porównywane do rezultatów uzyskanych bez wykorzystania dylacji (test kontrolny). Wynik uznawany był za lepszy dla danej miary jakości, jeśli jej wartość była wyższa lub równa wynikowi testu kontrolnego. W przypadku dopasowania na podstawie cech, jeśli algorytm nie był w stanie zwrócić żadnego punktu kluczowego dla wersji bez dylacji, natomiast po zastosowaniu tej modyfikacji takie punkty już istniały to niezależnie od uzyskanego wyniku, druga wersja uznawana była zawsze za lepszą. W~przypadku, gdy mimo dylacji występował w dalszym ciągu brak punktów kluczowych to taki przypadek testowy nie był brany pod uwagę i pomijany, mimo że spełniał on zależność lepszy lub tak samo dobry. Podane poniżej rezultaty dla algorytmów template i feature matching odpowiadają sumie wyników dla $K=0,05$ i $K=0,01$ w każdym przypadku testowym. 
+
+
+Dla algorytmu dopasowania na podstawie wzorca, porównanie wyników w zależności od zastosowania dylacji przedstawiono w tabeli \ref{tab:dilation-comparision-template}. Dla wszystkich trzech kombinacji, wszystkie wskaźniki były przeciętnie lepsze niż w teście kontrolnym. Dokładność była aż w~$90\%$ testach wyższa dla dylacji na modelu i dylacji na obu obrazach. Wyniki te były lepsze niż bez wykorzystania dylacji odpowiednio w $29$ i $28$ przypadkach na $32$. Oba te ustawienia w większości przypadków osiągały również lepszy wynik miary F1 niż test kontrolny - $81,3\%$ oraz $78,1\%$. Dylacja na zdjęciu rzeczywistym uzyskała słabsze wyniki niż pozostałe dwa rodzaje, ale mimo to, w dalszym ciągu okazała się lepsza niż brak dylacji na obrazach. W jej przypadku największy zysk jest w czułości, bo lepsze rezultaty osiągnęła aż dla $27$ na $32$ testy. 
+
+Warto odnotować również fakt, że najlepsze wyniki dla wskaźników dokładności i~miary F1, zarówno przy $K=0,05$, jak i $K=0,01$ metoda dopasowania szablonu uzyskiwał przy wykorzystaniu dylacji na obu obrazach. W przypadku funkcji precyzji i czułości, wartości równe $1,0$ uzyskiwane były zarówno z wykorzystaniem dylacji jak i bez. W tym wypadku jednak trudno mówić o sensowności takich danych, ponieważ w przypadku precyzji występowało to, gdy klasyfikator zwrócił na przykład jedynie $10$ poprawnie pozytywnych przypadków, a resztę klasyfikował jako negatywne. 
+
+\input{tex/tables/dilation_comparision_template}
+
+Rezultaty na podobnym poziomie uzyskane zostały również w przypadku algorytmu porównującego cechy i deskryptory. Wyniki podzielone na sposób dopasowania punktów kluczowych i ich filtrowanie przedstawiono w tabeli \ref{tab:dilation-comparision-feature}. Ważnym aspektem jest wpływ operacji morfologicznej na możliwość wykrywania punktów kluczowych przez algorytm SIFT. W przypadku obrazów bez dylacji lub modyfikacji tylko jednego z dwóch obrazów, nie był on w stanie zwrócić nawet jednego punktu kluczowego dla żadnego przypadku testowego. Natomiast, jeśli wykorzystana była dylacja na obu obrazach to był on w stanie podać wystarczającą liczbę punktów kluczowych i estymować położenie szczytu. W~tym wypadku, wpływ operacji morfologicznej na poprawę skuteczność klasyfikatora jest bezdyskusyjny, ponieważ pozwala na jakiekolwiek jego działanie. 
+
+W przeciwieństwie do dopasowania szablonu, występowały tutaj ustawienia, dla których brak wykorzystania dylacji dawał częściej lepsze wyniki. Miało to miejsce jednak jedynie dla wskazań przy wykorzystaniu pewnego progu dopasowania cech, a~operacja morfologiczna była użyta tylko na jednym z dwóch obrazów. Natomiast, gdy do filtrowania połączonych cech wykorzystany został test współczynników rezultaty były już odmienne, ze wskazaniem na proces dylacji. W pozostałych przypadkach modyfikacja zdjęć dawała lepsze wyniki w większości przypadków. Jeśli dylacja była zastosowana na obu obrazach to średnia dokładność wahała się między $75\%$ a $80\%$ oraz miara F1 w~okolicach $90\%$. Na~podobnym poziomie uzyskiwane były wtedy wartości metryk precyzji oraz czułości. 
+
+
+
+\input{tex/tables/dilation_comparision_feature}
+
+Na podstawie przedstawionych powyżej porównań dotyczących wykorzystania dylacji, można wyciągnąć wnioski, że w wielu przypadkach pozwala ona uzyskać lepsze rezultaty. Dla dopasowania na podstawie szablonu, poprawa wszystkich wskaźników występowała w co najmniej połowie testów, osiągając przy niektórych nawet $90\%$ wzmocnienia. W~przypadku analizy cech zdarzały się przypadki gdzie lepsze wyniki uzyskiwał algorytm bez wykorzystania dylacji. W ogólności jednak i dla tej metody polepszenie się wyników występowało średnio w ponad $75\%$ przypadków. Wydaje się, że zaproponowana modyfikacja procesu dopasowania obrazów może mieć znaczący wpływ na jego działanie oraz zwiększać jakość klasyfikacji. Jednak, ze względu, że wyniki te nie są jednoznaczne, w~pozostałych testach, opisanych w następnym podrozdziale, badane były kombinacje ze wszystkimi rodzajami użycia dylacji. 
+
+
+\subsubsection{Porównanie algorytmów dopasowania obrazów} \label{sec:test_template_feature}
+
+Skuteczność algorytmów dopasowania obrazów była badana również poprzez porównanie wartości wskaźników jakości uzyskanych przez metodę opartą na wzorach oraz na punktach kluczowych i deskryptorach. Oba algorytmy zostały zgrupowane w całość, niezależnie od użytych parametrów poszczególnych metod. Porównanie odbywało się poprzez zestawienie ze sobą maksymalnych wartości dokładności, precyzji, czułości i~miary F1 uzyskiwanej przez oba klasyfikatory dla współczynnika skalującego o wartościach $K=0,05$ i $K=0,01$. 
+
+Wyniki przy większej tolerancji błędu przedstawione zostały w tabeli \ref{tab:matching_comparision_005}. Większość zaprezentowanych w niej wyników jest lepszych dla dopasowania obrazów na podstawie szablonu. Najlepszy uzyskany przez nią wynik dokładności wyniósł $86,8\%$. Natomiast w~przypadku dopasowania cech wartość ta była niższa aż o $36,3$ p.p., a w liczbie poprawnych dopasowań o $137$. Feature matching uzyskał $100\%$ wartości wskaźników precyzji oraz czułości. Jednak są to mało wartościowe dane. Wynika to z faktu, że dla precyzji zwracał on prawie wszystkie klasyfikacje jako negatywne, a w przypadku czułości jako pozytywne. Podkreśla to też dokładność wynosząca jedynie $26,5\%$ przy $100\%$ metryki czułości. Dla precyzji identyczny efekt występuje również przy wykorzystaniu korelacji między szablonem, a zdjęciem wejściowym. Mimo to, udało mu się sklasyfikować o kilka więcej prawdziwie pozytywnych niż rozwiązanie wykorzystujące cechy. Wskaźnik czułości, w przypadku template matching, ma jednak więcej sensu, ponieważ starał się on dokładnie klasyfikować wszystkie szczyty, co potwierdza dokładność - $82,5\%$. Algorytm oparty na cechach, gdy uzyskiwał wysoką precyzję to wskaźnik czułości był niski - i na odwrót. Z tego względu przewidywalna była przeciętna wartość miary F1 - $50,5\%$. Druga z~porównywanych metod uzyskała dużo lepszą wartość tej metryki, bo prawie $87\%$.
+
+\input{tex/tables/matching_comparision_005}
+
+Porównanie rezultatów przy współczynniku $K=0,01$ jeszcze bardziej pogłębiło różnice między dopasowaniem na podstawie wzorca, a porównaniem cech, na korzyść tego pierwszego. Wyniki te przedstawione zostały w tabeli \ref{tab:matching_comparision_001}. Szczególnie duża rozbieżność między tymi metodami widoczna jest przy porównaniu współczynnika F1. W tym przypadku różnica wyniosła prawie $60$ p.p., przy zestawieniu najwyższych wartości tej metryki. Dla tego wskazania bardzo kiepsko wypada dopasowanie cech również pod względem dokładności, ponieważ uzyskuje raptem $17\%$, przy $70\%$ wartości drugiej metody dla tej miary. Podobnie jak przy większej tolerancji, tak i tutaj, nie ma sensu przykładać uwagi do precyzji i czułości ze względu na charakter klasyfikatorów, które uzyskały te wyniki. Najlepszą dokładność, $48,1\%$, metoda dopasowania na podstawie cech uzyskała w momencie, gdy klasyfikowała jedynie $3$ przypadki jako pozytywne, a pozostałe jako negatywne. Stąd niska wartość miary F1 -  $3,0\%$ - tego ustawienia. 
+
+\input{tex/tables/matching_comparision_001}
+
+Opisane powyżej wyniki dla porównań obu metod w zależności od tolerancji błędu pokazują dużo większą jakość klasyfikatorów opartych na dopasowaniu na podstawie szablonu. Uzyskiwały one lepsze wyniki dokładności i miary F1 w porównaniu do porównania cech. W szczególności uwidoczniło się to przy $K=0,01$, gdy metody wykorzystujące punkty kluczowe i deskryptory uzyskiwały bardzo niskie wyniki.
+
+
+
+ Jednak w procesie związanym z tematem pracy sensowne wydaje się faworyzowanie przypadków prawdziwie pozytywnych, a karanie fałszywie pozytywnych. Lepszym wyjściem jest nieoznaczanie widocznych szczytów, niż błędnie podać ich lokalizacje lub wskazać te, które w rzeczywistości są niewidoczne. W~teorii takie informacje ma nieść wskaźnik precyzji ($\textrm{P}=\frac{\textrm{TP}}{\textrm{TP}+\textrm{FP}}$). Pewne ustawienia badanych metod potrafiły jednak osiągnąć nawet $100\%$ tej miary. Działo się to wtedy, gdy większość predykcji była w klasie negatywnej i tylko kilka (np. $3$ TP) prawdziwe pozytywnych. Jednak w takich przypadkach, gdy rozkład klas jest w przybliżeniu równomierny, dokładność wynosi jedynie około $50\%$. Dla takich predykcji wskaźnik precyzji wydaje się mało informatywny i nie spełnia swojego celu. Ze względu jednak na chęć faworyzowania predykcji prawdziwie pozytywnych, wyszukane zostały takie przypadki testowe, dla których precyzja była największa oraz liczba TP wynosiła co najmniej $0.85*max(\textrm{TP})$ ($85\%$ największej liczby TP z danego zbioru). Porównanie wskaźnika precyzji przy takim założeniu pokazano w tabeli \ref{tab:precision_comparision}.
+
+ \input{tex/tables/matching_comparision_precision}
+
+ W przypadku algorytmu dopasowania przy użyciu korelacji dwóch obrazów, gdy współczynnik błędu wynosi $0,05$, wynik dla najlepszej precyzji pokrywa się z tym, uzyskanym przy najwyższej dokładności. Dla niego, precyzja wyniosła aż $91,5\%$, natomiast poprawność wszystkich wskazań jest na poziomie $86,8\%$. Warto również, ponownie, podkreślić wysokie wartości pozostałych wskaźników - czułość $82,2\%$, miara F1 $86,6\%$. Przy pięcioprocentowej tolerancji błędu, dopasowanie na podstawie cech, tak jak w wyżej opisanych porównaniach, osiąga dużo gorsze wyniki niż odpowiednik oparty na szablonach. Najlepsza precyzja wyniosła jedynie $37\%$, przy równie niskiej dokładności - $45,5\%$. Podobnie  miara F1 nie przekroczyła progu $50\%$. Znaczna różnica jest też w liczbie przypadków prawdziwe pozytywnych - $162$ i $100$. Mała skuteczność algorytmu porównania punktów kluczowych objawia się także w liczbie fałszywie pozytywnych przypadków - $170$. Ta liczba jest wyższa o $155$ niż uzyskana przez template matching.
+
+ Dla mniejszej tolerancji błędu, $K=0,01$, rozbieżność między jakością dopasowania na podstawie szablonu, a punktów charakterystycznych była jeszcze większa. Pierwsza z~metod uzyskała precyzję ponad $81\%$, gdy druga niecałe $11\%$. W przypadku wykorzystania wzorca, całkiem wysoka wartość wystąpiła również dla wskaźnika dokładności, bo prawie $75\%$. Mimo to, dla tak restrykcyjnego błędu, poprawnie wskazane zostały lokalizacje aż $113$ widocznych szczytów i tylko $26$ fałszywie pozytywnych. Wynika to z faktu, że przy tych ustawieniach, metoda wolała klasyfikować przypadek jako negatywny niż ocenić błędnie jako pozytywny. Dlatego wynik czułości jest relatywnie niski - $61,4\%$. Jednak takie podejście o wyborze detekcji jako negatywną, zamiast fałszywie pozytywną, a co za tym idzie zwiększając precyzję, pokrywa się z opisanym wyżej preferowanym sposobem klasyfikacji. W przypadku metody opartej na cechach i punktach kluczowych liczba błędnie wskazanych pozytywnych przypadków osiągnęła aż $285$, co stanowi $75\%$ wszystkich prób. Skutkiem tego jest bardzo niska precyzja na poziomie $10\%$. Mimo, że jest to bardzo słaby wynik, to był on najlepszy z uzyskanych przy określonej minimalnej liczbie $\textrm{TP}$. 
+
+
+
+
+Przeprowadzone porównanie pokazało niską skuteczność i jakość klasyfikatora opartego na cechach i punktach kluczowych. Uzyskał on dokładność na poziomie $16\%$ i precyzję około $11\%$ w teście z minimalną liczbą przypadków poprawnie pozytywnych oraz aż $285$ fałszywie pozytywnych, co całkowicie dyskwalifikuje możliwość wykorzystania tego rozwiązania. Dopasowanie na podstawie szablonu uzyskało wyniki na dobrym poziomie, nawet dla minimalnej tolerancji błędu. Z powodu odrzucenia feature matching już na tym etapie, ze względu na bardzo niską jakość klasyfikatora dla problemu porównań szczytów, pominięte zostały jakiekolwiek testy złożoności czasowej algorytmów i ich porównanie.
+
+
+\subsubsection{Podsumowanie badania algorytmów dopasowania obrazów}
+
+Przeprowadzone badania algorytmów dopasowania obrazów pozwoliły na wyciągniecie odpowiednich wniosków oraz na wybór optymalnych rozwiązań w tym aspekcie pod kątem procesu identyfikacji szczytów górskich. Zostały przeprowadzone testy wykorzystania dylacji na obrazach binarnych oraz jaki wpływ ma ta modyfikacja na jakość klasyfikatorów. Porównane zostały również ze sobą algorytmy dopasowania obrazów na podstawie wzorca i~cech.
+
+
+Testowanie wpływu dylacji nie przyniosło wyników jednoznacznie potwierdzających przewagę dopasowania obrazów z wykorzystaniem tej techniki względem operacji na surowych zdjęciach. Dla większości przypadków testowych wykorzystanie dylacji wykazywało jednak lepszą klasyfikację pod względem miary dokładności. Istotnym aspektem jest również jej wpływ na działanie deskryptora SIFT przy dopasowaniu na podstawie cech. W~tym wypadku dylacja umożliwiła jakiekolwiek działanie temu algorytmowi, ponieważ na wejściowych obrazach nie był on w stanie wskazać żadnych punktów kluczowych. 
+Dodatkowo, najlepsze wyniki precyzji oraz dokładności, dla dopasowania wzorca uzyskane były przy wykorzystaniu tej techniki. Wpływ na template matching oraz statystycznie lepsza skuteczność sprawiają, że wykorzystanie tej operacji morfologicznej w implementacji projektu wydaje się uzasadnione i potrzebne. 
+
+Porównanie metod dopasowania obrazów, dla obu wartości współczynnika błędu pokazały bezdyskusyjną przewagę jakości klasyfikatora opartego na korelacji krzyżowej szablonów. Różnica w ich najlepszych wartościach dokładności była na poziomie $30-35$ punktów procentowych. Jest to duża rozbieżność w tym jaką liczbę poprawnych przypadków oba z nich były w stanie sklasyfikować. Jednak najbardziej wartościowym wyróżnikiem w tej kwestii wydaje się porównanie precyzji przy określonej minimalnej liczbie TP. Wtedy wykorzystanie szablonu przewyższało porównanie cech o $41,3$ p.p dokładności oraz $54,5$ p.p. precyzji przy $K=0,05$. Różnice te powiększają się do odpowiednio $57,6$ p.p. i $70,6$ p.p. przy bardziej restrykcyjnej tolerancji błędu $K=0.01$. Dopuszczalna mniejsza niedokładność, zgodnie z wcześniejszymi założeniami, ma większe znaczenie w kontekście sprawności i jakości klasyfikatora. W jej przypadku algorytm oparty na cechach całkowicie sobie nie radził uzyskując raptem $16,7\%$ dokładności. Są to wielkości zbyt niskie by można mówić o możliwości wykorzystania tego algorytmu w projekcie rozpoznawania szczytów górskich.
+
+Przedstawione wartości jednoznacznie pokazują różnice skuteczności pomiędzy tymi metodami dla zadania porównania obrazów binarnych gór. Dobre wyniki dopasowania z wykorzystaniem wzorca potwierdzają rozważania teoretyczne o efektywności tego algorytmu przy porównywaniu prostych obrazów o podobnej intensywności. Opisany i~uzasadniony w poprzednim podrozdziale brak porównania złożoności czasowej tych rozwiązań sprawił, że wybór opierał się tylko na jakości klasyfikatorów. Z tego powodu za lepszą uznana została metoda porównania oparta na szablonach, wspierana przez proces dylacji. 
+
+\subsection{Wpływ kolejności przetwarzania pikseli zdjęcia i wykorzystania pamięci podręcznej procesora} \label{sec:profilowanie}
+
+Celem wykrycia ewentualnych błędów implementacji poszczególnych algorytmów oraz weryfikacji wyników wykonanych testów przeprowadzono profilowanie procesu identyfikacji szczytów górskich wykonywanego na platformie testowej. Odbyło się to przy symulacji realnych warunków, gdzie widoczne jest około $30$ szczytów, a wartości parametrów dopasowania obrazów ustawione zostały zgodnie z najlepszymi wynikami testów przeprowadzonych w poprzednim podrozdziale. Pomiary czasu były przeprowadzone w~cyklu $1000$ klatek, powtórzone $10$ razy. Ich wynik w formie graficznej pokazano na wykresie \ref{fig:profilowanie_przed_linia}. Łatwo zauważyć, że najwięcej czasu system przeznaczał na wyznaczenie najwyższej linii gór przetwarzając obraz binarny z wykrytymi krawędziami. Porównując złożoność tego mechanizmu na przykład do metody Canny, która jest złożonym, wieloetapowym procesem, można stwierdzić, że tak nie powinno być i hipotetycznie założyć błędną lub nieoptymalną implementację tego etapu.
+
+\begin{figure}[!h]
+    \centering \includegraphics[width=0.9\linewidth]{img/pie_chart_profilowanie_przed_linii.png}
+    \caption{Profilowanie procesu identyfikacji szczytów górskich przed optymalizacją wykrywania krawędzi najwyższych gór.}
+    \label{fig:profilowanie_przed_linia}
+\end{figure}
+
+
+Z punktu widzenia człowieka oraz tego jak przetwarza on pewne dane, proces wybierania najwyższych krawędzi na danym obrazie binarnym powinien odbywać się kolumna po kolumnie, sprawdzając piksele od góry do dołu. W momencie natrafienia na biały punkt powinien on go wybrać i przejść do następnej kolumny. Takie podejście wydaje się logiczne z takiego punktu widzenia i w ten sposób najpierw został zaimplementowany ten etap. Jednak jest to sposób dobry tylko dla człowieka. 
+
+Najczęstszą formą reprezentacji zdjęć w pamięci jest zapis rzędami. Oznacza to, że wartości pikseli w danym rzędzie są kolejnymi wpisami pamięci. Taki format występuje również w OpenCV \cite{opencv_mat}. W tym wypadku dla procesora lepszy jest dostęp do zdjęcia rzędami, ponieważ minimalizuje liczbę zapytań do pamięci i skoków między adresami odpowiednich komórek. Pozwala to również na wykorzystanie pamięci podręcznej CPU, ze względu na to, że może on pobrać i zapisać w niej pewną liczbę kolejnych pikseli. Nowoczesne procesory wyposażane są w tzw. prefetcher, który automatycznie wykrywa wzorce dostępu do pamięci i z wyprzedzeniem pobiera dane \cite{cache_memory}. Dzięki temu nie ma potrzeby ciągłego odpytywania pamięci RAM i przesyłania kolejnych informacji. Dodatkowo, dostęp do pamięci podręcznej w porównaniu do operacyjnej jest sporo szybszy \cite{memory_hierarchy}.
+
+Takie rozważania teoretyczne potwierdza diagram \ref{fig:profilowanie_po_linia}. Po zmianie implementacji na analizę obrazu rzędami, wykrycie linii gór stanowi już jedynie $4\%$ czasu całego cyklu. Mimo, że w tym przypadku przetwarzane było całe zdjęcie, a nie tylko niektóre wartości w poszczególnych kolumnach. Możliwe jest dodatkowe zmniejszenie czasu przez zastosowanie flag logicznych celem opuszczenia pętli po znalezieniu wszystkich poszukiwanych pikseli. W przypadku pesymistycznym, gdy wszystkie potrzebne krawędzie będą znajdować się w~dolnej części zdjęcia, może pogorszyć to efektywność. Jednak możliwe jest założenie, że potencjalne oprogramowanie stworzone na podstawie opisywanego w niniejszej pracy dyplomowej procesu, będzie wykorzystywane w taki sposób, że krawędzie analizowanych gór będą znajdować się w środkowej części kadru. Dla tak umiejscowionych szczytów udział tego etapu w całym cyklu spada do $3\%$. 
+
+\begin{figure}[!h]
+    \centering \includegraphics[width=0.9\linewidth]{img/pie_chart_profilowanie_po_linii.png}
+    \caption{Profilowanie procesu identyfikacji szczytów górskich po optymalizacji wykrywania krawędzi najwyższych gór poprzez zmianę kolejności analizy pikseli i wykorzystaniem pamięci podręcznej.}
+    \label{fig:profilowanie_po_linia}
+\end{figure}
+
+Po zmianie implementacji wykrywania linii gór, najwięcej czasu procesor poświęca na dopasowanie obrazów. Związane to jest z koniecznością wycinania obszaru dla każdego szczytu z obu obrazów binarnych, tworząc za każdym razem nowe macierze. Następnie przeprowadzana jest analiza dla każdego takiego fragmentu. Sumarycznie prowadzi to do dużej ilości obliczeń wykonywanych przez procesor. Z tego powodu prawdopodobnie poprawny jest tak duży procentowy udział tego etapu w cyklu detekcji szczytów. 
+
+Analiza ta pokazuje, że odpowiednie przetwarzanie tablic wielowymiarowych oraz wykorzystanie pamięci podręcznej mogą być kluczowymi czynnikami wpływającymi na złożoność czasową danego zagadnienia. Można też wyciągnąć z tego wnioski, że reprezentacja w pamięci danych dwu i więcej wymiarowych w sposób ciągły pozwala zoptymalizować do nich dostęp i zmniejszyć liczbę potrzebnych zapytań. Zasadne wydaje się w takich przypadkach pisanie kodu w sposób zorientowany na optymalizację nawet kosztem czytelności i refaktoringu czy nawet logiczności i zgodności z ludzką intuicją.

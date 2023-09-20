@@ -1,0 +1,14 @@
+\newpage
+
+\abstract
+
+The main aim of the Master's Degree Thesis was to research and test digital image processing algorithms which allow to recognize mountain peaks in the video in real-time. The experiments were conducted on the custom made platform that was made for mobile devices with the Android operating system. The developed mountain peaks recognition process can also be transferred to different platforms.
+
+Based on the analysis of the current state of the art and other existing approaches, an early process of mountain peak recognition was prepared. In the next stages of the conducted research the process has been updated due to growing knowledge. Moreover, it was also improved with numerous tests and comparisons of different algorithms. Furthermore, for the sake of the thesis there was also created an simple application, which saves the additional geolocation data at the moment a picture is taken. Hence, a set of static photos of mountain peaks with appropriate data was created. The application was loaded with this set. It allowed to evaluate the quality of the different methods. What is more, it helps to choose optimal methods in terms of the mountain peak recognition process. Tests were mainly focused on algorithms time complexity in real-time. However, the quality and accuracy of the solutions were also taken into account.
+
+The process of the mountain peaks recognition that was proposed in this thesis is made of several elements. At the very beginning, the data is gathered from the device's sensors. It is used to generate a 3D model of the Earth's surface from the observer's point of view. The model is created with the \textit{digital elevation model} and \textit{OpenGL} interface. With the generated panorama view, the visibility of mountain peaks are assessed. So as to do that, there is a need to filter the data concerning mountain peaks. The hidden-surface determination methods are used - \textit{frustum culling} and \textit{occlusion culling}. With the \textit{Canny} edge detector algorithm, on the basis of the panorama view and the input photo, the binary images containing the mountain's contour are created. \textit{Template matching} is used to compare specific parts of the images that might include possible peaks. Obtained results are used to conclude the visible mountain peaks in the consecutive frames of the video.
+
+Developed process was verified in the real-life conditions. The process's ability to properly recognize mountain peaks was confirmed. Furthermore, it was shown to work in the real-time.
+
+
+\keywords mountain peaks recognition, image registration, image alignment, template matching, digital elevation model, three-dimensional graphics, digital image processing, real-time

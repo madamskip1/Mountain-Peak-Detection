@@ -1,0 +1,91 @@
+\begin{table}[!h]  \centering\hfill
+\caption{Porównanie czasu wykonania wybranych algorytmów obliczających odległość między dwoma punktami geograficznymi.}
+\resizebox{\textwidth}{!}{%
+\begin{tabular} {| c | c | c | c | c | c | c |} \hline
+    Urządzenie &
+   &
+  \textbf{Vincent (1000)} &
+  \textbf{Vincent (100)} &
+  \textbf{Haversian} &
+  \textbf{\begin{tabular}[c]{@{}l@{}}Spherical\\ Law of Cosines\end{tabular}} &
+  \textbf{\begin{tabular}[c]{@{}l@{}}Equirectangular\\ Approximation\end{tabular}} \\
+  \hline \hline
+  
+  
+\multicolumn{1}{|l|}{\multirow{3}{*}{\begin{tabular}[c]{@{}l@{}}\hphantom{abc}\\  \\ \\ Mate 20 Lite\end{tabular}}} &
+  \multicolumn{1}{l|}{\begin{tabular}[c]{@{}l@{}}Średni czas\\ jednego testu\end{tabular}} &
+  \multicolumn{1}{l|}{10,97529 s} &
+  \multicolumn{1}{l|}{11,52881 s} &
+  \multicolumn{1}{l|}{2,25107 s} &
+  \multicolumn{1}{l|}{2,06024 s} &
+  \multicolumn{1}{l|}{0,59029 s} \\ \cline{2-7} 
+\multicolumn{1}{|l|}{} &
+  \multicolumn{1}{l|}{\begin{tabular}[c]{@{}l@{}}Średni czas\\ wywołania\\ jednej funkcji\end{tabular}} &
+  \multicolumn{1}{l|}{1097,52893 ns} &
+  \multicolumn{1}{l|}{1152,88094 ns} &
+  \multicolumn{1}{l|}{225,10736 ns} &
+  \multicolumn{1}{l|}{206,02364 ns} &
+  \multicolumn{1}{l|}{59,02929 ns} \\ \cline{2-7} 
+\multicolumn{1}{|l|}{} &
+  \multicolumn{1}{l|}{\begin{tabular}[c]{@{}l@{}}Różnica czasowa\\ jednego wywołania\\ funkcji\end{tabular}} &
+  \multicolumn{1}{l|}{nd.} &
+  \multicolumn{1}{l|}{\begin{tabular}[c]{@{}l@{}}-55,35201 ns\\ (-4,80119\%)\end{tabular}} &
+  \multicolumn{1}{l|}{\begin{tabular}[c]{@{}l@{}}-927,77358 ns\\ (-80,47436\%)\end{tabular}} &
+  \multicolumn{1}{l|}{\begin{tabular}[c]{@{}l@{}}-946,85730 ns\\ (-82,12967\%)\end{tabular}} &
+  \multicolumn{1}{l|}{\begin{tabular}[c]{@{}l@{}}-1093,85165 ns\\ (-94,87982\%)\end{tabular}} \\
+  \hline
+  
+  
+\multicolumn{1}{|l|}{\multirow{3}{*}{\begin{tabular}[c]{@{}l@{}}\hphantom{abc}\\  \\ \\ P30 Pro\end{tabular}}} &
+  \multicolumn{1}{l|}{\begin{tabular}[c]{@{}l@{}}Średni czas\\ jednego testu\end{tabular}} &
+  \multicolumn{1}{l|}{4,84974 s} &
+  \multicolumn{1}{l|}{4,83854 s} &
+  \multicolumn{1}{l|}{0,89253 s} &
+  \multicolumn{1}{l|}{0,91203 s} &
+  \multicolumn{1}{l|}{0,35220 s} \\ \cline{2-7} 
+\multicolumn{1}{|l|}{} &
+  \multicolumn{1}{l|}{\begin{tabular}[c]{@{}l@{}}Średni czas\\ wywołania \\ jednej funkcji\end{tabular}} &
+  \multicolumn{1}{l|}{484,97448 ns} &
+  \multicolumn{1}{l|}{483,85403 ns} &
+  \multicolumn{1}{l|}{89,25293 ns} &
+  \multicolumn{1}{l|}{91,20310 ns} &
+  \multicolumn{1}{l|}{35,22035 ns} \\ \cline{2-7} 
+\multicolumn{1}{|l|}{} &
+  \multicolumn{1}{l|}{\begin{tabular}[c]{@{}l@{}}Różnica czasowa\\ jednego wywołania\\ funkcji\end{tabular}} &
+  \multicolumn{1}{l|}{nd.} &
+  \multicolumn{1}{l|}{\begin{tabular}[c]{@{}l@{}}+1,12045 ns\\ (+0,23157 \%)\end{tabular}} &
+  \multicolumn{1}{l|}{\begin{tabular}[c]{@{}l@{}}-394,60110 ns\\ (-81,55375\%)\end{tabular}} &
+  \multicolumn{1}{l|}{\begin{tabular}[c]{@{}l@{}}-392,65093 ns\\ (-81,15070\%)\end{tabular}} &
+  \multicolumn{1}{l|}{\begin{tabular}[c]{@{}l@{}}-448,63368 ns\\ (-92,72087\%)\end{tabular}} \\
+  \hline
+  
+  
+\multicolumn{1}{|l|}{\multirow{3}{*}{\begin{tabular}[c]{@{}l@{}}\hphantom{abc}\\  \\ \\ Mate 50 Pro\end{tabular}}} &
+  \multicolumn{1}{l|}{\begin{tabular}[c]{@{}l@{}}Średni czas\\ jednego testu\end{tabular}} &
+  \multicolumn{1}{l|}{3,98607 s} &
+  \multicolumn{1}{l|}{3,92896 s} &
+  \multicolumn{1}{l|}{0,66648 s} &
+  \multicolumn{1}{l|}{0,60028 s} &
+  \multicolumn{1}{l|}{0,15715 s} \\ \cline{2-7} 
+\multicolumn{1}{|l|}{} &
+  \multicolumn{1}{l|}{\begin{tabular}[c]{@{}l@{}}Średni czas\\ wywołania\\ jednej funkcji\end{tabular}} &
+  \multicolumn{1}{l|}{398,60748 ns} &
+  \multicolumn{1}{l|}{392,8963 ns} &
+  \multicolumn{1}{l|}{66,64805 ns} &
+  \multicolumn{1}{l|}{60,02849 ns} &
+  \multicolumn{1}{l|}{15,71475 ns} \\ \cline{2-7} 
+\multicolumn{1}{|l|}{} &
+  \multicolumn{1}{l|}{\begin{tabular}[c]{@{}l@{}}Różnica czasowa\\ jednego wywołania\\ funkcji\end{tabular}} &
+  \multicolumn{1}{l|}{nd.} &
+  \multicolumn{1}{l|}{\begin{tabular}[c]{@{}l@{}}+5,71118 ns\\ (+1,45361\%)\end{tabular}} &
+  \multicolumn{1}{l|}{\begin{tabular}[c]{@{}l@{}}-326,24825 ns\\ (-83,03673\%)\end{tabular}} &
+  \multicolumn{1}{l|}{\begin{tabular}[c]{@{}l@{}}-332,86781 ns\\ (-84,72154\%)\end{tabular}} &
+  \multicolumn{1}{l|}{\begin{tabular}[c]{@{}l@{}}-377,18155 ns\\ (-96,00028\%)\end{tabular}} \\
+  \hline
+
+
+\end{tabular}%
+}
+\label{tab:geo-distance-time}
+\end{table}
+

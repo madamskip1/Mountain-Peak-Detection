@@ -1,0 +1,38 @@
+\begin{table}[!h]
+  \centering
+  \small
+  \caption{Porównanie wartości wskaźnika precyzji przy założeniu minimalnej liczby prawdziwie pozytywnych przypadków dla algorytmów dopasowania obrazów na podstawie szablonu oraz na podstawie cech, gdy dopuszczalny błąd $K=0,05$ i $K=0,01$.}
+\resizebox{\textwidth}{!}{%
+  \begin{tabularx}{\linewidth}{|l|*{8}{>{\centering\arraybackslash}X|}}
+    \hline
+     &
+     \vspace{0.5em}TP & 
+     \vspace{0.5em}TN  & 
+     \vspace{0.5em}FP & 
+     \vspace{0.5em}FN  & 
+     \hspace{0em}\textbf{Dokładność}  &
+     \vspace{0.01ex}\hspace{0em}\textbf{Precyzja}   & 
+     \vspace{0.01ex}\hspace{0em}\textbf{Czułość} &
+     \vspace{0.5em}\textbf{F1} \\
+    \hline
+    \hline
+    \multicolumn{9}{|c|}{$K=0,05$} \\
+    \hline
+    {\begin{tabular}[c]{@{}l@{}}Dopasowanie\\ szablonu\end{tabular}}  & 162 & 166 & 15 & 35 & $86,8\%$ & $\textbf{91,5\%}$ & $82,2\%$ & $86,6\%$  \\
+    \hline
+     {\begin{tabular}[c]{@{}l@{}}Dopasowanie\\ cech\end{tabular}} &  100 & 72 & 170 & 36 & $45,5\%$ & $\textbf{37,0\%}$ & $73,5\%$ &  $49,3\%$ \\
+    \hline
+    
+    \multicolumn{9}{|c|}{$K=0,001$} \\
+    \hline
+    {\begin{tabular}[c]{@{}l@{}}Dopasowanie\\szablonu\end{tabular}}  & 113 & 168 & 26 & 71 & $74,3\%$ & $\textbf{81,3\%}$ & $61,4\%$ & $70,0\%$  \\
+    \hline
+     {\begin{tabular}[c]{@{}l@{}}Dopasowanie\\cech\end{tabular}} & 34 & 29 & 285 & 30 & $16,7\%$ & $\textbf{10,7\%}$ & $53,1\%$ & $17,8\%$  \\
+    \hline
+
+    
+  \end{tabularx}%
+}
+  \label{tab:precision_comparision}
+\end{table}
+

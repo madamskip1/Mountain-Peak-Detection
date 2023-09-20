@@ -1,0 +1,28 @@
+\begin{table}[!h]
+  \centering
+  \small
+  \caption{Wpływ operacji morfologicznej dylacji na algorytm dopasowania na podstawie szablonu.}
+\resizebox{\textwidth}{!}{%
+  \begin{tabularx}{\linewidth}{|l|*{4}{>{\centering\arraybackslash}X|}}
+    \hline
+    &
+     \hspace{0em}\textbf{Dokładność}  & 
+      \textbf{Precyzja}   & 
+      \textbf{Czułość} &
+      \textbf{F1} \\
+    \hline
+    \hline
+    
+    {\begin{tabular}[c]{@{}l@{}}Dylacja na\\ renderze\end{tabular}}  & {\begin{tabular}[c]{@{}c@{}}$29/32$\\ $(90,6\%)$\end{tabular}} & {\begin{tabular}[c]{@{}c@{}}$26/32$\\ $(81,3\%)$\end{tabular}} & {\begin{tabular}[c]{@{}c@{}}$20/32$\\ $(62,5\%)$\end{tabular}} & {\begin{tabular}[c]{@{}c@{}}$26/32$\\ $(81,3\%)$\end{tabular}} \\
+    \hline
+    {\begin{tabular}[c]{@{}l@{}}Dylacja na\\ zdjęciu rzeczywistym\end{tabular}} &  {\begin{tabular}[c]{@{}c@{}}$26/32$\\ $(75,0\%)$\end{tabular}} & {\begin{tabular}[c]{@{}c@{}}$24/32$\\ $(62,5\%)$\end{tabular}} & {\begin{tabular}[c]{@{}c@{}}$20/32$\\ $(85,7\%)$\end{tabular}} &  {\begin{tabular}[c]{@{}c@{}}$22/32$\\ $(68,8\%)$\end{tabular}} \\
+    \hline
+    {\begin{tabular}[c]{@{}l@{}}Dylacja na\\ obu obrazach\end{tabular}} &  {\begin{tabular}[c]{@{}c@{}}$28/32$\\ $(87,5\%)$\end{tabular}} & {\begin{tabular}[c]{@{}c@{}}$29/32$\\ $(90,6\%)$\end{tabular}} & {\begin{tabular}[c]{@{}c@{}}$21/32$\\ $(65,6\%)$\end{tabular}} &  {\begin{tabular}[c]{@{}c@{}}$25/32$\\ $(78,1\%)$\end{tabular}} \\
+    \hline
+
+    
+  \end{tabularx}%
+}
+  \label{tab:dilation-comparision-template}
+\end{table}
+

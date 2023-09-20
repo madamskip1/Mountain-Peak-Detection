@@ -1,0 +1,15 @@
+\newpage
+
+\section{Pierwszy etap implementacyjny} \label{sec:pierwszy_etap}
+
+W trakcie pierwszego etapu implementacji projektu opracowano prototyp systemu rozpoznawania szczytów górskich na statycznych zdjęciach. Miało to na celu zweryfikowanie założeń, stworzenie możliwości zbadania wybranych rozwiązań oraz wykrycie potencjalnych problemów. W ramach tego etapu zostały stworzone takie moduły jak: system zbierający dane geolokalizacyjnie podczas robienia zdjęć, generator trójwymiarowego terenu, moduł do porównywania konturów dwóch obrazów, a także połączenie ich wszystkich celem finalnej predykcji szczytów na statycznych obrazach.
+
+\st{Dzieki wykorzystaniu Pythona pozwalajacego na pisanie prostych aplikacji w skroconym czasie wzgledem jezykow nizszego poziomu, mozliwe bylo przyspieszenie procesu prototypowania rozwiazan i zalozen. Dodatkowo, srodowisko PC umoliwilo szybsze testowanie prototypow, bez koniecznosci ciaglego przysylania pakietow instalacyjnych na urzadzenia mobilne. Stworzony system byl zasilany danymi i zdjeciami zebranymi w~trakcie realizacji tego etapu. Obrazy te opisane zostaly w nastepnym podrozdziale. Takie podejscie pozwolilo stworzyc funkcjonalny system rozpoznajacy szczyty na statycznych zdjeciach, jego testowanie oraz badanie pod katem mozliwych usprawnien.}
+
+
+
+\subsubsection{Podsumowanie etapu}
+
+Opisany w tym rozdziale etap pracy dyplomowej pozwolił na weryfikacje przyjętych założeń oraz na ich ewentualne korekty. Zebrane zdjęcia gór oraz odpowiadające im dane geolokalizacyjne pozwoliły na przeprowadzenie testów różnych rozwiązań z wykorzystaniem statycznych obrazów. Wykazały one m.in. niedokładności sensorów urządzeń mobilnych, co brane było później pod uwagę w trakcie pracy nad projektem. Dzięki prototypowaniu trójwymiarowego generatora terenu ustalono potrzebę prawidłowego skalowania modelu na podstawie położenia geograficznego. Porównanie i próby optymalizacji algorytmów dla poszczególnych kroków procesu rozpoznawania szczytów górskich pozwoliły sprawdzić jakość oraz wydajność różnych rozwiązań. Na ich podstawie zostały wybrane takie, które dawały najlepsze wyniki oraz spełniały przyjęte założenia związane z~wytwarzaniem aplikacji na urządzenia mobilne. 
+
+Takie podejście do projektu pracy dyplomowej pozwoliło w skuteczny i efektywny sposób weryfikować przyjęte wymagania oraz założenia, a także analizować wszelkie napotkane problemy. Zdobyta wiedza oraz informacje pozwoliły, w następnym etapie, na implementację na docelową platformę aplikacji potrafiącą w czasie rzeczywistym rozpoznawać szczyty. Etap ten został opisany w następnym rozdziale.

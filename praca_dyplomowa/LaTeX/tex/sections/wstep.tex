@@ -1,0 +1,48 @@
+\newpage % Rozdziały zaczynamy od nowej strony.
+
+\section{Wstęp}
+
+\subsection{Motywacja pracy}
+
+Dzisiejsza technologia oraz możliwość ciągłej geolokalizacji naszego położenia mimo, że bardzo ułatwiają turystom wędrówki, to nie zawsze pozwalają jednoznacznie określać prawidłowy kierunek, w którym powinni się oni poruszać. Posiadanie informacji o~nazwach pobliskich gór może być bardzo ważne dla osób, które zgubiły się na szlaku. Dzięki rozwiązaniom pozwalającym identyfikować i określać nazwy szczytów górskich, turysta ma możliwość odczytania widocznych w danym momencie gór. Dzięki takiej wiedzy mogliby oni lepiej nawigować lub przekazać te dane służbom ratowniczym w celu łatwiejszego namierzenia ich w przypadku ewentualnych poszukiwań. Z tego powodu może mieć to realny wpływ na bezpieczeństwo na szlakach górskich.
+
+\par
+
+Pozytywny wpływ na aspekt dotyczący bezpieczeństwa mogłoby mieć również wykorzystanie takiego rozwiązania do celów analizy warunków atmosferycznych w okolicach danego szczytu lub ścieżkach turystycznych na niego prowadzących. Łącząc algorytmy rozpoznawania szczytów i pogody możliwe jest automatyczne wykrywanie zmian meteorologicznych, nadchodzących burz czy dużego zachmurzenia w okolicach danej góry. Tego typu monitoring może informować turystów o możliwych niebezpiecznych warunkach pogodowych. Możliwe też jest sprawdzenie przez użytkowników, na który szczyt nie powinno się planować wycieczek.
+
+\par
+
+Aplikacja pozwalająca etykietować widoczne szczyty może mieć też działanie edukacyjne. Gdy chcemy poznać nazwę jakiegoś pasma czy gór w danym regionie możemy skorzystać z takich rozwiązań oraz uzyskać pożądane informacje. Dzięki temu pozwoli to~zwiększyć ogólną wiedzę użytkowników na temat geografii i geologii. Może zachęcić ich również do~eksploracji i poznawania mniej popularnych szlaków czy rejonów.
+
+\par
+
+Rozwiązanie potrafiące identyfikować szczyty nie musi być wykorzystywana jedynie przez turystów spędzających czas w górach czy osoby ciekawe tego jaki wierzchołek widzą. Sieci społecznościowe również mogłyby korzystać z takich rozwiązań. Ich użytkownicy mogliby dodawać etykiety z nazwami szczytów, tak jak jest to aktualnie możliwe na przykład z miastami, znanymi budowlami czy miejscami kultury i pomnikami. Dałoby to również możliwość automatycznego oznaczania zdjęć odpowiednimi nazwami gór, a takie dane można wykorzystać przykładowo w procesie uczenia sztucznej inteligencji. 
+
+
+\subsection{Cel pracy}
+
+Celem niniejszej pracy dyplomowej było poznanie oraz przebadanie i porównanie, a~także próby optymalizacji algorytmów przetwarzania cyfrowego obrazów pozwalających identyfikować szczyty górskie na obrazie. Finalnie, miało to pozwolić na stworzenie i~opisanie procesu rozpoznającego góry w czasie rzeczywistym.
+
+
+Na podstawie aspektów opisanych w podrozdziale dotyczącym motywacji pracy sformułowano założenie, że poszczególne algorytmów miały być badane na platformie testowej działającej na urządzeniach mobilnych. Związane jest to z faktem, że urządzenia takie jak smartfony większa część społeczeństwa ma cały czas przy sobie. Dzięki temu możliwe byłoby użytkowanie potencjalnego projektu opartego na opracowanym procesie na przykład podczas wycieczki turystycznej w góry. Z tego powodu platforma testowa wykorzystywana do badania algorytmów w ramach pracy dyplomowej została zaimplementowana na system Android, który jest jednym z najpowszechniejszych rozwiązań na urządzenia mobilne.
+
+Badania algorytmów, które było kluczowym elementem pracy magisterskiej, opierały się nie tylko na testowaniu ich funkcjonalności, ale również dotyczyło aspektów takich jak wydajność czy użyteczność. Miały on przede wszystkim umożliwiać działanie procesu identyfikacji szczytów górskich w czasie rzeczywistym. Ze względu na ograniczoną moc docelowych urządzeń, jakimi są urządzenia mobilne, by to osiągnąć zastosowane algorytmy nie mogły mieć zbyt dużej złożoności obliczeniowej, zachowując przy tym zadowalającą jakość. Na podstawie wyników takich badań miały zostać wybrane optymalne algorytmy zarówno pod względem czasu potrzebnego na obliczenia, jak i wartości stosowanych metryk.
+
+Elementem końcowym pracy dyplomowej miało być zweryfikowanie procesu składającego się ze zdefiniowanych jako optymalne algorytmów pod kątem jakości rozpoznawania szczytów oraz zdolności do działania w czasie rzeczywistym na urządzeniach mobilnych.
+
+
+
+
+
+\subsection{Etapy pracy}
+
+
+Pierwszym etapem przygotowania pracy magisterskiej była analiza literatury traktującej o zagadnieniach powiązanych z rozpoznawaniem szczytów górskich na obrazie. Na~ich podstawie przygotowany został teoretyczny proces rozpoznawania gór, wymagane biblioteki oraz źródła danych wykorzystywane w projekcie. W szczególności określono wstępną listę kroków potrzebnych do prawidłowej detekcji szczytów i opisano rozwiązania służące do generowania grafiki trójwymiarowej oraz przetwarzania cyfrowego obrazów. Jako źródła danych przybliżono numeryczne modele terenu oraz bazy zawierające wpisy na temat szczytów na świecie.
+
+Wykorzystując uzyskaną wiedzę teoretyczną zaimplementowano platformę testową służącą do testowania i badania poszczególnych elementów procesu identyfikacji szczytów górskich na obrazie. Następnie przygotowano zestaw zdjęć gór oraz odpowiadające im dane dotyczące geolokalizacji. Wykonane zostały przez autora pracy przy pomocy aplikacji stworzonej na potrzeby pracy dyplomowej. Podczas zapisywania obrazu tworzył on również plik zawierający takie wpisy jak lokalizacja GPS czy kąt o jaki obrócone było urządzenie. Służyły one jako zbiór testowy, na którym przeprowadzano badania oraz porównanie algorytmów.
+
+Przeprowadzone zostały testy mające na celu określenie jakości poszczególnych metod jako klasyfikatorów. Podjęte zostały również próby optymalizacji oraz poprawienie dokładności wskazań przez dodatkowe operacje, na przykład poprzez dylacje obrazów binarnych. Jakość rozwiązań była mierzona przy pomocy metryk takich jak precyzja, czułość czy miara F1. Pod uwagę brany był też kontekst wydajnościowy ze względu na ograniczoną moc obliczeniową urządzeń mobilnych. Z tego powodu przeprowadzono szereg modyfikacji mających na celu zmniejszenie złożoności algorytmów całego procesu. 
+
+Badano między innymi wpływ ilości danych SRTM na odwzorowanie modelu i czas jego generowania. Podjęte były próby odrzucenia częściowych wpisów numerycznego modelu terenu w zależności od możliwej wizji z pozycji obserwatora. Porównano metody obliczające odległość między dwoma punktami mając na uwadze ich dokładność i złożoność obliczeniową. Przetestowano również szczegółowo algorytmy dopasowania obrazów poświęcając im najwięcej uwagi ze względu, że jest to kluczowy element opracowywanego procesu. Przeprowadzano także weryfikacje końcową całościowego procesu złożonego z~wybranych algorytmów pod względem skuteczności detekcji szczytów oraz działania w~czasie rzeczywistym. Celem potwierdzenia działania procesu wykonane zostały nagrania prezentacyjne w paśmie gór, dołączone w formie załącznika numer 1.
+
+

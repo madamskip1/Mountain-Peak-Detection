@@ -1,0 +1,42 @@
+\begin{table}[!h]
+  \centering
+  \caption{Porównanie czasu generowania wierzchołków i trójkątów przy uproszczeniu i braku uproszczenia danych.}
+  \resizebox{\textwidth}{!}{%
+  \begin{tabularx}{\linewidth}{|l|*{4}{>{\centering\arraybackslash}X|}}
+    \hline
+     Urządzenie & \begin{tabular}[c]{@{}c@{}}Czas \\ upraszczania \\ danych \end{tabular} & \begin{tabular}[c]{@{}c@{}}Czas \\ generowania\\ wierzchołków \end{tabular} & \begin{tabular}[c]{@{}c@{}}Czas \\ generowania\\ trójkątów \end{tabular}  & Sumaryczny czas\\
+    \hline
+    \hline
+    \multicolumn{5}{|c|}{Bez upraszczania danych ($t_{1}$)} \\
+    \hline
+    Mate 20 Lite & nd. & 0,1730 s & 0,1255 s & 0,2985 s  \\
+    \hline
+    P30 Pro &  nd. & 0,0980 s & 0,1170 s & 0,0937 s \\
+    \hline
+    Mate 50 Pro &  nd. & 0,0549 s & 0,0586 & 0,1136 s \\
+    \hline
+    
+    \multicolumn{5}{|c|}{Z upraszczaniem danych ($t_{2}$)} \\
+    \hline
+    Mate 20 Lite & 0,0033 s & 0,0387 s & 0,0227 s & 0,0648 s  \\
+    \hline
+    P30 Pro &  0,0016 s & 0,0142 s & 0,0154 s & 0,0314 s \\
+    \hline
+    Mate 50 Pro & 0,0007 s & 0,0081 s & 0,0079 s & 0,0168 s \\
+    \hline
+    
+    \multicolumn{5}{|c|}{Stosunek czasów $\frac{t_{2}}{t_{1}}$} \\
+    \hline
+
+     Mate 20 Lite & nd. & 0,2241 & 0,1811 & 0,2171  \\
+    \hline
+    P30 Pro &  nd. & 0,1458 & 0,1651 & 0,1640 \\
+    \hline
+    Mate 50 Pro & nd. & 0,1478 & 0,1362 & 0,1458 \\
+    \hline
+    
+  \end{tabularx}%
+}
+  \label{tab:render-drop-time-comp}
+\end{table}
+

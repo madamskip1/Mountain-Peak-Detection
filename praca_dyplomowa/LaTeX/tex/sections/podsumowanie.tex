@@ -1,0 +1,61 @@
+\newpage
+
+\section{Podsumowanie}
+
+
+
+
+\subsection{Wykonane prace}
+
+
+W trakcie opracowywania pracy dyplomowej przeprowadzono następujące po sobie etapy tworzenia projektu informatycznego opartego na pracach badawczych i testowaniu algorytmów. Rozpoczęty został od analizy literatury oraz przygotowania teoretycznego. Następnie stworzona została platforma testowa pozwalająca przeprowadzać badania oraz pomiary. Dalszym krokiem były testy różnych metod i algorytmów, na podstawie których wyciągano wnioski i modyfikowano opracowywany proces oraz jego założenia. Na koniec zweryfikowane zostało działanie stworzonego procesu w rzeczywistych warunkach.
+
+Na początku wykonany został przegląd dostępnych i znanych rozwiązań prowadzących do rozpoznawania szczytów górskich na obrazie (rozdz. \ref{sec:literatura}). Na ich podstawie przygotowano wstępny proces zawierający  elementy potrzebne do prawidłowej klasyfikacji widocznych na zdjęciach gór. Opisany został on w rozdziale \ref{section:teoretical_pipeline}. Etapami tego procesu były: generowanie trójwymiarowego modelu ziemi na podstawie numerycznych modeli terenu, ustalenie widocznych na nim szczytów, detekcja krawędzi na  takiej wizualizacji oraz na rzeczywistym zdjęciu gór, a także dopasowanie obu zdjęć binarnych do siebie.
+
+Przed przystąpieniem do implementacji i badania oraz prób optymalizacji poszczególnych etapów procesu identyfikacji szczytów przygotowano zestaw zdjęć statycznych będących zbiorem testowym (rozdz. \ref{sec:zebranie_zdjec}). Do tego celu wykonano prostą aplikację działającą na urządzeniach mobilnych. Podczas wykonywania zdjęć zapisywała ona również dodatkowe dane, w szczególności geolokalizacyjne. Dzięki nim możliwe było statyczne testowanie algorytmów związanych z pracą dyplomową bez konieczności analizy całych nagrań i fizycznego przebywania w regionach górskich. 
+
+
+W rozdziale \ref{section:nmt} opisano czym są numeryczne modele terenu SRTM. Natomiast, opis generowania trójwymiarowego modelu z wykorzystaniem tych danych za pomocą interfejsu OpenGL został zawarty w rozdziale \ref{sec:szczegoly_generowanie_modelu}. Zbiór SRTM występuje w różnych rozdzielczościach, a wybór odpowiedniej ma znaczenie w kontekście dokładności odwzorowania modelu. Porównanie dwóch rozmiarów SRTM oraz ich wpływ na szczegółowość modelu i czas jego generowania przeprowadzono w rozdziale \ref{sec:rozdzielczosc_srtm}. Dodatkowo podjęte zostały próby optymalizacji generowania modelu oraz wykorzystania pamięci urządzenia poprzez odrzucenie niepotrzebnych dla danego zadania wpisów w zbiorze SRTM (rozdz. \ref{sec:niepotrzebne_srtm}). 
+
+Proces ustalania widocznych na wygenerowanym modelu szczytach górskich został oparty na danych pochodzących z serwisu GeoNames. Dane te zostały przybliżone w~rozdziale \ref{section:geonames}. Dla każdej klatki filmu poddawane są ona procesowi filtracji. Opis tego dwuetapowego cyklu zawarty został w rozdziale \ref{sec:widocznosc_model}. Wykorzystuje on techniki usuwania niewidocznych powierzchni w procesie renderingu. Są to kolejno test frustum culling (rozdz. \ref{sec:frustum}) sprawdzający czy dany punkt znajduje się w polu widzenia kamery, a następnie occlusion culling (rozdz. \ref{sec:occlusion}) określający czy jest on zasłaniany przez inne bryły w scenie. 
+
+Jednym z etapów procesu prezentowanego w pracy dyplomowej rozpoznawania szczytów jest rozpoznawanie krawędzi gór. Próby implementacji oraz testowania rozwiązań celem osiągnięcia detekcji wszelkich widocznych pasm górskim doprowadziły do decyzji o~uproszczeniu oczekiwanego rezultatu. Przyjął on formę wykrywania jedynie najwyższych krawędzi gór tworzących linię horyzontalną z niebem. Opisane zostało to w rozdziale \ref{sec:edge_detection_expected}. Z tego powodu ostatecznie wybrany został algorytm Canny (rozdz. \ref{sec:canny}) wspomagany przez metodę wyboru oczekiwanej krawędzi.
+
+Dużo uwagi poświęcono procesowi dopasowania do siebie dwóch obrazów binarnych (rozdz. \ref{sec:dopasowanie}) zawierających krawędzie gór - jednego uzyskanego z analizy wyrenderowanego modelu, natomaist drugiego ze zdjęcia rzeczywistego. Przedstawiono w nim analizę literaturową potencjalnych rozwiązań oraz ich krótki opis. Fragment ten podzielony został na dwa podrozdziały odpowiadające dwóm prezentowanym metodom. Rozdział \ref{sec:template_matching} przybliżył algorytm oparty na dopasowaniu wzorca (ang. template matching), w szczególności sposób obliczania podobieństwa dwóch obrazów przy pomocy korelacji krzyżowej lub współczynnika korelacji. Druga z metod, dopasowanie na podstawie cech charakterystycznych (ang. feature matching) opisana została w rozdziale \ref{sec:feature_matching}. W jej przypadku przybliżone zostały wszystkie kolejne etapy wykonywane przez ten algorytm: wykrywanie punktów kluczowych oraz ich deskryptorów (rozdz. \ref{sec:feature_matching_keypoints}), dopasowanie punktów kluczowych z~obu obrazów (rozdz. \ref{sec:feature_matching_matching}), projekcja położenia punktów kluczowych z wykorzystaniem homografii (rozdz. \ref{sec:feature_matching_homography}).
+
+Ze względu na znaczenie prawidłowego dopasowania obrazów zawierających krawędzie danych gór przeprowadzono obszerne testy i analizy opisanych rozwiązań. Badania te zostały zrelacjonowane w rozdziale \ref{sec:test_matching}. Jednym z testowanych elementów był wpływ operacji morfologicznej dylacji na skuteczność poszczególnych rozwiązań (rozdz. \ref{sec:test_dilation}). Kolejnym etapem tych testów było porównanie ze sobą jakości klasyfikatorów opartych na szablonach oraz cechach charakterystycznych. Szczegółowe wyniki oraz wyciągnięte na ich podstawie wnioski zawarte zostały w rozdziale \ref{sec:test_template_feature}.
+
+Po przeprowadzeniu testów i wyborze optymalnych algorytmów przygotowano całościowy proces potrafiący identyfikować szczyty górskie. Na tak zaimplementowanym cyklu przeprowadzono profilowanie opisane w rozdziale \ref{sec:profilowanie}. Pozwoliło ono zdiagnozować element procesu o kiepskiej wydajności. Udało się go zniwelować poprzez bardziej optymalne pobieranie potrzebnych danych z pamięci oraz wykorzystanie pamięci podręcznej procesora.
+
+
+Finalnie, udało się przebadać i przetestować różne algorytmy oraz wybrać z spośród nich optymalne, które pozwoliły identyfikować szczyty górskie na obrazie w czasie rzeczywistym realizując założony cel pracy magisterskiej. Działanie stworzonego procesu zostało sprawdzone zarówno na statycznych zdjęciach, dla których znane były parametry lokalizacyjne, jak i poprzez analizę obrazu na żywo z kamery urządzenia symulując warunki rzeczywiste (rozdz. \ref{sec:weryfikacja_koncowa}).
+
+
+
+
+
+
+\subsection{Zdobyta wiedza i wyciągnięte wnioski}
+
+Poświęcony czas na pracę dyplomową pozwolił na poszerzenie wiedzy z zakresu analizy literatury, projektowania oraz wytwarzania oprogramowania, a także  przetwarzania cyfrowego obrazów. 
+
+Ze względu na świeżość zagadnienia jakim jest identyfikacja szczytów górskich na zdjęciach, liczba opracowań naukowych jest jeszcze w znacznym stopniu ograniczona. Dostępne źródła pozwoliły jednak zgromadzić wystarczającą wiedzę na temat podejścia do tego problemu oraz poszczególnych jego elementów. Przeanalizowane zostały modyfikacje wprowadzane między różnymi pracami zmieniające możliwości oraz złożoność takich systemów. Finalnie przegląd oraz przyswojony materiał pozwoliły na przygotowanie listy potencjalnych algorytmów oraz stworzenie funkcjonalnego oprogramowania tego typu.
+
+Praca nad projektem pozwoliła ugruntować wiedzę na temat grafiki trójwymiarowej oraz sposobu działania biblioteki OpenGL pozwalającej na jej generowanie. Poznano również techniki optymalizacji procesu renderingu poprzez usuwanie powierzchni niewidocznych. W pracy dyplomowej były wykorzystane do filtrowania niewidocznych wierzchołków modelu odpowiadającym szczytom górskim. Znaczna część pracy magisterskiej poświęcona była zagadnieniu dopasowania obrazów. Dzięki temu poznano techniki rejestracji oraz wyrównywania zdjęć, które pozwalają porównywać ze sobą obrazy za pomocą szablonów (metoda template matching) czy cech charakterystycznych (metoda feature matching). Zapoznano się również z algorytmami obliczającymi odległości między dwoma punktami geograficznymi. 
+
+Mimo, że główną dziedziną niniejszej pracy dyplomowej jest informatyka to w jej ramach poruszane są również zagadnienia związane z geografią czy geoinformatyką. Z~tego względu udało się poszerzyć zasób informacji z nimi powiązanymi. Poznano wiele nazw gór, ich położenie czy wysokość nad poziomem morza, w szczególności występujące w polskich pasmach górskich. Ale również aspekty dotyczące siatki geograficznej oraz jej rozmiarem w zależności od położenia. Poznano także numeryczne zbiory danych dotyczące topograficznej mapy Ziemi oraz graficzne sposoby ich interpretacji. Zapoznano się również z kilkoma metodami pozwalającymi estymować odległość między dwoma punktami geograficznymi.
+
+Zagadnienie rozpoznawania szczytów górskich przy pomocy algorytmów opartych czysto na metodach przetwarzania obrazów pozwala wyciągnąć wnioski, że mimo dynamicznie rozwijającej się gałęzi sztucznej inteligencji do podobnych celów, to niektóre problemy dalej mogą być rozwiązywane podejściem klasycznym. Nawet, jeśli takie podejście może być związane z większą złożonością, w szczególności w aspektach dobierania prawidłowego schematu i algorytmów. Osiągnięta możliwość rozpoznawania szczytów górskich w czasie rzeczywistym na urządzeniach mobilnych pokazuje, że dzisiejsza technologia sprzętowa jest już na wystarczającym poziomie by móc obsłużyć zadania tego typu.
+
+
+
+\subsection{Możliwość rozwoju i dalszych badań}
+
+Opracowany w ramach pracy dyplomowej proces na podstawie przeprowadzonych badań i prób optymalizacji algorytmów pozostawia możliwość dalszego rozwoju oraz usprawnień. Stworzona do celów testowych platforma może być punktem wyjścia do dalszych prac badawczych. Dzięki swojej modułowej architekturze możliwe jest dodatnie kolejnych metod do procesu, wykorzystanie sieci neuronowych czy lepsze dostrojenie parametrów opisanych wyżej algorytmów. Następnie dla takich zmian w łatwy sposób mogą być przeprowadzone testy. Dodatkowe widoki, poszerzające użyteczność platformy testowej pozwalają na żywo sprawdzać wpływ różnych parametrów, na przykład progowania algorytmu Canny, co może pomóc w wyborze optymalnych wartości takich danych i~badać ich znaczenie w zależności od różnych czynników zewnętrznych.
+
+
+Konsekwencją decyzji związanej z detekcją krawędzi gór ograniczającej się jedynie do tych, które tworzą linię z niebem był brak możliwości analizy widoczności szczytów będących poniżej tej granicy. Stworzenie rozwiązania umożliwiającego w skuteczny sposób rozpoznawać pozostałe kontury pozwoliłoby lepiej dopasowywać wzorzec widocznych szczytów oraz analizować też niższe wierzchołki. Dobrym pomysłem mogłoby się okazać wykorzystanie do tego celu sztucznej inteligencji, która w ostatnich latach zyskuje popularność w wielu obszarach przetwarzania cyfrowego obrazu.
+
+Możliwe byłoby również poszerzenie możliwości oprogramowania wykorzystującego opracowany proces tak aby mógł rozpoznawać szczyty górskie jedynie na podstawie lokalizacji, bez potrzeby posiadania informacji o~kątach odchylenia urządzenia. Wiązałoby się to prawdopodobnie z potrzebą generowania panoramy w postaci sfery $360^{\circ}$, dla której poszukiwano by wzorca szczytu widocznego na zdjęciu. Dzięki temu, klasyfikacja gór byłaby również możliwa na zdjęciach opisanych tylko meta-tagiem o geolokalizacji, na przykład udostępnianych w internecie czy mediach społecznościowych.
+
+Dalsze badania i testowanie przedstawionych w powyższych rozdziałach algorytmów, w szczególności różnych ustawień hiperparametrów może prowadzić do poprawienia ich rezultatów oraz końcowego wyniku rozpoznawania szczytów górskich. Warto również zaimplementować inne niż opisane metody, które mogą okazać się lepszymi w danym zastosowaniu. 

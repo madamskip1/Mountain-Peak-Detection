@@ -1,0 +1,37 @@
+\begin{table}[!h]
+  \centering
+  \small
+  \caption{Porównanie skuteczności algorytmów dopasowania obrazów na podstawie szablonu oraz na podstawie cech przy przykładowych ustawieniach parametrów tych metod z wykorzystaniem operacji dylacji oraz bez.}
+\resizebox{\textwidth}{!}{%
+  \begin{tabularx}{\linewidth}{|l|*{8}{>{\centering\arraybackslash}X|}}
+    \hline
+     &
+     \vspace{0.5em}TP & 
+     \vspace{0.5em}TN  & 
+     \vspace{0.5em}FP & 
+     \vspace{0.5em}FN  & 
+     \hspace{0em}\textbf{Dokładność}  &
+     \vspace{0.01ex}\hspace{0em}\textbf{Precyzja}   & 
+     \vspace{0.01ex}\hspace{0em}\textbf{Czułość} &
+     \vspace{0.5em}\textbf{F1} \\
+    \hline
+    \hline
+    \multicolumn{9}{|c|}{Dopasowanie na podstawie szablonu} \\
+    \hline
+    Bez dylacji  & 0 & 179 & 0 & 199 & $47,3\%$ & $0,00\%$ & $0,00\%$ & $0,00\%$ \\
+    \hline
+    Z dylacją &  151 & 145 & 34 & 48 & $78,3\%$ & $81,6\%$ & $75,8\%$ &  $78,6\%$ \\
+    \hline
+    
+    \multicolumn{9}{|c|}{Dopasowanie na podstawie cech} \\
+    \hline
+    Bez dylacji  & 10 & 164 & 22 & 182 & $46,0\%$ & $31,2\%$ & $5,2\%$ & $8,9\%$  \\
+    \hline
+    Z dylacją & 39 & 144 & 71 & 124 & $48,4\%$ & $35,4\%$ & $23,9\%$ & $28,3\%$  \\
+    \hline
+    
+  \end{tabularx}%
+}
+  \label{tab:dilation}
+\end{table}
+

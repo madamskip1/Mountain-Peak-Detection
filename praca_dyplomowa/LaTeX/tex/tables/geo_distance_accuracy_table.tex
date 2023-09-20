@@ -1,0 +1,63 @@
+\begin{table}[!h]  \centering
+\caption{Porównanie dokładności wybranych algorytmów obliczających odległość między dwoma punktami geograficznymi.}
+\resizebox{\textwidth}{!}{%
+\begin{tabular} {| c | c | c | c | c | c |} \hline
+\textbf{Punkty geograficzne} &
+  \textbf{Vincent (1000)} &
+  \textbf{Vincent (100)} &
+  \textbf{Haversian} &
+  \textbf{\begin{tabular}[c]{@{}c@{}}Spherical \\ Law of Cosines\end{tabular}} &
+  \textbf{\begin{tabular}[c]{@{}c@{}}Equirectangular \\ Approximation\end{tabular}} \\
+\hline \hline
+(49.0; 20.0) -\textgreater (50.0; 20.0) &
+  111,21941 km &
+  \begin{tabular}[c]{@{}c@{}}111,21941 km\\ $\Delta=0,00000$ km\\ (0,00000\%)\end{tabular} &
+  \begin{tabular}[c]{@{}c@{}}111,19493 km\\ $\Delta=0,02448$ km\\ (0,02201\%)\end{tabular} &
+  \begin{tabular}[c]{@{}c@{}}111,19497 km\\ $\Delta=0,02444$ km\\ (0,02197\%)\end{tabular} &
+  \begin{tabular}[c]{@{}c@{}}111,19493 km\\ $\Delta=0,02448$ km\\ (0,02201\%)\end{tabular} \\
+\hline
+
+(49.0; 20.0) -\textgreater (49.0; 21.0) &
+  73,17126 km &
+  \begin{tabular}[c]{@{}c@{}}73,17126 km\\ $\Delta=0,00000$ km\\ (0,00000\%)\end{tabular} &
+  \begin{tabular}[c]{@{}c@{}}72,94991 km\\ $\Delta=0,22135$ km\\ (0,30251\%)\end{tabular} &
+  \begin{tabular}[c]{@{}c@{}}72,94991 km\\ $\Delta=0,22135$ km\\ (0,30251\%)\end{tabular} &
+  \begin{tabular}[c]{@{}c@{}}72,95044 km\\ $\Delta=0,22082$ km\\ (0,30179\%)\end{tabular} \\
+\hline
+
+\begin{tabular}[c]{@{}l@{}}(51.509865; -0.118092)\\ -\textgreater (52.237049; 21.017532)\\ Londyn -\textgreater Warszawa\end{tabular} &
+  1452,71785 km &
+  \begin{tabular}[c]{@{}c@{}}1452,71104 km\\ $\Delta=0,00681$ km\\ (0,00047\%)\end{tabular} &
+  \begin{tabular}[c]{@{}c@{}}1448,08846 km\\ $\Delta=4,62939$ km\\ (0,31867\%)\end{tabular} &
+  \begin{tabular}[c]{@{}c@{}}1448,08846 km\\ $\Delta=4,62939$ km\\ (0,31867\%)\end{tabular} &
+  \begin{tabular}[c]{@{}c@{}}1453,24964 km\\ $\Delta=0,53179$ km\\ (0,03661\%)\end{tabular} \\
+\hline
+
+\begin{tabular}[c]{@{}l@{}}(52.237049; 21.017532)\\ -\textgreater (50.049683; 19.944544)\\ Warszawa -\textgreater Kraków\end{tabular} &
+  254,66051  km &
+  \begin{tabular}[c]{@{}c@{}}254,66057 km\\ $\Delta=0,00006$ km\\ (0,00002\%)\end{tabular} &
+  \begin{tabular}[c]{@{}c@{}}254,74374 km\\ $\Delta=0,18677$ km\\ (0,07334\%)\end{tabular} &
+  \begin{tabular}[c]{@{}c@{}}254,47374 km\\ $\Delta=0,18677$ km\\ (0,07334\%)\end{tabular} &
+  \begin{tabular}[c]{@{}c@{}}254,48145 km\\ $\Delta=0,17906$ km\\ (0,07031\%)\end{tabular} \\
+\hline
+
+\begin{tabular}[c]{@{}l@{}}(50.049683; 19.944544)\\ -\textgreater (49.299030; 19.949047)\\ Kraków -\textgreater Zakopane\end{tabular} &
+  83,49035 km &
+  \begin{tabular}[c]{@{}c@{}}83,49035 km\\ $\Delta=0,00000$ km\\ (0,00000\%)\end{tabular} &
+  \begin{tabular}[c]{@{}c@{}}83,46943 km\\ $\Delta=0,02092$ km\\ (0,02506\%)\end{tabular} &
+  \begin{tabular}[c]{@{}c@{}}83,46943 km\\ $\Delta=0,02092$ km\\ (0,02506\%)\end{tabular} &
+  \begin{tabular}[c]{@{}c@{}}83,46943 km\\ $\Delta=0,02092$ km\\ (0,02506\%)\end{tabular} \\
+\hline
+
+\begin{tabular}[c]{@{}l@{}}(49.299030; 19.949047)\\ -\textgreater (49.250332; 19;933662)\\ Zakopane -\textgreater Giewont\end{tabular} &
+  5,53040 km &
+  \begin{tabular}[c]{@{}c@{}}5,53040 km\\ $\Delta=0,00000$ km\\ (0,00000\%)\end{tabular} &
+  \begin{tabular}[c]{@{}c@{}}5,52875 km\\ $\Delta=0,00165$ km\\ (0,02984\%)\end{tabular} &
+  \begin{tabular}[c]{@{}c@{}}5,52875 km\\ $\Delta=0,00165$ km\\ (0,02984\%)\end{tabular} &
+  \begin{tabular}[c]{@{}c@{}}5,52875 km\\ $\Delta=0,00165$ km\\ (0,02984\%)\end{tabular}  \\
+\hline
+
+\end{tabular}%
+}
+\label{tab:geo-distance-accuracy}
+\end{table}

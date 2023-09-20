@@ -1,0 +1,75 @@
+\newpage
+
+\section{Stos technologiczny platformy testowej}
+
+Na potrzeby pracy magisterskiej ustalony został stos technologiczny związany z pracami badawczymi, a także z opracowywaną platformą testową, przy pomocy której testowano implementowane algorytmy cyfrowego przetwarzania obrazów odnoszące się do zagadnienia identyfikacji szczytów górskich na obrazie. Opisano między innymi wybrane biblioteki służące do generowania grafiki trójwymiarowej oraz modyfikowania i~analizowania obrazów. Ponadto, w ramach tego rozdziału zostały określone i opisane sensory urządzeń potrzebne do stworzenia takiego projektu. Wybrano również języki programowania użyte do stworzenia bazy testowej oraz system operacyjny, na który była ona implementowana. 
+
+
+\subsection{OpenGL}
+
+OpenGL (ang. Open Graphics Library) \cite{opengl_home} to interfejs służący do tworzenia i renderowania grafiki - zarówno dwu, jak i trójwymiarowej. Aktualnie standaryzowany przez konsorcjum Khronos Group, zrzeszające największe firmy związane z grafiką komputerową. Biblioteka ta bazuje na niskopoziomowym interfejsie. Dzięki temu możliwe jest osiągnięcie lepszych zależności wydajnościowych.
+
+W swoim działaniu OpenGL wykorzystuje tzw. potok graficzny. Składa się on z kolejnych etapów przetwarzania danych wejściowych - wierzchołków i trójkątów. Na wyjściu potoku wysyłany jest finalny obraz odwzorowujący widoczną scenę po odpowiednich przekształceniach. Poszczególne etapy wykonują takie operacje jak transformacje, skalowanie czy obroty, ale też kolorowanie, nakładanie tekstur, aż do finalnego przetworzenie widocznych punktów na obraz płaski.
+
+
+W projekcie wykorzystywany był podzbiór OpenGL zaprojektowany dla systemów wbudowanych - OpenGL ES (z ang. OpenGL for Embedded Systems) \cite{opengl_es}. Ze względu na~ograniczone zasoby sprzętowe takich systemów, rozszerzenie to koncentruje się na usprawnieniach związanych z wydajnością oraz na umożliwieniu wykonywania obliczeń w czasie rzeczywistym. Z tego powodu pasuje do zagadnienia wykorzystania procesu identyfikacji szczytów góskich przy pomocy urządzeń mobilnych w czasie rzeczywistym. Dodatkowo, używany był również interfejs EGL (z ang. Embedded-System Graphics Library) \cite{egl}. Podobnie jak OpenGL ES, stworzony został z myślą o systemach wbudowanych. Służy on do tworzenia kontekstu graficznego oraz powierzchni renderingu. W projekcie, dzięki niemu, możliwe było generowanie obrazów przy pomocy OpenGL bez konieczności wyświetlania ich na ekranie (tzw. offscreen rendering).
+
+Na wybór OpenGL jako interfejsu do generowania modelu terenu wpływ miała powszechność i popularność tego rozwiązania. Zapewnia on szybkie i stabilne działanie, a~także opisany jest bogatą dokumentacją. Wspierany jest on przez dużą liczbę producentów sprzętu, systemów operacyjnych czy oprogramowania. 
+
+
+\subsection{OpenCV}
+
+Do celów manipulacji obrazami oraz wykonywania na nich obliczeń wybrana została biblioteka OpenCV - (ang. Open Source Computer Vision Library) \cite{opencv_home}. Dostarcza mnogi wybór dobrze udokumentowanych algorytmów przetwarzania cyfrowego obrazu. Dzięki temu, że została stworzona z użyciem języka C/C++, zapewnia wysoką szybkość działania wykorzystując do tego niskopoziomowe mechanizmy. Może być użyta również w~środowiskach opartych o Javę czy Pythona, ponieważ stworzone są dla niej wiązania do~wielu popularnych języków programowania. Dostarcza ona także odpowiednie obiekty przechowujące obraz w pamięci, które w prosty sposób można modyfikować.
+
+Ze względu na to, że jest to powszechnie uznana biblioteka została wytypowana jako główny element pracy magisterskiej związanej z przetwarzaniem obrazu. Ważnym czynnikiem przy tym wyborze był również szeroki wachlarz dostarczanych metod, które mogły zostać wykorzystane w trakcie prac badawczych czy tworzenia platformy testowej. Algorytmy takie często opatrzone są odpowiednimi przypisami bibliograficznymi do artykułów, na podstawie których były implementowane.
+
+\subsection{System operacyjny Android}
+
+Docelowym systemem, na który implementowana była aplikacja testowa na urządzenia mobilne był \textit{Android}. Jest to system opracowany przez firmę Google i systematycznie rozwijany od 2007 roku. Obecnie jest on powszechnie stosowany w wielu urządzeniach mobilnych, ale także innych akcesoriach elektronicznych życia codziennego - np. zegarkach, telewizorach, systemach audio czy nawet lodówkach. Opiera się on na odpowiednio zmodyfikowanym jądrze Linux, co pozwala na wykorzystanie narzędzi oraz bibliotek pierwotnie pisanych z myślą o tym systemie. 
+
+\par
+
+Wybór platformy Android został podyktowany ogromną liczbą urządzeń mobilnych z~tym systemem w skali światowej. Dzięki temu, rozwiązanie bazujące na opracowywanym oraz testowanym w ramach pracy dyplomowym procesie mogłoby dotrzeć do większej liczby potencjalnych odbiorców. Dodatkowo, dostępna jest duża liczba artykułów i dokumentacji związanych z projektowaniem oraz implementacją programów na ten system, co może mieć wpływ na szybsze rozwiązywanie ewentualnych problemów z tworzonym oprogramowaniem testowym. Z tego powodu weryfikacja działania projektowanego w~ramach pracy procesu odbyła się na tej platformie.
+
+\par
+
+Mimo, że eksperymenty przeprowadzane były na projekcie stworzonym na konkretny system operacyjny to możliwe jest, dzięki opracowaniu odpowiednich metod opisanych w pracy dyplomowej, dostosowanie procesu rozpoznawania szczytów górskich na dowolne urządzenie działające pod innym oprogramowaniem systemowym. Warunkiem koniecznym do spełnienia jest dostępność opisanych sensorów i odpowiednich dla nich interfejsów API. 
+
+\subsection{Sensory}
+
+W ramach platformy testowej pracy dyplomowej wykorzystane zostały dostępne w mobilnych urządzeniach sensory. Były to przede wszystkim globalny system pozycjonowania oraz czujnik obrotu.
+
+\paragraph{Globalny System Pozycjonowania (GPS).} GPS to system nawigacyjny wykorzystujący satelity umieszczone na orbicie okołoziemskiej \cite{GPS}. Dzięki określaniu czasu dotarcia emitowanych sygnałów radiowych możliwe jest obliczenie położenia danego urządzenia. System Android udostępnia interfejs umożliwiający pobieranie aktualnych danych o lokalizacji urządzenia w czasie rzeczywistym. Oprócz informacji dotyczących położenia takich jak długość i szerokość geograficzna zwracane są również dodatkowe dane:  wysokość na jakiej znajduje się odbiornik czy prędkość z jaką przemieszcza się urządzenie \cite{android_location}.
+
+\par
+
+Sensor ten może pracować w dwóch trybach: dokładnym i przybliżonym. Na potrzeby pracy dyplomowej został wybrany tryb dokładny, dzięki czemu określane położenia urządzenia są bardziej precyzyjne. Przekłada się to na dopasowywanie map topograficznych z~większą skutecznością.
+
+
+\paragraph{Wektor obrotu.} Kolejnym czujnikiem wykorzystywanym w projekcie jest wektor obrotu. Jest to rodzaj fikcyjnego sensora, który umożliwia określenie orientacji telefonu w trzech wymiarach. Wykorzystuje do swojego działania dwa lub trzy (w zależności od wybranego trybu) czujniki fizyczne: akcelerometr, żyroskop oraz czujnik pola geomagnetycznego. Pozwala on określić kąt odchylenia urządzania wzdłuż trzech osi układu $XYZ$ \cite{android_sensor_training}. Wynikowy kąt zwracany jest w postaci kwaternionu:
+
+\begin{align*}
+\begin{pmatrix}
+    \cos{(\theta/2)} \\ x*\sin{(\theta/2)} \\ y*\sin{(\theta/2)} \\ z*\sin{(\theta/2)}
+\end{pmatrix}
+\end{align*}
+
+Dzięki wykorzystaniu tego czujnika możliwe jest stwierdzenie, w którym kierunku i~pod jakim kątem obserwator ogląda dane pasmo górskie.
+
+\par
+
+Istnieją trzy tryby pracy wektora obrotów:
+\begin{itemize}
+    \item Użycie wszystkich trzech czujników fizycznych. Zwracanym rezultatem jest kąt o~wartości absolutnej względem ziemi.
+    \item Użycie jedynie akcelerometru i żyroskopu. Kąt $Y$ nie wskazuje wartości bezwzględnej, a względną do pewnej wartości referencyjnej. Skutkuje to brakiem informacji o~odchyleniu względem północnego bieguna ziemi.
+    \item Użycie jedynie akcelerometru i czujnika pola geomagnetycznego. Jest to mniej dokładna odmiana pierwszego trybu, zwracająca wartości bezwzględne ziemi.
+\end{itemize}
+
+
+\subsection{Języki programowania}
+
+Wybór odpowiedniego języka programowania jest kluczowym elementem większości projektów związanych z wytwarzaniem oprogramowania. Stworzona w ramach projektu dyplomowego aplikacja na system Android będąca platformą testową została napisana z wykorzystaniem w głównej mierze języka Java, zapewniającego wiele przydatnych bibliotek czy narzędzi. Natomiast do tworzenia interfejsu graficznego wykorzystano język znaczników XML. Służy on~do~opisu struktury, stylizacji, a także rozmieszczenia interfejsu użytkownika. W prosty sposób pozwala na hierarchiczne tworzenie UI (z ang. User Interface). 
+
+\par
+
+Prócz Javy oraz XML, w trakcie prac wykorzystany był również język Python. Jest to język wysokiego poziomu, dzięki czemu pozwala on w szybki sposób prototypować hipotetyczne rozwiązania. Miało to niebagatelny wpływ na testowanie wybranych algorytmów i rozwiązań, ponieważ pozwalało na wstępną ich weryfikację w skróconym czasie. 

@@ -1,0 +1,51 @@
+\begin{table}[!h]
+  \centering
+  \small
+  \caption{Porównanie skuteczności algorytmów dopasowania obrazów na podstawie szablonu oraz na podstawie cech przy dopuszczalnym błędzie $K=0,01$.}
+\resizebox{\textwidth}{!}{%
+  \begin{tabularx}{\linewidth}{|l|*{8}{>{\centering\arraybackslash}X|}}
+    \hline
+    &
+     \vspace{0.5em}TP & 
+     \vspace{0.5em}TN  & 
+     \vspace{0.5em}FP & 
+     \vspace{0.5em}FN  & 
+     \hspace{0em}\textbf{Dokładność}  &
+     \vspace{0.01ex}\hspace{0em}\textbf{Precyzja}   & 
+     \vspace{0.01ex}\hspace{0em}\textbf{Czułość} &
+     \vspace{0.5em}\textbf{F1} \\
+    \hline
+    \hline
+    \multicolumn{9}{|c|}{Ze względu na dokładność} \\
+    \hline
+    {\begin{tabular}[c]{@{}l@{}}Dopasowanie\\szablonu\end{tabular}}  & 129 & 166 & 48 & 35 & $\textbf{78,0\%}$ & $72,9\%$ & $78,7\%$ & $75,7\%$  \\
+    \hline
+     {\begin{tabular}[c]{@{}l@{}}Dopasowanie\\cech\end{tabular}} &  3 & 179 & 0 & 196 & $\textbf{48,1\%}$ & $100,0\%$ & $1,5\%$ &  $3,0\%$ \\
+    \hline
+    
+    \multicolumn{9}{|c|}{Ze względu na precyzję} \\
+    \hline
+    {\begin{tabular}[c]{@{}l@{}}Dopasowanie\\szablonu\end{tabular}}  & 12 & 175 & 0 & 191 & $49,5\%$ & $\textbf{100,0\%}$ & $5,9\%$ & $11,2\%$  \\
+    \hline
+     {\begin{tabular}[c]{@{}l@{}}Dopasowanie\\cech\end{tabular}} & 3 & 179 & 0 & 196 & $48,1\%$ & $\textbf{100,0\%}$ & $1,5\%$ & $3,0\%$  \\
+    \hline
+    
+    \multicolumn{9}{|c|}{Ze względu na czułość} \\
+    \hline
+    {\begin{tabular}[c]{@{}l@{}}Dopasowanie\\szablonu\end{tabular}}  & 129 & 166 & 48 & 35 & $78,0\%$ & $72,9\%$ & $\textbf{78,7\%}$ & $75,7\%$ \\
+    \hline
+     {\begin{tabular}[c]{@{}l@{}}Dopasowanie\\cech\end{tabular}} &  20 & 14 & 334 & 0 & $9,0\%$ & $5,5\%$ & $\textbf{100,0\%}$ &  $10,4\%$ \\
+    \hline
+    
+    \multicolumn{9}{|c|}{Ze względu na F1} \\
+    \hline
+    {\begin{tabular}[c]{@{}l@{}}Dopasowanie\\szablonu\end{tabular}}  & 129 & 166 & 48 & 35 & $70,0\%$ & $72,9\%$ & $78,7\%$ & $\textbf{75,7\%}$  \\
+    \hline
+    {\begin{tabular}[c]{@{}l@{}}Dopasowanie\\cech\end{tabular}} & 34 & 29 & 285 & 30 & $16,7\%$ & $10,7\%$ & $53,1\%$ & $\textbf{17,8\%}$  \\
+    \hline
+    
+  \end{tabularx}%
+}
+  \label{tab:matching_comparision_001}
+\end{table}
+

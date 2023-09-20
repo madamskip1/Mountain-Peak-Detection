@@ -1,0 +1,20 @@
+\begin{table}[!h]
+  \centering
+  \caption{Porównanie czasu generowania wierzchołków i trójkątów w zależności od rozdzielczości danych SRTM.}
+  \begin{tabularx}{\linewidth}{|l|*{3}{>{\centering\arraybackslash}X|}*{3}{>{\centering\arraybackslash}X|}}
+    \hline
+    \begin{tabular}[c]{@{}c@{}} \\ Urządzenie \end{tabular} & \multicolumn{3}{c|}{\begin{tabular}[c]{@{}c@{}}Czas generowania\\ wierzchołków \end{tabular}} & \multicolumn{3}{c|}{\begin{tabular}[c]{@{}c@{}}Czas generowania\\ trójkątów \end{tabular}} \\
+    \cline{2-7}
+      & $1^{\prime\prime}$ & $3^{\prime\prime}$ & $\frac{t_{1^{\prime\prime}}}{t_{3^{\prime\prime}}}$ & $1^{\prime\prime}$ & $3^{\prime\prime}$ & $\frac{t_{1^{\prime\prime}}}{t_{3^{\prime\prime}}}$\\
+    \hline
+    \hline
+    Mate 20 Lite & 0,3576 s & 0,0516 s & 0,1444 & 0,3330 s & 0,0364 s & 0,1095 \\
+    \hline
+    P30 Pro & 0,1794 s & 0,0209 s & 0,1170 & 0,2256 s & 0,0231 s & 0,1026 \\
+    \hline
+    Mate 50 Pro & 0,1197 s & 0,0135 s & 0,1129 & 0,1526 s & 0,0147 s & 0,0969 \\
+    \hline
+  \end{tabularx}
+  \label{tab:render-res-time-comp}
+\end{table}
+

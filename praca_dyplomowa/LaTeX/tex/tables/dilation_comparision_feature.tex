@@ -1,0 +1,56 @@
+\begin{table}[!h]
+  \centering
+
+  \caption{Wpływ operacji morfologicznej dylacji na algorytm dopasowania na podstawie cech.}
+\resizebox{\textwidth}{!}{%
+  \begin{tabularx}{\linewidth}{|l|*{4}{>{\centering\arraybackslash}X|}}
+    \hline
+    &
+     \hspace{0em}\textbf{Dokładność}  & 
+      \textbf{Precyzja}   & 
+      \textbf{Czułość} &
+      \textbf{F1} \\
+    \hline
+    \hline
+    
+    \multicolumn{5}{|c|}{Algorytm siłowy + Progowanie} \\
+    \hline
+    {\begin{tabular}[c]{@{}l@{}}Dylacja na\\ renderze\end{tabular}}  & {\begin{tabular}[c]{@{}c@{}}$44/90$\\ $(48,9\%)$\end{tabular}} & {\begin{tabular}[c]{@{}c@{}}$52/90$\\ $(57,8\%)$\end{tabular}} & {\begin{tabular}[c]{@{}c@{}}$82/90$\\ $(91,1\%)$\end{tabular}} & {\begin{tabular}[c]{@{}c@{}}$64/90$\\ $(71,1\%)$\end{tabular}} \\
+    \hline
+    {\begin{tabular}[c]{@{}l@{}}Dylacja na\\ zdjęciu rzeczywistym\end{tabular}} &  {\begin{tabular}[c]{@{}c@{}}$32/90$\\ $(35,6\%)$\end{tabular}} & {\begin{tabular}[c]{@{}c@{}}$44/90$\\ $(48,9\%)$\end{tabular}} & {\begin{tabular}[c]{@{}c@{}}$68/90$\\ $(75,6\%)$\end{tabular}} &  {\begin{tabular}[c]{@{}c@{}}$44/90$\\ $(48,9\%)$\end{tabular}} \\
+    \hline
+    {\begin{tabular}[c]{@{}l@{}}Dylacja na\\ obu obrazach\end{tabular}} &  {\begin{tabular}[c]{@{}c@{}}$178/234$\\ $(76,1\%)$\end{tabular}} & {\begin{tabular}[c]{@{}c@{}}$196/234$\\ $(83,8\%)$\end{tabular}} & {\begin{tabular}[c]{@{}c@{}}$222/234$\\ $(94,9\%)$\end{tabular}} &  {\begin{tabular}[c]{@{}c@{}}$210/234$\\ $(89,7\%)$\end{tabular}} \\
+    \hline
+
+    \multicolumn{5}{|c|}{Algorytm siłowy + Test współczynników} \\
+    \hline
+    {\begin{tabular}[c]{@{}l@{}}Dylacja na\\ renderze\end{tabular}}  & {\begin{tabular}[c]{@{}c@{}}$176/192$\\ $(91,7\%)$\end{tabular}} & {\begin{tabular}[c]{@{}c@{}}$156/192$\\ $(81,3\%)$\end{tabular}} & {\begin{tabular}[c]{@{}c@{}}$160/192$\\ $(83,3\%)$\end{tabular}} & {\begin{tabular}[c]{@{}c@{}}$152/192$\\ $(79,2\%)$\end{tabular}} \\
+    \hline
+    {\begin{tabular}[c]{@{}l@{}}Dylacja na\\ zdjęciu rzeczywistym\end{tabular}} &  {\begin{tabular}[c]{@{}c@{}}$176/192$\\ $(91,7\%)$\end{tabular}} & {\begin{tabular}[c]{@{}c@{}}$156/192$\\ $(81,3\%)$\end{tabular}} & {\begin{tabular}[c]{@{}c@{}}$160/192$\\ $(83,3\%)$\end{tabular}} &  {\begin{tabular}[c]{@{}c@{}}$152/192$\\ $(79,2\%)$\end{tabular}} \\
+    \hline
+    {\begin{tabular}[c]{@{}l@{}}Dylacja na\\ obu obrazach\end{tabular}} &  {\begin{tabular}[c]{@{}c@{}}$290/384$\\ $(75,5\%)$\end{tabular}} & {\begin{tabular}[c]{@{}c@{}}$348/384$\\ $(90,6\%)$\end{tabular}} & {\begin{tabular}[c]{@{}c@{}}$360/384$\\ $(93,8\%)$\end{tabular}} &  {\begin{tabular}[c]{@{}c@{}}$348/384$\\ $(90,6\%)$\end{tabular}} \\
+    \hline
+
+    \multicolumn{5}{|c|}{FLANN + Progowanie} \\
+    \hline
+    {\begin{tabular}[c]{@{}l@{}}Dylacja na\\ renderze\end{tabular}}  & {\begin{tabular}[c]{@{}c@{}}$40/90$\\ $(44,4\%)$\end{tabular}} & {\begin{tabular}[c]{@{}c@{}}$46/90$\\ $(51,1\%)$\end{tabular}} & {\begin{tabular}[c]{@{}c@{}}$76/90$\\ $(84,4\%)$\end{tabular}} & {\begin{tabular}[c]{@{}c@{}}$54/90$\\ $(60,0\%)$\end{tabular}} \\
+    \hline
+    {\begin{tabular}[c]{@{}l@{}}Dylacja na\\ zdjęciu rzeczywistym\end{tabular}} &  {\begin{tabular}[c]{@{}c@{}}$48/90$\\ $(53,3\%)$\end{tabular}} & {\begin{tabular}[c]{@{}c@{}}$46/90$\\ $(51,1\%)$\end{tabular}} & {\begin{tabular}[c]{@{}c@{}}$72/90$\\ $(80,0\%)$\end{tabular}} &  {\begin{tabular}[c]{@{}c@{}}$48/90$\\ $(53,3\%)$\end{tabular}} \\
+    \hline
+    {\begin{tabular}[c]{@{}l@{}}Dylacja na\\ obu obrazach\end{tabular}} &  {\begin{tabular}[c]{@{}c@{}}$204/258$\\ $(79,1\%)$\end{tabular}} & {\begin{tabular}[c]{@{}c@{}}$212/258$\\ $(82,2\%)$\end{tabular}} & {\begin{tabular}[c]{@{}c@{}}$250/258$\\ $(96,9\%)$\end{tabular}} &  {\begin{tabular}[c]{@{}c@{}}$228/258$\\ $(88,4\%)$\end{tabular}} \\
+    \hline
+
+    \multicolumn{5}{|c|}{FLANN + Test współczynników} \\
+    \hline
+    {\begin{tabular}[c]{@{}l@{}}Dylacja na\\ renderze\end{tabular}}  & {\begin{tabular}[c]{@{}c@{}}$170/192$\\ $(88,5\%)$\end{tabular}} & {\begin{tabular}[c]{@{}c@{}}$156/192$\\ $(81,3\%)$\end{tabular}} & {\begin{tabular}[c]{@{}c@{}}$160/192$\\ $(83,3\%)$\end{tabular}} & {\begin{tabular}[c]{@{}c@{}}$150/192$\\ $(78,1\%)$\end{tabular}} \\
+    \hline
+    {\begin{tabular}[c]{@{}l@{}}Dylacja na\\ zdjęciu rzeczywistym\end{tabular}} &  {\begin{tabular}[c]{@{}c@{}}$160/192$\\ $(83,3\%)$\end{tabular}} & {\begin{tabular}[c]{@{}c@{}}$160/192$\\ $(83,3\%)$\end{tabular}} & {\begin{tabular}[c]{@{}c@{}}$156/192$\\ $(81,3\%)$\end{tabular}} &  {\begin{tabular}[c]{@{}c@{}}$150/192$\\ $(78,1\%)$\end{tabular}} \\
+    \hline
+    {\begin{tabular}[c]{@{}l@{}}Dylacja na\\ obu obrazach\end{tabular}} &  {\begin{tabular}[c]{@{}c@{}}$288/384$\\ $(75,0\%)$\end{tabular}} & {\begin{tabular}[c]{@{}c@{}}$348/384$\\ $(90,6\%)$\end{tabular}} & {\begin{tabular}[c]{@{}c@{}}$364/384$\\ $(94,8\%)$\end{tabular}} &  {\begin{tabular}[c]{@{}c@{}}$348/384$\\ $(90,6\%)$\end{tabular}} \\
+    \hline
+    
+  \end{tabularx}%
+}
+  \label{tab:dilation-comparision-feature}
+\end{table}
+

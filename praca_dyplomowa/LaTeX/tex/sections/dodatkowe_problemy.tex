@@ -1,0 +1,26 @@
+\newpage
+
+\section{Dodatkowe problemy implementacyjne}
+
+
+\subsection{Niedokładność sensorów urządzeń}
+
+Jednym z elementów procesu identyfikacji szczytów górskich na obrazie jest generowanie trójwymiarowego modelu terenu. W stworzonej platformie testowej opiera się on na interfejsie OpenGL i danych NTM. Moduł ten umożliwia kalibrację kamery zgodnie z ustawieniami danego urządzeniami.  Dzięki temu, generowany model może być łatwo porównywany z rzeczywistymi, statycznymi zdjęciami. Możliwe jest również ustawienie obserwatora w dowolnym miejscu, np. zgodnie z danymi dotyczącymi zarejestrowanego wcześniej obrazu z urządzenia mobilnego oraz obserwacja terenu z różnych perspektyw. 
+
+Podczas testów wykorzystujących przygotowany zbiór statycznych zdjęć zauważono, że generowany model na podstawie zapisanych danych, w szczególności kątów obrotu, był w niektórych przypadkach przesunięty o pewną odległość względem zdjęcia rzeczywistego. Wynikało to przeważnie ze wskazań czujnika obrotów. Przesunięcia odpowiadały najczęściej błędom o wielkości $2^\circ-5^\circ$. Dzięki temu, w dalszej pozostałej części testowej pracy dyplomowej założono pewną tolerancję odpowiadającej takim niedokładnościom uzyskiwanych danych.
+
+\subsection{Skalowanie trójwymiarowego modelu terenu}
+
+Testowanie wizualizacji trójwymiarowej wykazało również błędne założenia na~temat skalowania terenu. Wstępnie wykorzystywane były ogólnie przyjęte przybliżenia jednej jednostki szerokości oraz długości geograficznej. Wygenerowana w ten sposób panorama terenów Tatr była rozciągnięta w poziomie względem tego co widoczne na~odpowiadających zdjęciach.
+
+Na podstawie analizy tego problemu stwierdzono, że problem wynika ze zbyt dużej powierzchni generowanej na podstawie jednej kratki danych względem terenu rzeczywistego. Związane to jest z kształtem Ziemi, a w szczególności z rozłożenia siatki geograficznej. Wraz ze zbliżaniem się do jednego z biegunów maleje odległość między kolejnymi wartościami długości geograficznej. Przy równiku odległość ta wynosi około $111$ km, natomiast przy biegunie już tylko $2$ km. W Polsce, przykładowo w okolicach Tatr długość ta ma wartość około $73$ km, a nad morzem $65$ km. Natomiast liczba danych w~jednym kwadracie SRTM się nie zmienia. Z tego powodu skalowanie (odległość między kolejnymi wartościami) powinno być różne w zależności od położenia geograficznego miejsca, dla którego generowany jest teren. 
+
+W konsekwencji wykorzystane zostały metody obliczania odległości między dwoma punktami geograficznymi, celem estymowania przybliżonej skali terenu. Pozwoliło to na wyeliminowanie efektu rozciągnięcia panoramy, dzięki czemu była ona bardziej zbliżona do rzeczywistego widoku.
+
+\subsection{Migotanie wskazań lokalizacji widocznych szczytów}
+
+W trakcie weryfikacji końcowej przetestowane zostało działanie całego procesu rozpoznawania szczytów górskich. Odbyło się to w okolicach Zakopanego oraz Bukowiny Tatrzańskiej. Testy polegały na sprawdzeniu czy potencjalne oprogramowanie wykorzystujące wyniki niniejszej pracy dyplomowej jest w stanie rozpoznawać widoczne oraz odrzucać zasłonięte szczyty na obrazie pobieranym na żywo z kamery, a także jej zdolności do działania w czasie rzeczywistym. 
+
+Badania wykazały wrażliwość projektu na różnego typu drgania czy wpływ wiatru, a~także zmiany w odbieranej jasności w danych punktach. Skutkowało to wahaniami wykrywanych krawędzi gór. Objawiało się to niekontrolowanym przesuwaniem się oznaczeń na zdjęciu. Było to pewnego rodzaju migotanie. Spowodowało to konieczność zaimplementowania mechanizmu tłumienia tych drgań, ograniczającego ruchy etykiet na obrazie. 
+
+Mechanizm ten został opracowany z wykorzystaniem okna analizy pewnej liczby klatek wstecz. Zapamiętywał on ostatnie obliczone położenia danego szczytu i na ich podstawie określał najbardziej prawdopodobną lokalizację góry. Jednocześnie odrzucał wartości brzegowe mogące być wynikiem błędów algorytmów, chwilowych zmian widoczności, różnego typu szumów czy niedoskonałościom odbieranego obrazu. Skutkiem wymienionych zmian może być mniej dokładne etykietowanie w danym momencie ze względu na uśrednianie położenia, lecz dzięki nim zmniejszono wpływ migotania będącego nieprzyjemnym efektem dla użytkownika i utrudniającym mu odbiór wyników aplikacji. 
